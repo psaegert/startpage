@@ -1,7 +1,75 @@
 $( document ).ready(function() {
 
+    function startTime() {
+        var today = new Date();
+        var mt = today.getMonth();
+        var d = today.getDate();
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        h = checkTime(h);
+        m = checkTime(m);
+        s = checkTime(s);
+        if(done){
+            $(".hour").html(h)
+            $(".minute").html(":" + m)
+            $(".second").html(":" + s)
+            $(".date").html(d)
+            $(".month").html(monthToStr(mt))
+            var t = setTimeout(startTime, 500);
+        } else {
+            $(".hour").html(checkTime(Math.floor(($(".time").width() / $(document).width()) * (24))))
+            $(".minute").html(":" + checkTime(Math.floor((($(".time").width() / $(document).width()) * (24) - Math.floor(($(".time").width() / $(document).width()) * (24))) * 60)));
+            $(".second").html(":" + s)
+            $(".month").html(monthToStr(mt))
+            $(".date").html(d)
+            var t = setTimeout(startTime, 10);
+        }
+      }
+      function checkTime(i) {
+        if (i < 10) {i = "0" + i};
+        return i;
+      }
+
+    function monthToStr(mt){
+        switch(mt +1){
+            case 1: return "JAN";
+            case 2: return "FEB";
+            case 3: return "MAR";
+            case 4: return "APR";
+            case 5: return "MAY";
+            case 6: return "JUN";
+            case 7: return "JUL";
+            case 8: return "AUG";
+            case 9: return "SEP";
+            case 10: return "OCT";
+            case 11: return "NOV";
+            case 12: return "DEC";
+        }
+    }
+
+    var done = false;
+    startTime();
+    var progress = 0;
+
     setTimeout(function(){
-        document.getElementsByClassName("bar_ini")[0].className = "bar";
+        $(".bar_ini").addClass("bar");
+        $(".bar_ini").removeClass("bar_ini");
+        setTimeout(function(){
+            progress = ((new Date().getHours() * 3600) + (new Date().getMinutes()) * 60 + (new Date().getSeconds())) / (24 * 3600) * $( document ).width();
+            $(".time").css("width", progress + "px")
+            $(".clock .hour").css("opacity", 1);
+            $(".clock .minute").css("opacity", 1);
+            if($(document).width() - progress > $(".clock").width()){
+                $(".clock").css("left", progress + "px");
+            } else {
+                $(".clock").css("left", $(document).width() - $(".clock").width() - 10 + "px");
+            }
+            setTimeout(function(){
+                done = true;
+                $(".second").css("opacity", 1);
+            }, 2000);
+        }, 800);
     }, 150);
 
     var exit = false, engine_index = 0, engines = ["Google", "Youtube"];
@@ -98,8 +166,8 @@ $( document ).ready(function() {
                     case "orange2": url = "https://www.reddit.com/"; break;
                 }
                 window.location = url;
-            }, 700)
-        }, 450)
+            }, 600)
+        }, 350)
     }
 
     function hoverIn(color){
