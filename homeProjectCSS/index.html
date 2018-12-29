@@ -6,87 +6,9 @@
         <script src="jquery.js"></script>
         <link rel="icon" href="./img/google4.ico">
         <link rel="stylesheet" href="style.css">
+        <script src="script.js"></script>
     
-        <script>
-            $( document ).ready(function() {
-                document.getElementsByClassName("bar_ini")[0].className = "bar";
-
-                
-                $(".red").hover(function(){
-                    $("#yt-b").addClass("preview-active");
-                    $("#yt-b .small-bar").addClass("small-bar-active");
-                    $("#yt .container-color-cover .cover").addClass("cover-active");
-                    $("#yt .container-color .outer-rect").addClass("outer-rect-active");
-                    $("#yt .container-white .inner-rect").addClass("inner-rect-active");
-                }, function(){
-                    $("#yt-b").removeClass("preview-active");
-                    $("#yt-b .small-bar").removeClass("small-bar-active");
-                    $("#yt .container-color-cover .cover").removeClass("cover-active");
-                    $("#yt .container-color .outer-rect").removeClass("outer-rect-active");
-                    $("#yt .container-white .inner-rect").removeClass("inner-rect-active");
-                });
-
-                $(".orange").hover(function(){
-                    $("#sc-b").addClass("preview-active");
-                    $("#sc-b .small-bar").addClass("small-bar-active");
-                    $("#sc .container-color-cover .cover").addClass("cover-active");
-                    $("#sc .container-color .outer-rect").addClass("outer-rect-active");
-                    $("#sc .container-white .inner-rect").addClass("inner-rect-active");
-                }, function(){
-                    $("#sc-b").removeClass("preview-active");
-                    $("#sc-b .small-bar").removeClass("small-bar-active");
-                    $("#sc .container-color-cover .cover").removeClass("cover-active");
-                    $("#sc .container-color .outer-rect").removeClass("outer-rect-active");
-                    $("#sc .container-white .inner-rect").removeClass("inner-rect-active");
-                });
-
-                $(".blue").hover(function(){
-                    $("#tv-b").addClass("preview-active");
-                    $("#tv-b .small-bar").addClass("small-bar-active");
-                    $("#tv .container-color-cover .cover").addClass("cover-active");
-                    $("#tv .container-color .outer-rect").addClass("outer-rect-active");
-                    $("#tv .container-white .inner-rect").addClass("inner-rect-active");
-                }, function(){
-                    $("#tv-b").removeClass("preview-active");
-                    $("#tv-b .small-bar").removeClass("small-bar-active");
-                    $("#tv .container-color-cover .cover").removeClass("cover-active");
-                    $("#tv .container-color .outer-rect").removeClass("outer-rect-active");
-                    $("#tv .container-white .inner-rect").removeClass("inner-rect-active");
-                });
-
-                $(".purple").hover(function(){
-                    $("#tw-b").addClass("preview-active");
-                    $("#tw-b .small-bar").addClass("small-bar-active");
-                    $("#tw .container-color-cover .cover").addClass("cover-active");
-                    $("#tw .container-color .outer-rect").addClass("outer-rect-active");
-                    $("#tw .container-white .inner-rect").addClass("inner-rect-active");
-                }, function(){
-                    $("#tw-b").removeClass("preview-active");
-                    $("#tw-b .small-bar").removeClass("small-bar-active");
-                    $("#tw .container-color-cover .cover").removeClass("cover-active");
-                    $("#tw .container-color .outer-rect").removeClass("outer-rect-active");
-                    $("#tw .container-white .inner-rect").removeClass("inner-rect-active");
-                });
-
-                $(".orange2").hover(function(){
-                    $("#g-b").addClass("preview-active");
-                    $("#g-b .small-bar").addClass("small-bar-active");
-                    $("#g .container-color-cover .cover").addClass("cover-active");
-                    $("#g .container-color .outer-rect").addClass("outer-rect-active");
-                    $("#g .container-white .inner-rect").addClass("inner-rect-active");
-                }, function(){
-                    $("#g-b").removeClass("preview-active");
-                    $("#g-b .small-bar").removeClass("small-bar-active");
-                    $("#g .container-color-cover .cover").removeClass("cover-active");
-                    $("#g .container-color .outer-rect").removeClass("outer-rect-active");
-                    $("#g .container-white .inner-rect").removeClass("inner-rect-active");
-                });
-                
-            });
-
-        </script>
     </head>
-
 
     <body>
 
@@ -104,7 +26,7 @@
 
             <div class="input">
 
-                <input id = "input" spellcheck="false" placeholder="Search Google" autofocus>    
+                <input id = "input" spellcheck="false" placeholder="Search Google" autofocus class="border-Google">    
 
             </div>
 
@@ -191,7 +113,6 @@
 
         <div class="overlay">
 
-
             <div id ="white"  class="preview-big">
                 <img src="./img/white.png">
             </div>
@@ -219,6 +140,11 @@
             <div id="g-b" class="preview-big">
                 <div class="small-bar orange2"></div>
                 <img src="./img/redditB.png">
+            </div>
+
+            <div class="slider">
+                <div class="triangle-colored"></div>
+                <div class="triangle-white"></div>
             </div>
     
 
