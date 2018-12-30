@@ -120,26 +120,26 @@ body {
 }
 
 #input {
-    left:-172.5px;
-    position: absolute;
-    font-family: GothamRoundedLight;
-    outline: none;
-    z-index: 50;
-    white-space: nowrap;
-    width: 345px;
-    box-sizing: border-box;
-    height: 50px;
-    background-color: #e3e3e3;
-    border: none;
-    font-size: 13pt;
-    float: left;
-    color: #333c47;
-    padding-left: 45px;
-    border-radius: 5px;
-    text-decoration: none;
+  left:-172.5px;
+  position: absolute;
+  font-family: GothamRoundedLight;
+  outline: none;
+  z-index: 50;
+  white-space: nowrap;
+  width: 345px;
+  box-sizing: border-box;
+  height: 50px;
+  background-color: #e3e3e3;
+  border: none;
+  font-size: 13pt;
+  float: left;
+  color: #333c47;
+  padding-left: 45px;
+  border-radius: 5px;
+  text-decoration: none;
 
-    transition: background-color .55s ease;
-    will-change: background-color;
+  transition: background-color .55s ease;
+  will-change: background-color;
 }
 
 #input:hover{
@@ -178,6 +178,7 @@ body {
 }
 
 .clock{
+  text-shadow: 2px 2px rgb(220, 220, 220);
   z-index: 10;
   left: 0;
   margin-top: 5px;
@@ -206,12 +207,14 @@ body {
   font-family: GothamBold;
   font-weight: 1000;
   transition: opacity 0.7s cubic-bezier(0.7, 0, 0.2, 1);
+  will-change: opacity;
 }
 
 .clock .second{
   font-family: GothamRoundedLight;
   opacity: 0;
   transition: 0.7s opacity ease-in-out;
+  will-change: opacity;
 }
 
 .date{
@@ -264,6 +267,7 @@ body {
   image-rendering: pixelated;
   opacity: 0;
   transition: opacity .3s ease;
+  will-change: opacity;
 }
 
 .preview-small-img-active{
@@ -291,23 +295,59 @@ body {
   top: -300%;
   z-index: 6;
   transition: 0.2s opacity ease;
+  will-change: opacity;
 }
 
+
 .outer-rect{
+  box-sizing:border-box;
+  box-shadow: 3px 3px 1px 0px rgb(220, 220, 220);
   z-index: 0;
   margin: auto auto;
   width: 88%;
   height: 88%;
   transition: 0.2s ease;
+  will-change: transform;
 }
+
+.container-color .outer-rect{
+  opacity: 0;
+  border-style: solid;
+  border-width: 1px;
+  transition: 0.2s ease;
+}
+
+.outer-rect-active{
+  transform: scale(1.07954, 1.13636);
+  opacity: 1 !important;
+}
+
+
+.inner-rect{
+  box-sizing:border-box;
+  box-shadow: 3px 3px 1px 0px rgb(220, 220, 220);
+  z-index: 1;
+  margin: auto auto;
+  width: 88%;
+  height: 88%;
+  border-style: solid;
+  border-width: 1px;
+  transition: 0.2s ease;
+  will-change: opacity, transform;
+}
+
+.inner-rect-active{
+  transform: scale(1.0375, 1.060227);
+}
+
 
 .cover-container-centered{
   z-index: 7;
+  box-shadow: 3px 3px 1px 0px lightgrey;
   margin: auto auto;
   opacity: 1;
   width: 88%;
   height: 88%;
-  transition: 0.3s ease;
 }
 
 .cover{
@@ -322,35 +362,6 @@ body {
 
 .cover-active{
   transform: translateY(100%) skewY(-30deg);
-}
-
-.container-color .outer-rect{
-  opacity: 0;
-  border-style: solid;
-  border-width: 1px;
-  transition: 0.2s ease;
-}
-
-.outer-rect-active{
-  width: 95% !important;
-  height: 100% !important;
-  opacity: 1 !important;
-}
-
-
-.inner-rect{
-  z-index: 1;
-  margin: auto auto;
-  width: 88%;
-  height: 88%;
-  border-style: solid;
-  border-width: 1px;
-  transition: 0.2s ease;
-}
-
-.inner-rect-active{
-  width: 91.3% !important;
-  height: 93.3% !important;
 }
 
 
@@ -430,6 +441,7 @@ body {
   top: 60%;
   width: 100%;
   transition: 0.3s ease;
+  will-change: top;
 }
 
 @media only screen and (max-height: 800px) {
@@ -455,6 +467,7 @@ body {
   opacity: 1;
   z-index: 100 !important;
   transition: 0.6s cubic-bezier(1, 0, 0.4, 0.4) !important;
+  will-change: top;
 }
 
 .preview-active-exit img{
@@ -472,11 +485,13 @@ body {
   top: 30px;
   image-rendering: pixelated;
   transition: 0.3s ease;
+  will-change: opacity;
 }
 
 .fade-out{
   opacity: 0;
   transition: 0.5s cubic-bezier(1, 0, 0.7, 1) !important;
+  will-change: opacity;
 }
 
 .preview-active img{
@@ -484,25 +499,29 @@ body {
   opacity: 0.3;
 }
 
+
 #white img{
   filter: brightness(0.941);
   opacity: 0;
+  will-change: opacity;
 }
 
 .small-bar{
   height: 1px;
-  width: 0px;
+  width: 100%;
   margin: 0 auto;
   top: -1px;
+  transform: scaleX(0);
   transition: 0.3s ease-out;
+  will-change: transform;
 }
 
 .small-bar-active{
-  width: 100%;
+  transform: scaleX(1);
 }
 
 .small-bar-active-exit{
-  width: 100% !important;
+  transform: scaleX(1) !important;
 }
 
 .slider{
@@ -527,8 +546,9 @@ body {
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid rgb(255, 160, 160);
-  left: -3717px;
-  transition: 0.6s left cubic-bezier(0.3, 0, 0.55, 1);
+  transform: translateX(-3717px);
+  transition: 0.6s transform cubic-bezier(0.3, 0, 0.55, 1);
+  will-change: transform;
 }
 
 .triangle-white{
@@ -536,50 +556,52 @@ body {
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid white;
-  left: -3717px;
+  transform: translateX(-3717px);
   transition: 0.6s cubic-bezier(0.45, 0, 0.7, 1);
+  will-change: transform;
 }
+
 
 .yt-triangle-colored-exit{
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid rgb(255, 160, 160);
-  left: 0;
+  transform: translateX(0);
 }
 
 .sc-triangle-colored-exit{
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid rgb(255, 200, 160);
-  left: 0;
+  transform: translateX(0);
 }
 
 .tv-triangle-colored-exit{
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid rgb(160, 160, 255);
-  left: 0;
+  transform: translateX(0);
 }
 
 .tw-triangle-colored-exit{
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid rgb(220, 160, 255);
-  left: 0;
+  transform: translateX(0);
 }
 
 .g-triangle-colored-exit{
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid rgb(255, 180, 140);
-  left: 0;
+  transform: translateX(0);
 }
 
 .triangle-white-exit{
   border-left: 0 solid transparent;
   border-right: 3717px solid transparent;
   border-bottom: 2100px solid white;
-  left: 0;
+  transform: translateX(0);
 }
 
 .display{
@@ -601,6 +623,7 @@ body {
 }
 
 .text-container{
+  text-shadow: 2px 2px rgb(200, 200, 200);
   overflow: visible;
   position:absolute;
   top: 26vw;
@@ -631,11 +654,14 @@ body {
 }
 
 .text-underline{
+  box-shadow: 2px 2px rgb(210, 210, 210);
   height:1px;
-  width: 0;
+  width: 100%;
+  transform-origin:left;
+  transform: scaleX(0);
   opacity: 0;
   background-color: rgb(50, 50, 50);
-  will-change: width, opacity;
+  will-change: transform, opacity;
   transition: 0.2s cubic-bezier(0, 0.26, 0.32, 0.99);
 }
 
@@ -645,12 +671,14 @@ body {
 }
 
 .text-underline-active{
-  width: 100%;
+  transform: scaleX(1);
   opacity: 1;
 }
 
 .text-box{
   position:absolute;
+  padding-bottom: 5px;
+  padding-right: 5px;
 }
 
 .weather-container{
@@ -659,9 +687,12 @@ body {
   color: rgb(230, 230, 230);
   position: absolute;
   top: 0;
+  opacity: 0;
   left: 25%;
   height: 50px;
   font-family: GothamRoundedLight;
+  will-change: opacity;
+  transition: 2s opacity ease;
 }
 
 .weather-description{

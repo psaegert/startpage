@@ -3,7 +3,8 @@ $( document ).ready(function() {
    
 
     function updateTimeDisplay(h, m, s){
-        if(done){progress = (h * 3600 + m * 60) / (24 * 36);
+        if(done){
+            progress = (h * 3600 + m * 60) / (24 * 36);
             $(".time").css("transform", "translateX(" + progress + "%)")
             
             if($(document).width() * (100- progress) / 100 > 80){
@@ -220,6 +221,9 @@ $( document ).ready(function() {
     setTimeout(function(){
         $(".bar_ini").addClass("bar");
         $(".bar_ini").removeClass("bar_ini");
+        setTimeout(function(){
+            $(".weather-container").css("opacity", 1);
+        }, 1000);
         setTimeout(function(){
             progress = ((new Date().getHours() * 3600) + (new Date().getMinutes()) * 60 + (new Date().getSeconds())) / (24 * 36);
             $(".time").css("transform", "translateX(" + progress + "%)")
