@@ -4,8 +4,10 @@
     <head>
         <title>Home</title>
         <script src="jquery.js"></script>
+        <script src="p5.min.js"></script>
         <link rel="icon" href="./img/google4.ico">
         <link rel="stylesheet" href="style.css">
+        <script src="sketch.js"></script>
         <script src="script.js"></script>
 
         <link rel="prefetch" href="https://www.youtube.com">
@@ -24,9 +26,7 @@
 
         <div class="header">
 
-            <div class="bar_ini">
-
-            </div>
+            <div class="bar_ini"></div>
 
             <div class="top_left_icon">
                 <a href="https://www.youtube.com/channel/UC7tD6Ifrwbiy-BoaAHEinmQ">
@@ -34,10 +34,13 @@
                 </a>
             </div>
 
+            <div class="weather-container">
+                <p class="weather-description">Dark</p>
+                <p class="weather-degrees">13.3 C</p>
+            </div>
+
             <div class="input">
-
                 <input id = "input" spellcheck="false" placeholder="Search Google" autofocus class="border-Google">    
-
             </div>
 
             <div class="top_right_icon">
@@ -45,9 +48,9 @@
                 <span class="month">MM</span>
             </div>
 
-            <div class="time">
 
-            </div>
+            <div class="time"></div>
+
 
             <div class="clock">
                 <span class="hour">HH:</span><span class="minute">MM:</span><span class="second">SS</span>
@@ -68,7 +71,9 @@
                     <div class="outer-rect red"></div>
                 </div>
                 <div class="shadow-container container-color-cover">
-                    <div class="cover red"></div>
+                    <div class="cover-container-centered">
+                        <div class="cover red"></div>
+                    </div>
                 </div>
             </div>
             <div id ="sc" class="preview-small">
@@ -82,7 +87,9 @@
                     <div class="outer-rect orange"></div>
                 </div>
                 <div class="shadow-container container-color-cover">
-                    <div class="cover orange"></div>
+                    <div class="cover-container-centered">
+                        <div class="cover orange"></div>
+                    </div>
                 </div>
             </div>
             <div id ="tv" class="preview-small">
@@ -96,7 +103,9 @@
                     <div class="outer-rect blue"></div>
                 </div>
                 <div class="shadow-container container-color-cover">
-                    <div class="cover blue"></div>
+                    <div class="cover-container-centered">
+                        <div class="cover blue"></div>
+                    </div>
                 </div>
             </div>
             <div id ="tw" class="preview-small">
@@ -110,7 +119,9 @@
                     <div class="outer-rect purple"></div>
                 </div>
                 <div class="shadow-container container-color-cover">
-                    <div class="cover purple"></div>
+                    <div class="cover-container-centered">
+                        <div class="cover purple"></div>
+                    </div>
                 </div>
             </div>
             <div id ="g" class="preview-small">
@@ -124,10 +135,35 @@
                     <div class="outer-rect orange2"></div>
                 </div>
                 <div class="shadow-container container-color-cover">
-                    <div class="cover orange2"></div>
+                    <div class="cover-container-centered">
+                        <div class="cover orange2"></div>
+                    </div>
                 </div>
             </div>
 
+        </div>
+
+        <div class="text-container">
+            <div id="yt-text" class="text-box">
+                <span class="text-site">YouTube</span>
+                <div class="text-underline"></div>
+            </div>
+            <div id="sc-text" class="text-box">
+                <span class="text-site">Soundcloud</span>
+                <div class="text-underline"></div>
+            </div>
+            <div id="tv-text" class="text-box">
+                <span class="text-site">TV</span>
+                <div class="text-underline"></div>
+            </div>
+            <div id="tw-text" class="text-box">
+                <span class="text-site">Twitch</span>
+                <div class="text-underline"></div>
+            </div>
+            <div id="g-text" class="text-box">
+                <span class="text-site">Reddit</span>
+                <div class="text-underline"></div>
+            </div>
         </div>
 
         <div class="overlay">
