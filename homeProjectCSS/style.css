@@ -64,6 +64,7 @@ body {
 
 .top_right_icon{
   position:absolute;
+  cursor: pointer;
   width: 75px;
   height: 75px;
   right: 50px;
@@ -173,7 +174,7 @@ body {
   width: 100%;
   transform: translateX(0%);
   background-color: rgb(230, 230, 230);
-  transition: 2.5s transform cubic-bezier(0.65, 0, 0.1, 1);
+  transition: 2.5s transform cubic-bezier(0.6, 0, 0.1, 1); 
   will-change: transform;
 }
 
@@ -186,7 +187,7 @@ body {
   width:100%;
   position: absolute;
   overflow: visible;
-  transition: transform 2.5s cubic-bezier(0.65, 0, 0.1, 1);
+  transition: transform 2.5s cubic-bezier(0.6, 0, 0.1, 1);
   will-change: transform;
 }
 
@@ -689,7 +690,7 @@ body {
   top: 0;
   opacity: 0;
   left: 25%;
-  height: 50px;
+  height: 128px;
   font-family: GothamRoundedLight;
   will-change: opacity;
   transition: 2s opacity ease;
@@ -708,4 +709,50 @@ body {
   color: rgb(230, 230, 230);
   font-size: 12pt;
 }
+#weather-icons{
+  position: absolute;;
+  width: 100%;
+  height:100%;
+}
 
+
+
+
+.item-list{
+  list-style:none;
+  margin:0px;
+  margin-top:7px;
+  padding-left:10px;
+  padding-right:10px;
+  padding-bottom:7px;
+  color: #333333;
+  
+}
+
+.dropdown{
+  z-index: 10;
+  display:none;
+  position:fixed;
+  border:1px solid #B2B2B2;
+  width:150px;     
+  background: rgb(240, 240, 240);
+  box-shadow: 3px 3px 1px 0px rgba(0, 0, 0, 0.05);
+  border-radius:5px;
+}
+
+.yt-dropdown{
+  display:none;
+}
+
+li{
+  padding: 7px;
+  padding-left: 10px;
+  font-size: 10pt;
+  font-family: GothamRoundedLight;
+  border-radius:3px;
+}
+
+.item-list li:hover{
+  color: white;
+  background:#343d46;
+}

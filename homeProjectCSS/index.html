@@ -3,12 +3,12 @@
 <html>
     <head>
         <title>Home</title>
-        <script src="jquery.js"></script>
-        <script src="p5.min.js"></script>
+        <script type='text/javascript' src="jquery.js"></script>
+        <script type='text/javascript' src="p5.min.js"></script>
         <link rel="icon" href="./img/google4.ico">
         <link rel="stylesheet" href="style.css">
-        <script src="sketch.js"></script>
-        <script src="script.js"></script>
+        <script type='text/javascript' src="script.js"></script>
+        <script type='text/javascript' src="sketch.js"></script>
 
         <link rel="prefetch" href="https://www.youtube.com">
         <link rel="prefetch" href="https://www.youtube.com/channel/UC7tD6Ifrwbiy-BoaAHEinmQ">
@@ -34,7 +34,8 @@
                 </a>
             </div>
 
-            <div class="weather-container">
+            <div class="weather-container"><!---
+                <div id="weather-icons"></div>-->
                 <p class="weather-description"></p>
                 <p class="weather-degrees"></p>
             </div>
@@ -75,6 +76,14 @@
                         <div class="cover red"></div>
                     </div>
                 </div>
+
+                <div class='dropdown'>
+                    <ul class='item-list'>
+                        <li id="yts">Subscriptions</li>
+                        <li id="ttt">TTT</li>
+                        <li id="hds">HDSoundI</li>  
+                    </ul>
+                </div>
             </div>
             <div id ="sc" class="preview-small">
                 <div class="image-container">
@@ -90,6 +99,13 @@
                     <div class="cover-container-centered">
                         <div class="cover orange"></div>
                     </div>
+                </div>
+
+                <div class='dropdown'>
+                    <ul class='item-list'>
+                        <li id="scl">Likes</li>
+                        <li id="sch">History</li>  
+                    </ul>
                 </div>
             </div>
             <div id ="tv" class="preview-small">
@@ -107,6 +123,14 @@
                         <div class="cover blue"></div>
                     </div>
                 </div>
+
+                <div class='dropdown'>
+                    <ul class='item-list'>
+                        <li id="tv22">22:00</li>
+                        <li id="tvt">Tomorrow, 20:15</li>
+                        <li id="tvf">Friday, 20:15</li>  
+                    </ul>
+                </div>
             </div>
             <div id ="tw" class="preview-small">
                 <div class="image-container">
@@ -123,6 +147,14 @@
                         <div class="cover purple"></div>
                     </div>
                 </div>
+
+                <div class='dropdown'>
+                    <ul class='item-list'>
+                        <li id="nb3">Nightblue3</li>
+                        <li id="nasa">NASA</li>
+                        <li id="shr">Shroud</li>  
+                    </ul>
+                </div>
             </div>
             <div id ="g" class="preview-small">
                 <div class="image-container">
@@ -138,6 +170,13 @@
                     <div class="cover-container-centered">
                         <div class="cover orange2"></div>
                     </div>
+                </div>
+
+                <div class='dropdown'>
+                    <ul class='item-list'>
+                        <li id="prf">Profile</li>
+                        <li id="rall">r/all</li> 
+                    </ul>
                 </div>
             </div>
 
@@ -204,6 +243,11 @@
     
 
         </div>
+        <!----
+        <script src="react.development.js"></script>
+        <script src="react-dom.js"></script>
+        <script src="weather-icons.js"></script>
+        -->
     
     </body>
 

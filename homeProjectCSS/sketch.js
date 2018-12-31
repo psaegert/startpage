@@ -1,24 +1,15 @@
-function getWeather(lat, lon) {
-    $.ajax({
-        url: "https://api.darksky.net/forecast//" + lat + "," + lon,
-        dataType: "jsonp",
-        success: function(data) {
-            weather.temp = ((data.currently.temperature.toFixed(2) - 32) * 5 / 9).toFixed(1);;
-            weather.icon = data.currently.icon.toUpperCase();
-            weather.descr = data.currently.summary;
-
-            weather.hum = data.currently.humidity;
-            weather.clcover = data.currently.cloudCover;
-            weather.uv = data.currently.uvIndex / 11;
-            data.currently.uvIndex / 11;
-        }
-    });
-}
+Math.easeInOutQuad = function (t, b, c, d) {
+	t /= d/2;
+	if (t < 1) return c/2*t*t + b;
+	t--;
+	return -c/2 * (t*(t-2) - 1) + b;
+};
 
 function displayWeather(){
-    let center = {x: 40, y: 53};
+    let center = {x: 35, y: 54};
     colors = {sun: color(255, 225, 160),
         white: color(240, 240, 240),
+        fog: color(240, 240, 240, 70),
         cloud: color(180, 180, 180),
         rain: color(180, 180, 180),
         hum: color(141, 228, 239),
@@ -26,7 +17,7 @@ function displayWeather(){
         clcover: color(165, 165, 165),
         uv: color(198, 160, 219),
         darkcloud: color(110, 110, 110),
-        grey: color(240, 240, 240, 70),
+        grey: color(240, 240, 240, Math.easeInOutQuad(framePercentage(40, 60), 0, 1, 1)*70),
         blue: color(52, 61, 70, 255)
     };
 
@@ -83,18 +74,15 @@ function displayWeather(){
             });
             break;
         case "SNOW":
-            if(!snowing){
-                snowing = true;
-            }
+            stroke(colors.white);
+            randoms.forEach(star => {
+                ellipse(center.x + star.x, center.y + star.y, 2*star.r)
+            });
             break;
         case "SLEET":
+            stroke(colors.ice);
             randoms.forEach(star => {
-                noFill();
-                stroke(colors.ice);
-                line(center.x + star.x, center.y + star.y, center.x + star.x, center.y + star.y - 7,);
-                fill(colors.white);
-                noStroke();
-                ellipse(center.x + star.x, center.y + star.y, star.r * 2.5, star.r * 2.5);
+                ellipse(center.x + star.x, center.y + star.y, 2*star.r)
             });
             break;
         case "WIND":
@@ -112,23 +100,23 @@ function displayWeather(){
             strokeWeight(7);
             for(let i = 0; i < randoms.length; i++){
                 if(randoms[i].x < 12){
-                    stroke(color(colors.white.red, colors.white.green, colors.white.blue, 50 + 100 * noisef[i]));
+                    stroke(colors.fog);
                     line(center.x + randoms[i].x, center.y + randoms[i].y, center.x + randoms[i].x + randoms[i].r * 10, center.y + randoms[i].y);
                 } else {
-                    stroke(color(colors.white.red, colors.white.green, colors.white.blue, 50 + 100 * noisef[i]));
+                    stroke(colors.fog);
                     line(center.x + randoms[i].x, center.y + randoms[i].y, center.x + randoms[i].x - randoms[i].r * 10, center.y + randoms[i].y);
                 }
             }
             break;
         case "CLOUDY":
             fill(colors.darkcloud);
-            ellipse(center.x - 7, center.y + 3, 24, 24);
-            ellipse(center.x + 4, center.y + 5, 20, 20);
-            rect(center.x - 7, center.y + 13, 13, 3);
+            ellipse(center.x - 7, center.y, 24, 24);
+            ellipse(center.x + 4, center.y + 2, 20, 20);
+            rect(center.x - 7, center.y + 10, 13, 3);
             fill(colors.cloud);
-            ellipse(center.x - 7, center.y + 8, 17, 17);
-            ellipse(center.x + 5, center.y + 9, 15, 15);
-            rect(center.x - 7, center.y + 13, 13, 3);
+            ellipse(center.x - 7, center.y + 5, 17, 17);
+            ellipse(center.x + 5, center.y + 6, 15, 15);
+            rect(center.x - 7, center.y + 10, 13, 3);
             break;
         case "PARTLY-CLOUDY-NIGHT":
             fill(colors.white);
@@ -147,11 +135,14 @@ function displayWeather(){
     }
 
     for(let i = 0; i < 3; i++){
-        let x = center.x + i * 40;
-        let y = center.y + 42;
+        let center_bar = {x: $(".weather-container").width() / 2, y: 95};
+        let x = center_bar.x + (i - 1) * 40, y = center_bar.y;
+
 
         noFill();
         strokeWeight(1.5);
+        //line(center.x, 0, center.x, height);
+        //line(center_bar.x, 0, center_bar.x, height);
         stroke(colors.grey);
         ellipse(x, y, 12, 12);
 
@@ -159,20 +150,20 @@ function displayWeather(){
             case 0:
                 if(weather.hum > 0){
                     stroke(colors.hum);
-                    arc(x, y, 12, 12, - HALF_PI, TWO_PI * weather.hum - HALF_PI - 0.05);
+                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(70, 130), 0, 1, 1) * TWO_PI * weather.hum * 0.99 - HALF_PI);
                 }
                 break;
             case 1:
                 if(weather.clcover > 0){
                     stroke(colors.clcover);
-                    arc(x, y, 12, 12, - HALF_PI, TWO_PI * weather.clcover - HALF_PI - 0.05);
+                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(80, 140), 0, 1, 1) * TWO_PI * weather.clcover * 0.99 - HALF_PI);
                     
                 }
                 break;
             case 2:
                 if(weather.uv > 0){
                     stroke(colors.uv);
-                    arc(x, y, 12, 12, - HALF_PI, TWO_PI * weather.uv - HALF_PI - 0.05);
+                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(90, 150), 0, 1, 1) * TWO_PI * weather.uv * 0.99 - HALF_PI);
                     
                 }
                 break;                
@@ -182,23 +173,29 @@ function displayWeather(){
     pop();
 }
 
-var weather = {}, noisef = []
+function framePercentage(b, c){
+    if(frameCount >= b){
+        if(frameCount < c){
+            return constrain(frameCount - b, 0, c - b) / (c - b)
+        }
+        return 1;
+    }
+    return 0;
+}
 
-var randoms = [{x: 5, y: 10, r: 1.3},
-    {x: 3, y: -15, r: 1.1},
-    {x: -7, y: 7, r: 1.3},
-    {x: -15, y: 3, r: 1.6},
-    {x: -10, y: -11, r: 0.9},
-    {x: -2, y: 3, r: 1},
-    {x: 16, y: 0, r: 1.4},
-    {x: -19, y: -15, r: 1},
-    {x: 12, y: -6, r: 1.5},
-    {x: -20, y: 10, r: 1.9}];
+var randoms = [{x: 5, y: 11, r: 1.3},
+    {x: 3, y: -13, r: 1.1},
+    {x: -7, y: 8, r: 1.3},
+    {x: -15, y: 4, r: 1.6},
+    {x: -10, y: -10, r: 0.9},
+    {x: -2, y: 4, r: 1},
+    {x: 16, y: 1, r: 1.4},
+    {x: -19, y: -13, r: 1},
+    {x: 12, y: -5, r: 1.5},
+    {x: -20, y: 11, r: 1.9}];
 
 function setup(){
-    createCanvas(150, 110);
-
-    getWeather(49.4431922, 8.6644594);
+    createCanvas(250, 110);
     jQuery("#defaultCanvas0").detach().appendTo('.weather-container')
     $("#defaultCanvas0").css("position", "absolute");
     $("#defaultCanvas0").css("top", "0");
@@ -206,25 +203,8 @@ function setup(){
 
 function draw(){
     clear();
-    let drawn = false;
-    if(!drawn){
-        if(frameCount > 100){
-            if(weather.temp != "" && weather.temp != undefined){
-                $(".weather-description").html(weather.descr);
-                $(".weather-degrees").html(weather.temp + " C");
-                displayWeather();
-                drawn = true;
-            } else {
-                $(".weather-container").css("opacity", "0 !important");
-                $(".weather-description").html("");
-                $(".weather-degrees").html("");
-            }
-        }
-    } else {
-        if(weather.descr == "FOG"){
-            for(let i = 0; i < randoms.length; i++){
-                noisef[i] = noise(frameCount / 700 + i * 100);
-            }
-        }
+    displayWeather();
+    if(frameCount > 200){
+        frameRate(1/(60*5))
     }
 }
