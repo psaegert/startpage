@@ -72,6 +72,8 @@ body {
   font-family: GothamRoundedLight;
   color: rgb(230, 230, 230);
   text-align:center;
+  will-change: opacity;
+  transition: 0.2s opacity ease;
 }
 
 .top_left_icon a{
@@ -696,6 +698,13 @@ body {
   transition: 2s opacity ease;
 }
 
+@media only screen and (max-width: 1400px) {
+  .weather-container{
+    opacity: 0 !important;
+    transition: 0.2s opacity ease;
+  }
+}
+
 .weather-description{
   margin-left: 80px;
   margin-top: 35px;
@@ -715,9 +724,6 @@ body {
   height:100%;
 }
 
-
-
-
 .item-list{
   list-style:none;
   margin:0px;
@@ -726,7 +732,6 @@ body {
   padding-right:10px;
   padding-bottom:7px;
   color: #333333;
-  
 }
 
 .dropdown{
@@ -734,7 +739,7 @@ body {
   display:none;
   position:fixed;
   border:1px solid #B2B2B2;
-  width:150px;     
+  min-width:150px;     
   background: rgb(240, 240, 240);
   box-shadow: 3px 3px 1px 0px rgba(0, 0, 0, 0.05);
   border-radius:5px;
@@ -744,15 +749,126 @@ body {
   display:none;
 }
 
-li{
+.dropdown li{
   padding: 7px;
   padding-left: 10px;
-  font-size: 10pt;
+  font-size: 11pt;
   font-family: GothamRoundedLight;
+  cursor: pointer;
   border-radius:3px;
 }
 
 .item-list li:hover{
   color: white;
   background:#343d46;
+}
+
+.sidebar{
+  z-index: 10;
+  position: absolute;
+  opacity: 0;
+  height:100%;
+  width: 350px;
+  right: 0;
+  transform: translateX(345px);
+  background-color: #343d46ee;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  will-change: transform, opacity;
+}
+
+.sidebar:hover{
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.date-time{
+  position: relative;
+  display:flex;
+  width:100%;
+  height:20%;
+}
+
+.more-websites{
+  position: relative;
+  width:100%;
+  height:70%;
+  overflow:hidden;
+}
+
+.settings{
+  position: relative;
+  width:100%;
+  height:10%;
+}
+
+.settings p{
+  position:fixed;
+  font-size: 8pt;
+  color: rgb(230, 230, 230);
+  font-family: GothamRoundedLight;
+  text-align: center;
+  width: 100%;
+  bottom: 1%;
+}
+
+hr {
+  display: block;
+  height: 0;
+  border: 0;
+  border-top: 1px solid rgb(230, 230, 230);
+  margin: 0 7%;
+  padding: 0;
+  bottom: 0;
+}
+
+.more-websites-list{
+  position: relative;
+  white-space: nowrap;
+  top: 5%
+}
+
+.more-websites li{
+  padding: 8px;
+  padding-left: 7%;
+  font-size: 12pt;
+  font-family: GothamRoundedLight;
+  cursor: pointer;
+  color: rgb(230, 230, 230);
+  border-radius:3px;
+  will-change: background-color;
+  transition: 0.2s ease;
+}
+
+.more-websites li:hover{
+  background-color: rgba(230, 230, 230, 0.2);
+}
+
+.date-time-container{
+  display: inline-block;
+  width: 100%;
+  padding: 0 7%;
+  margin:auto;
+  color: rgb(230, 230, 230);
+}
+
+.side-time{
+  display: inline-block;
+  float: right;
+  padding-top: 20px;
+  padding-right: 7px;
+  font-size: 24pt;
+  font-family: GothamRoundedLight;
+}
+
+.side-date{
+  display: inline-block;
+  font-size: 40pt;
+  font-family: GothamBold;
+}
+
+.side-month{
+  display: inline-block;
+  font-size: 15pt;
+  font-family: GothamRoundedLight;
+  padding-bottom: 7px;
 }

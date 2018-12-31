@@ -25,10 +25,10 @@ $( document ).ready(function() {
             progress = (h * 3600 + m * 60) / (24 * 36);
             $(".time").css("transform", "translateX(" + progress + "%)")
             
-            if($(document).width() * (100- progress) / 100 > 80){
+            if($(".header").width() * (100- progress) / 100 > 80){
                 $(".clock").css("transform", "translateX(" + progress + "%)");
             } else {
-                $(".clock").css("transform", "translateX(" + 97.3375 + "%)");
+                $(".clock").css("transform", "translateX(" + 95.8 + "%)");
             }
     
             if(h==0 && m== 0) done = false;
@@ -51,6 +51,11 @@ $( document ).ready(function() {
             $(".second").html(":" + s)
             $(".date").html(d)
             $(".month").html(monthToStr(mt))
+
+            $(".side-time").html(h + ":" + m)
+            $(".side-date").html(d)
+            $(".side-month").html(monthNames[mt])
+
             var t = setTimeout(startTime, 500);
         } else {
             $(".hour").html(checkTime(Math.floor((parseInt($('.time').css('transform').split(',')[4])) / $(".header").width() * (24))))
@@ -74,6 +79,11 @@ $( document ).ready(function() {
             $(".second").html(":" + s)
             $(".month").html(monthToStr(mt))
             $(".date").html(d)
+
+            $(".side-time").html(h + ":" + m)
+            $(".side-date").html(d)
+            $(".side-month").html(monthNames[mt])
+
             var t = setTimeout(startTime, 10);
         }
     }
@@ -169,7 +179,6 @@ $( document ).ready(function() {
 
     function hoverIn(str){
         hovered = str
-        console.log(hovered)
         $(str + "-b").addClass("preview-active");
         $(str + "-b .small-bar").addClass("small-bar-active");
         $(str + " .container-color-cover .cover").addClass("cover-active");
@@ -188,7 +197,6 @@ $( document ).ready(function() {
     function hoverOut(str){
         if(!dropdown_hovered){
             hovered = ""
-            console.log(hovered + "deleted")
         }
         $(str + "-b").removeClass("preview-active");
         $(str + "-b .small-bar").removeClass("small-bar-active");
@@ -228,14 +236,11 @@ $( document ).ready(function() {
         hovered = "";
         $(h + " .dropdown").hide();
         setTimeout(function(){
-            setTimeout(function(){
-                if(hovered != h){
-                    hoverOut(h);
-                    console.log(h, "-")
-                }
-                dropdown_hovered = false;
-            }, 10)
-        }, 10)
+            if(hovered != h){
+                hoverOut(h);
+            }
+            dropdown_hovered = false;
+        }, 5)
     }
     
     //initialize..
@@ -243,6 +248,9 @@ $( document ).ready(function() {
     var exit = false, engine_index = 0, engines = ["Google", "Youtube", "Soundcloud"];
     var keyDodge = false;
     var progress = 0;
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
     $("#input").keydown(function(e) {
         switch(e.keyCode){
@@ -282,6 +290,9 @@ $( document ).ready(function() {
         return;
     });
 
+    $(document).keydown(function(e) {
+        $("#input").focus();
+    });
 
     $("#input").keyup(function(e) {
         if(keyDodge){
@@ -306,10 +317,10 @@ $( document ).ready(function() {
             $(".time").css("transform", "translateX(" + progress + "%)")
             $(".clock .hour").css("opacity", 1);
             $(".clock .minute").css("opacity", 1);
-            if($(document).width() * (100- progress) / 100 > 80){
+            if($(".header").width() * (100- progress) / 100 > 80){
                 $(".clock").css("transform", "translateX(" + progress + "%)");
             } else {
-                $(".clock").css("transform", "translateX(" + 97.3375 + "%)");
+                $(".clock").css("transform", "translateX(" + 95.8 + "%)");
             }
             setTimeout(function(){
                 done = true;
@@ -343,20 +354,19 @@ $( document ).ready(function() {
     $("#rall").click(function(){clicked("#g", "all")});
 
     $(".top_right_icon").click(function(){searchExit("https://calendar.google.com/calendar/r")});
+    $("#side-github").click(function(){searchExit("https://github.com/")});
 
     $("#yt img").hover(function(){if(!exit)hoverIn("#yt")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#yt")}, 10)});
     $("#sc img").hover(function(){if(!exit)hoverIn("#sc")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#sc")}, 10)});
     $("#tv img").hover(function(){if(!exit)hoverIn("#tv")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#tv")}, 10)});
     $("#tw img").hover(function(){if(!exit)hoverIn("#tw")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#tw")}, 10)});
     $("#g img").hover(function(){if(!exit)hoverIn("#g")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#g")}, 10)});
-
-
+    $(".sidebar").hover(function(){$(".top_right_icon").css("opacity", 0)}, function(){$(".top_right_icon").css("opacity", 1)});
 
     //dropdown
 
     $(document).bind("contextmenu",function(e){
         e.preventDefault();
-        console.log(hovered)
         switch(hovered){
             case "#yt":
                 $("#yt .dropdown").css("left", e.pageX-1);
@@ -379,7 +389,11 @@ $( document ).ready(function() {
                 $("#tw .dropdown").fadeIn(120,startFocusOut("tw")); 
                 break;
             case "#g":
-                $("#g .dropdown").css("left", e.pageX - 1);
+                if(e.pageX > $(".header").width() - $("#g .dropdown").width()){
+                    $("#g .dropdown").css("left", e.pageX - $("#g .dropdown").width() + 1);
+                } else {
+                    $("#g .dropdown").css("left", e.pageX - 1);
+                }
                 $("#g .dropdown").css("top" ,e.pageY - 1);     
                 $("#g .dropdown").fadeIn(120,startFocusOut("g")); 
                 break;
