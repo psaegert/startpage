@@ -335,12 +335,12 @@ $( document ).ready(function() {
     $("#tvt").click(function(){clicked("#tv", "tomorrow")});
     $("#tvf").click(function(){clicked("#tv", "friday")});
 
-    $("#nb3").click(function(){clicked("#tv", "nightblue3")});
-    $("#nasa").click(function(){clicked("#tv", "nasa")});
-    $("#shr").click(function(){clicked("#tv", "shroud")});
+    $("#nb3").click(function(){clicked("#tw", "nightblue3")});
+    $("#nasa").click(function(){clicked("#tw", "nasa")});
+    $("#shr").click(function(){clicked("#tw", "shroud")});
 
-    $("#prf").click(function(){clicked("#tv", "profile")});
-    $("#rall").click(function(){clicked("#tv", "all")});
+    $("#prf").click(function(){clicked("#g", "profile")});
+    $("#rall").click(function(){clicked("#g", "all")});
 
     $(".top_right_icon").click(function(){searchExit("https://calendar.google.com/calendar/r")});
 
