@@ -44,6 +44,18 @@
                 <input id = "input" spellcheck="false" placeholder="Search Google" autofocus class="border-Google">    
             </div>
 
+            <div class="suggestions">
+                <!-- <div class="offset"> -->
+                    <ul>
+                        <li class="suggestion">test1</li>
+                        <li>test2</li>
+                        <li>test3test3</li>
+                        <li>test3test3</li>
+                        <li>as</li>
+                    </ul>
+                <!-- </div> -->
+            </div>
+
             <div class="top_right_icon">
                 <span class="date">DD</span>
                 <span class="month">MM</span>
@@ -260,17 +272,40 @@
             <hr/>
             <div class="more-websites">
                 <ul class="more-websites-list">
-                    <li id="side-github">GitHub</li>
-                    <li>Website 2</li>
+                    <li id="side-github"> 
+                        <svg  style=" fill: rgb(230, 230, 230);" height="12pt" width="12pt" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                        </svg>
+                        GitHub</li>
+                    <li id="side-desmos"><img height="12pt" style="margin-right:5px;" src="./img/desmos_icon_large.png" alt="">Desmos</li>
                     <li>Website 3</li>
                     <li>Website 4</li>
                     <li>Website 5</li>
-                    <li>Translate</li>
+                    <li id="side-translate"> <svg  height="12pt" width="12pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Ebene_1" x="0px" y="0px" viewBox="0 0 1000 1000" style="enable-background:new 0 0 1000 1000;" xml:space="preserve">
+                        <style type="text/css">
+                            .st0{fill:#D9D9D9;}
+                            .st1{fill:#4352B8;}
+                            .st2{fill:#617D8B;}
+                            .st3{fill:#4F8BF5;}
+                            .st4{fill:#FFFFFF;}
+                            .st5{opacity:0.2;fill:#FFFFFF;}
+                        </style>
+                        <path class="st0" d="M933.6,998.5c36.5,0,66.4-29.4,66.4-65.4V266c0-36-29.9-65.4-66.4-65.4H285.5l260.1,797.9H933.6z"/>
+                        <polygon class="st1" points="716.3,810 546.8,998.5 485.1,810 "/>
+                        <path class="st2" d="M937,477v-39H749v-63h-61v63H568v39h238.8c-12.8,45-41,87.5-68.5,120.5c-48.8-57.7-49-76.5-49-76.5h-50.7  c0,0,2.1,28.1,70.5,108.3C686.9,652,670,665.5,670,665.5l15.6,48.7c0,0,23.5-20.2,53-51.5c29.5,32,67.6,70.5,116.9,116.4l32-32  c-52.8-47.9-91.5-85.9-119.9-116.4c38.1-45.1,76.8-101.8,85-153.8H937z"/>
+                        <path class="st3" d="M68.3,0.2C31.8,0.2,1.9,30.1,1.9,66.7v677c0,36.5,29.9,66.4,66.4,66.4h648.1L456.3,0.2H68.3z"/>
+                        <path class="st4" d="M423.9,377.5h-17.3h-56.8H282v58.8h81.7c-7.6,37.4-39.5,58.8-81.7,58.8c-49.8,0-90-40.2-90-90s40.2-90,90-90  c21.5,0,40.8,7.6,56.1,20.1l44.3-44.3c-27-23.5-61.6-38.1-100.4-38.1c-84.5,0-152.3,67.8-152.3,152.3S197.6,557.5,282,557.5  c76.2,0,145.4-55.4,145.4-152.3C427.4,396.2,426,386.5,423.9,377.5z"/>
+                        <path class="st5" d="M536.2,200.6h397.4c36.5,0,66.4,29.4,66.4,65.4v400.2L536.2,200.6z"/>
+                        </svg>
+                        Translate</li>
                 </ul>
             </div>
             <hr/>
             <div class="settings">
-
+                <label class="switch dark-mode">
+                    <input type="checkbox">
+                    <span class="switch-slider round"></span>
+                  </label>
+                  <span class="dark-mode-label">Dark Mode</span>
                 <p>Made by P</p>
             </div>
         </div>

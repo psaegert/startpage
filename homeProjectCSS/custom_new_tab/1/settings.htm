@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Startpage Options</title>
+		<script src="jquery.js"></script>
+		<style>
+			* {
+				padding: 0px;
+				margin: 0px;
+				font-family: GothamRoundedLight;
+				box-sizing: border-box;
+			}
+
+			
+			@font-face {
+			font-family: GothamRoundedLight;
+			src: url("./GothamRoundedLight.otf") format("opentype");
+			}
+			
+			h1 {
+				margin-bottom: 10px;
+				font-size: 1em;
+				font-weight: 400;
+			}
+			
+			body,
+			html {
+				height: 100%;
+				font-size: 1.1em;
+			}
+			
+			body {
+				background: #eee;
+				display: flex;
+				align-content: center;
+			}
+			
+			input, input:focus {
+				padding: 10px 0;
+				color: #5c5c5c;
+				display: block;
+				width: 100%;
+				outline : none;
+				font-size: 0.9em;
+				border : none;
+				border-bottom : 1px solid #ddd;
+			}
+			
+			div {
+				background: white;
+				margin: auto;
+				padding: 20px;
+			}
+			
+			.shadow {
+				width:45%;
+				box-shadow: 3px 3px 1px 0 rgba(0, 0, 0, 0.14);
+			}
+			
+			button {
+				box-shadow: 3px 3px 1px 0 rgba(0, 0, 0, 0.14);
+				width:200px;
+				margin-top: 15px;
+				padding: 5px;
+				background: rgb(52, 61, 70);
+				border: none;
+				float: right;
+				color: rgb(230, 230, 230);
+				font-size : 1.1em;
+				padding: 10px;
+				border-radius: 3px;
+				outline: none;
+			}
+
+			button:hover {
+				background: rgb(62, 71, 80);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="shadow">
+			<h1>Enter the path to the startpage here</h1>
+			<input placeholder="C:/.../index.html" id="path" type="url" />
+			<button id="submit">Set as startpage</button>
+		</div>
+		<script src="settings.js"></script>
+	</body>
+
+</html>

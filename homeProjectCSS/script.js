@@ -1,5 +1,5 @@
 
-var weather = {}, hovered = "", dropdown_hovered = false;
+var weather = {}, hovered = "", dropdown_hovered = false, clockoverflow = true;;
 
 $( document ).ready(function() {
 
@@ -27,8 +27,10 @@ $( document ).ready(function() {
             
             if($(".header").width() * (100- progress) / 100 > 80){
                 $(".clock").css("transform", "translateX(" + progress + "%)");
+                $(".clock").css("left", 0);
             } else {
-                $(".clock").css("transform", "translateX(" + 95.8 + "%)");
+                $(".clock").css("transform", "translateX(%)");
+                $(".clock").css("left", "-80px");
             }
     
             if(h==0 && m== 0) done = false;
@@ -83,6 +85,11 @@ $( document ).ready(function() {
             $(".side-time").html(h + ":" + m)
             $(".side-date").html(d)
             $(".side-month").html(monthNames[mt])
+            
+            if($(".header").width() - parseInt($('.time').css('transform').split(',')[4]) < 200 && clockoverflow){
+                $(".clock").css("left", "-80px");
+                clockoverflow = false;
+            }
 
             var t = setTimeout(startTime, 10);
         }
@@ -114,7 +121,7 @@ $( document ).ready(function() {
         $("#white").addClass("search-exit-fade");
         setTimeout(function(){
             window.location = url;
-        }, 50)
+        }, 70)
     }
 
     function clicked(str, sub){
@@ -149,8 +156,15 @@ $( document ).ready(function() {
                     case "#tv":
                         switch(sub){
                             case "2200": url = "https://www.tvspielfilm.de/tv-programm/sendungen/fernsehprogramm-nachts.html"; break;
-                            case "tomorrow": url = "https://www.tvspielfilm.de/tv-programm/sendungen/?page=1&order=time&date=2019-01-04&cat%5B%5D=SP&cat%5B%5D=SE&cat%5B%5D=RE&cat%5B%5D=U&cat%5B%5D=KIN&cat%5B%5D=SPO&time=prime&channel="; break;
-                            case "friday": url = "https://www.tvspielfilm.de/tv-programm/sendungen/?page=1&order=time&date=2019-01-04&cat%5B%5D=SP&cat%5B%5D=SE&cat%5B%5D=RE&cat%5B%5D=U&cat%5B%5D=KIN&cat%5B%5D=SPO&time=prime&channel="; break;
+                            case "tomorrow": 
+                                now = new Date();
+                                url = "https://www.tvspielfilm.de/tv-programm/sendungen/?page=1&order=time&date=" + now.getFullYear() + "-" + checkTime(now.getMonth() + 1) + "-" + checkTime(now.getDate() + 1) + "&cat%5B%5D=SP&cat%5B%5D=SE&cat%5B%5D=RE&cat%5B%5D=U&cat%5B%5D=KIN&cat%5B%5D=SPO&time=prime&channel=";
+                            break;
+                            case "friday":
+                                now = new Date();
+                                now.setDate(now.getDate() + (5+(7-now.getDay())) % 7);
+                                url = "https://www.tvspielfilm.de/tv-programm/sendungen/?page=1&order=time&date=" + now.getFullYear() + "-" + checkTime(now.getMonth() + 1) + "-" + checkTime(now.getDate()) + "&cat%5B%5D=SP&cat%5B%5D=SE&cat%5B%5D=RE&cat%5B%5D=U&cat%5B%5D=KIN&cat%5B%5D=SPO&time=prime&channel=";
+                            break;
                             default: url = "https://www.tvspielfilm.de/tv-programm/sendungen/abends.html"; break;
                         } 
                     break;
@@ -242,44 +256,119 @@ $( document ).ready(function() {
             dropdown_hovered = false;
         }, 5)
     }
-    
-    //initialize..
 
-    var exit = false, engine_index = 0, engines = ["Google", "Youtube", "Soundcloud"];
+    function enginePrefix(query){
+        switch(engine_index){
+            case 0:
+                query = "https://www.google.de/search?client=opera&q=" + query;
+                break;
+            case 1:
+                query = "https://www.youtube.com/results?search_query=" + query;
+                break;
+            case 2:
+                query = "https://soundcloud.com/search?q="  + query;
+                break;
+        }
+        return query;
+    }
+
+    function searchSelect(selected_index){
+        $.each($(".suggestions ul li"), function(index, element) {
+            if(index == selected_index){
+                $(".suggestions ul li").eq(index).addClass("highlighted")
+                // console.log($(".suggestions ul li").eq(index).html(), $(".suggestions ul li").eq(index))
+            } else {
+                $(".suggestions ul li").eq(index).removeClass("highlighted")
+            }
+        });
+    }
+    
+
+    // initialize..
+
+    $("#input").val("")
+    var exit = false, engine_index = 0, engines = ["Google", "Youtube", "Soundcloud"], s_index = -1;
     var keyDodge = false;
     var progress = 0;
     const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+
+    // search bar enter and tab
 
     $("#input").keydown(function(e) {
         switch(e.keyCode){
-            case 9: 
+            case 9:
                 keyDodge = true;
-                last_index = engine_index;
 
-                engine_index++;
-                if(engine_index == engines.length){
-                    engine_index = 0;
+                if(e.shiftKey){
+                    if($("#input").val() != ""){
+                        // tab through suggestions
+                        let s_length = $(".suggestions ul li").length;
+                        s_index++;
+                        console.log(s_index, s_length)
+                        if(s_index >= s_length) s_index = 0;
+                        if(s_length > 0){
+                            if($(".suggestions ul li").eq(s_index).position().top != 0) s_index = 0;
+                            setTimeout(function(){
+                                searchSelect(s_index);
+                            }, 10)
+                        }
+                    }
+                } else {
+                    last_index = engine_index;
+                    s_index = -1;
+    
+                    engine_index++;
+                    if(engine_index >= engines.length) engine_index = 0;
+    
+                    $(this).attr("placeholder", "Search " + engines[engine_index])
+                    $(this).removeClass("border-" + engines[last_index]); 
+                    $(this).addClass("border-" + engines[engine_index]);
                 }
-
-                $(this).attr("placeholder", "Search " + engines[engine_index])
-                $(this).removeClass("border-" + engines[last_index]); 
-                $(this).addClass("border-" + engines[engine_index]);
                 break;
                 
             case 13:
                 keyDodge = true;
-                switch(engine_index){
-                    case 0:
-                        searchExit("https://www.google.de/search?client=opera&q=" + $(this).val());
-                        break;
-                    case 1:
-                        searchExit("https://www.youtube.com/results?search_query=" + $(this).val());
-                        break;
-                    case 2:
-                        searchExit("https://soundcloud.com/search?q="  + $(this).val());
-                        break;
+                if($(".highlighted").length == 0){
+                    switch(engine_index){
+                        case 0:
+                            searchExit(enginePrefix($(this).val()));
+                            break;
+                        case 1:
+                            searchExit(enginePrefix($(this).val()));
+                            break;
+                        case 2:
+                            searchExit(enginePrefix($(this).val()));
+                            break;
+                    }
+                } else if($(".highlighted").length == 1){
+                    switch(engine_index){
+                        case 0:
+                            searchExit(enginePrefix($(".highlighted").eq(0).html()));
+                            break;
+                        case 1:
+                            searchExit(enginePrefix($(".highlighted").eq(0).html()));
+                            break;
+                        case 2:
+                            searchExit(enginePrefix($(".highlighted").eq(0).html()));
+                            break;
+                    }
+                }
+            default: 
+                if($(".highlighted").length != 0){
+                    old = $(".highlighted").eq(0).html();
+                    setTimeout(function(){
+                        $.each($(".suggestions ul li"), function(index, element) {
+                            if($(".suggestions ul li").eq(index).html() == old){
+                                $(".suggestions ul li").eq(index).addClass("highlighted")
+                            } else {
+                                $(".suggestions ul li").eq(index).removeClass("highlighted")
+                            }
+                        });
+                    }, 10);
+                    
                 }
             break;
         }
@@ -290,8 +379,16 @@ $( document ).ready(function() {
         return;
     });
 
+	$('.suggestions ul li').click(function(e){
+        $("#input").val($(this).html());
+        searchExit(enginePrefix($(this).html()))
+    })
+
     $(document).keydown(function(e) {
         $("#input").focus();
+        if(e.keyCode == 9){
+            e.preventDefault();
+        }
     });
 
     $("#input").keyup(function(e) {
@@ -299,12 +396,19 @@ $( document ).ready(function() {
             e.preventDefault();
         }
         keyDodge = false;
+        $('.suggestions ul li').click(function(e){
+            $("#input").val($(this).html());
+            searchExit(enginePrefix($(this).html()))
+        })
         return;
     });
 
     var done = false;
     startTime();
     getWeather(49.4431922, 8.6644594);
+
+
+    // begin animations
 
     setTimeout(function(){
         $(".bar_ini").addClass("bar");
@@ -319,8 +423,9 @@ $( document ).ready(function() {
             $(".clock .minute").css("opacity", 1);
             if($(".header").width() * (100- progress) / 100 > 80){
                 $(".clock").css("transform", "translateX(" + progress + "%)");
+                $(".clock").css("left", 0);
             } else {
-                $(".clock").css("transform", "translateX(" + 95.8 + "%)");
+                $(".clock").css("transform", "translateX(100%)");
             }
             setTimeout(function(){
                 done = true;
@@ -328,6 +433,9 @@ $( document ).ready(function() {
             }, 2900);
         }, 800);
     }, 150);
+
+
+    // click handlers
 
     $("#yt img").click(function(){clicked("#yt")});
     $("#sc img").click(function(){clicked("#sc")});
@@ -355,13 +463,15 @@ $( document ).ready(function() {
 
     $(".top_right_icon").click(function(){searchExit("https://calendar.google.com/calendar/r")});
     $("#side-github").click(function(){searchExit("https://github.com/")});
+    $("#side-desmos").click(function(){searchExit("https://www.desmos.com/calculator/")});
+    $("#side-translate").click(function(){searchExit("https://translate.google.com/")});
 
     $("#yt img").hover(function(){if(!exit)hoverIn("#yt")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#yt")}, 10)});
     $("#sc img").hover(function(){if(!exit)hoverIn("#sc")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#sc")}, 10)});
     $("#tv img").hover(function(){if(!exit)hoverIn("#tv")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#tv")}, 10)});
     $("#tw img").hover(function(){if(!exit)hoverIn("#tw")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#tw")}, 10)});
     $("#g img").hover(function(){if(!exit)hoverIn("#g")}, function(){setTimeout(function(){if(!exit && !dropdown_hovered)hoverOut("#g")}, 10)});
-    $(".sidebar").hover(function(){$(".top_right_icon").css("opacity", 0)}, function(){$(".top_right_icon").css("opacity", 1)});
+    $(".sidebar").hover(function(){$(".top_right_icon").addClass("opacity-0")}, function(){$(".top_right_icon").removeClass("opacity-0")});
 
     //dropdown
 

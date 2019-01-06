@@ -26,6 +26,17 @@ body {
   position:absolute;
 }
 
+body:after{
+  content: "";
+  background: url("./img/bg1.png");
+  opacity: 0.03;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;  
+}
 .header{
   height: 131px;
   width: 100%;
@@ -122,12 +133,18 @@ body {
   }
 }
 
+@media only screen and (max-width: 930px) {
+  .top_right_icon{
+    opacity: 0;
+  }
+}
+
 #input {
   left:-172.5px;
   position: absolute;
   font-family: GothamRoundedLight;
   outline: none;
-  z-index: 50;
+  z-index: 13;
   white-space: nowrap;
   width: 345px;
   box-sizing: border-box;
@@ -181,7 +198,7 @@ body {
 }
 
 .clock{
-  text-shadow: 2px 2px rgb(220, 220, 220);
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.09);
   z-index: 10;
   left: 0;
   margin-top: 5px;
@@ -189,8 +206,8 @@ body {
   width:100%;
   position: absolute;
   overflow: visible;
-  transition: transform 2.5s cubic-bezier(0.6, 0, 0.1, 1);
-  will-change: transform;
+  transition: transform 2.5s cubic-bezier(0.6, 0, 0.1, 1), left 1s ease;
+  will-change: transform, left;
 }
 
 .clock span{
@@ -304,7 +321,7 @@ body {
 
 .outer-rect{
   box-sizing:border-box;
-  box-shadow: 3px 3px 1px 0px rgb(220, 220, 220);
+  box-shadow: 3px 3px 1px 0px rgba(0, 0, 0, 0.05);
   z-index: 0;
   margin: auto auto;
   width: 88%;
@@ -328,7 +345,7 @@ body {
 
 .inner-rect{
   box-sizing:border-box;
-  box-shadow: 3px 3px 1px 0px rgb(220, 220, 220);
+  box-shadow: 3px 3px 1px 0px rgba(0, 0, 0, 0.05);
   z-index: 1;
   margin: auto auto;
   width: 88%;
@@ -346,7 +363,7 @@ body {
 
 .cover-container-centered{
   z-index: 7;
-  box-shadow: 3px 3px 1px 0px lightgrey;
+  box-shadow: 3px 3px 1px 0px rgba(0, 0, 0, 0.045);
   margin: auto auto;
   opacity: 1;
   width: 88%;
@@ -626,9 +643,9 @@ body {
 }
 
 .text-container{
-  text-shadow: 2px 2px rgb(200, 200, 200);
+  text-shadow: 2.5px 2.5px rgba(0, 0, 0, 0.08);
   overflow: visible;
-  position:absolute;
+  position: absolute;
   top: 26vw;
   left: 10vw;
   font-family: GothamRoundedLight;
@@ -657,7 +674,7 @@ body {
 }
 
 .text-underline{
-  box-shadow: 2px 2px rgb(210, 210, 210);
+  box-shadow: 2.5px 2.5px rgba(0, 0, 0, 0.1);
   height:1px;
   width: 100%;
   transform-origin:left;
@@ -764,7 +781,7 @@ body {
 }
 
 .sidebar{
-  z-index: 10;
+  z-index: 13;
   position: absolute;
   opacity: 0;
   height:100%;
@@ -834,7 +851,6 @@ hr {
   font-family: GothamRoundedLight;
   cursor: pointer;
   color: rgb(230, 230, 230);
-  border-radius:3px;
   will-change: background-color;
   transition: 0.2s ease;
 }
@@ -871,4 +887,116 @@ hr {
   font-size: 15pt;
   font-family: GothamRoundedLight;
   padding-bottom: 7px;
+}
+
+.opacity-0{
+  opacity: 0;
+}
+
+/*settings*/
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+  top: 15%;
+  left:20%;
+  outline:none;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  outline:none;
+}
+/* The slider */
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(230, 230, 230);
+  transition: .2s;
+  outline:none;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #404850;
+  transition: .2s;
+  outline:none;
+}
+
+input:checked + .switch-slider {
+  background-color: rgb(51, 51, 51);
+}
+
+
+input:checked + .switch-slider:before {
+  transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.switch-slider.round {
+  border-radius: 34px;
+}
+
+.switch-slider.round:before {
+  border-radius: 50%;
+}
+
+.dark-mode-label{
+  position:absolute;
+  font-size: 12pt;
+  color: rgb(230, 230, 230);
+  font-family: GothamRoundedLight;
+  left: 40%;
+  top: 20%;
+}
+
+.suggestions{
+  position: absolute;
+  font-size: 11pt;
+  left: 50%;
+  top: 95px;
+  overflow: visible;
+  display:none;
+}
+
+.offset{
+  position:relative;
+  font-size: inherit;
+}
+
+.suggestions ul{
+  left: -160px;
+  font-size: inherit;
+  position: relative;
+  width: 330px;
+  height: 24px;
+}
+
+.suggestions ul li {
+  display: inline-block;
+  font-size: inherit;
+  color: rgb(52, 61, 70);
+  font-family: GothamRoundedLight;
+  background-color: rgb(230, 230, 230, 0.9);
+  padding: 3px 7px;
+  margin: 0 4px;
+  border-radius: 3px;
+  transition: 0.1s background-color;
+}
+
+.highlighted{
+  background-color: rgb(240, 240, 240) !important;
 }
