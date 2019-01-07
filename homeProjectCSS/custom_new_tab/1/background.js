@@ -1,9 +1,9 @@
 var redir = ['opera://startpage/', 'browser://startpage/', 'chrome://startpage/'];
 
-chrome.new_tabs.onCreated.addListener(function(new_tab){
+chrome.tabs.onCreated.addListener(function(tab){
 	
 	for (var i = 0; i < redir.length; i++) {
-		if(new_tab.url === redir[i])
+		if(tab.url === redir[i])
 			break;
 		if(i == redir.length - 1)
 			return;
@@ -20,15 +20,15 @@ chrome.new_tabs.onCreated.addListener(function(new_tab){
 				e.custom_startpage = 'http://' + e.custom_startpage;
 			}
 
-			chrome.new_tabs.create({url:e.custom_startpage});
+			chrome.tabs.create({url:e.custom_startpage});
 		
 		} else {
-			chrome.new_tabs.create({
+			chrome.tabs.create({
 				url:"settings.htm"
 			});
 		}
 		
-		chrome.new_tabs.remove(new_tab.id);
+		chrome.tabs.remove(tab.id);
 	});
 	
 });
