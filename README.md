@@ -19,7 +19,7 @@ The startpage sould be working without the extension, bugfixes coming in the fut
 known bugs:
 - portrait mode animation not adapted
 - not working with safari
-- time bar transition from 23:59 to 00:00 not working correctly
+- time bar transition from 23:59 to 00:00 not working correctly [FIXED]
 
 Preview:
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/home2.png)
