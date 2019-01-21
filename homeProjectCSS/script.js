@@ -5,7 +5,7 @@ $( document ).ready(function() {
 
     function getWeather(lat, lon) {
         $.ajax({
-            url: "https://api.darksky.net/forecast/9c4e8944261ed3b6f5f3438431a5cfa0/" + lat + "," + lon,
+            url: "https://api.darksky.net/forecast//" + lat + "," + lon,
             dataType: "jsonp",
             success: function(data) {
                 weather.temp = ((data.currently.temperature.toFixed(2) - 32) * 5 / 9).toFixed(1);;
