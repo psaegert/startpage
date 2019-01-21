@@ -5,7 +5,7 @@ $( document ).ready(function() {
 
     function getWeather(lat, lon) {
         $.ajax({
-            url: "https://api.darksky.net/forecast//" + lat + "," + lon,
+            url: "https://api.darksky.net/forecast/9c4e8944261ed3b6f5f3438431a5cfa0/" + lat + "," + lon,
             dataType: "jsonp",
             success: function(data) {
                 weather.temp = ((data.currently.temperature.toFixed(2) - 32) * 5 / 9).toFixed(1);;
@@ -20,23 +20,34 @@ $( document ).ready(function() {
         });
     }
     
-    function updateTimeDisplay(h, m, s){
+    function updateTimeDisplay(h, m){
         if(done){
             progress = (h * 3600 + m * 60) / (24 * 36);
             $(".time").css("transform", "translateX(" + progress + "%)")
             
             if($(".header").width() * (100- progress) / 100 > 80){
                 $(".clock").css("transform", "translateX(" + progress + "%)");
-                $(".clock").css("left", 0);
+                $(".clock").removeClass("shiftLeft");
             } else {
-                $(".clock").css("transform", "translateX(%)");
-                $(".clock").css("left", "-80px");
+                $(".clock").css("transform", "translateX(100%)");
+                $(".clock").addClass("shiftLeft");
             }
     
-            if(h==0 && m== 0) done = false;
+            if(h==0 && m== 0 ){
+                done = false;
+                $(".second").css("opacity", 0);
+                setTimeout(function(){
+                    done = true;
+                    $(".second").css("opacity", 1);
+                }, 2900);
+                setTimeout(function(){
+                    $(".clock").removeClass("shiftLeft");
+                }, 500);   //maybe tweak a bit
+            }
         }
     }
 
+    var timer = 0;
     function startTime() {
         var today = new Date();
         var mt = today.getMonth(),
@@ -86,8 +97,8 @@ $( document ).ready(function() {
             $(".side-date").html(d)
             $(".side-month").html(monthNames[mt])
             
-            if($(".header").width() - parseInt($('.time').css('transform').split(',')[4]) < 200 && clockoverflow){
-                $(".clock").css("left", "-80px");
+            if($(".header").width() - parseInt($('.time').css('transform').split(',')[4]) < 80 && clockoverflow){
+                $(".clock").addClass("shiftLeft");
                 clockoverflow = false;
             }
 
@@ -423,7 +434,7 @@ $( document ).ready(function() {
             $(".clock .minute").css("opacity", 1);
             if($(".header").width() * (100- progress) / 100 > 80){
                 $(".clock").css("transform", "translateX(" + progress + "%)");
-                $(".clock").css("left", 0);
+                $(".clock").removeClass("shiftLeft");
             } else {
                 $(".clock").css("transform", "translateX(100%)");
             }

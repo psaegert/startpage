@@ -86,18 +86,21 @@ $(function(){
 				}
 
 				//last search bias
-				if(display_queries.filter(display_query => {
-					return display_query.query.toUpperCase() == last.toUpperCase();
-				}).length != 0 && ($("#input").val().length != 1 || $("#input").val().toUpperCase()[0] == last.toUpperCase()[0])){
-					display_queries.sort(function (a, b) {
-						if(a.query.toUpperCase() == last.toUpperCase()){
-							return -1
-						} else if (a.query.toUpperCase() != last.toUpperCase()){
-							return 1;
-						}
-						return 0;
-					});
+				if(last != undefined && last != ""){
+					if(display_queries.filter(display_query => {
+						return display_query.query.toUpperCase() == last.toUpperCase();
+					}).length != 0 && ($("#input").val().length != 1 || $("#input").val().toUpperCase()[0] == last.toUpperCase()[0])){
+						display_queries.sort(function (a, b) {
+							if(a.query.toUpperCase() == last.toUpperCase()){
+								return -1
+							} else if (a.query.toUpperCase() != last.toUpperCase()){
+								return 1;
+							}
+							return 0;
+						});
+					}
 				}
+				
 				
 				if(!(e.keyCode == 16)){
 					console.log(display_queries != old_display_queries) //NOT WORKING ?

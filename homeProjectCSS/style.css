@@ -1000,3 +1000,7 @@ input:checked + .switch-slider:before {
 .highlighted{
   background-color: rgb(240, 240, 240) !important;
 }
+
+.shiftLeft{
+  left: -80px !important;
+}
