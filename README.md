@@ -1,9 +1,9 @@
 # startpage
 
-1) Installation
-2) (sort of) hidden features
-3) Planned or being worked on
-4) Known bugs
+**1) Installation**
+**2) (sort of) hidden features**
+**3) Planned or being worked on**
+**4) Known bugs**
 
 # Installation
 
@@ -21,7 +21,7 @@ Notice: Very strict Ad-Blockers will mess things up a bit, so make sure to white
   - right-clicking any rectangle opens a specific context menu
   - left-clicking the date in the top right corner will open google calendar
 
-# Planned or in being worked on :
+# Planned or in being worked on:
 - Dark mde
 - Toggle autocomplete (opt-out)
 - custom background
