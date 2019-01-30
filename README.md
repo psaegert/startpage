@@ -4,6 +4,8 @@ If you are using Chrome or Opera, go to settings and click "Load unpacked Extens
 
 Opening a new tab you need to enter the path to the startpages .html file on your local drive. Click "Set as startpage" and you're good to go!
 
+Notice: Very strict Ad-Blockers will mess things up a bit, so make sure to whitelist cosmetic filtering and Javascript
+
 # (sort of) hidden features:
   - cycle through search engines by pressing [TAB]
   - cycle trough (visible) autocomplete suggestions with [SHIFT] + [TAB], selected will be highlighted. Next, press [ENTER] to search
