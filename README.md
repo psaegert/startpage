@@ -1,5 +1,12 @@
 # startpage
 
+1) Installation
+2) (sort of) hidden features
+3) Planned or being worked on
+4) Known bugs
+
+# Installation
+
 If you are using Chrome or Opera, go to settings and click "Load unpacked Extension". Select the Folder 'homeProjectCSS/custom_new_tab/1/'.
 
 Opening a new tab you need to enter the path to the startpages .html file on your local drive. Click "Set as startpage" and you're good to go!
@@ -25,7 +32,7 @@ Notice: Very strict Ad-Blockers will mess things up a bit, so make sure to white
 
 The startpage sould be working without the extension, bugfixes coming in the future bc I'm busy af at the moment
 
-# known bugs:
+# Known bugs:
 - portrait mode animation not adapted
 - not working with safari
 - time bar transition from 23:59 to 00:00 not working correctly [FIXED]
