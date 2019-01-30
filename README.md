@@ -1,8 +1,11 @@
 # startpage
 
 **1) Installation**
+
 **2) (sort of) hidden features**
+
 **3) Planned or being worked on**
+
 **4) Known bugs**
 
 # Installation
