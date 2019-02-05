@@ -35,8 +35,8 @@ The startpage sould be working without the extension, bugfixes coming in the fut
 - bugfixes and performance improvements
 
 # Known bugs:
-- portrait mode animation not adapted
-- not working with safari
+- portrait mode animation not adapted (low priority)
+- not working on safari
 - time bar transition from 23:59 to 00:00 not working correctly [FIXED]
 
 # Preview:
