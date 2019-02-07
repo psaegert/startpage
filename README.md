@@ -36,6 +36,7 @@ The startpage sould be working without the extension, bugfixes coming in the fut
 
 # Known bugs:
 - portrait mode animation not adapted (low priority)
+- weather display: circles overlap when close to 100%
 - not working on safari
 - time bar transition from 23:59 to 00:00 not working correctly [FIXED]
 
