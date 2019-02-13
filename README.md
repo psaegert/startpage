@@ -42,3 +42,5 @@ The startpage sould be working without the extension, bugfixes coming in the fut
 
 # Preview:
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/home2.png)
+
+![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/preview_corner.png)
