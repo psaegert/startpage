@@ -1,0 +1,172 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    font-family: GothamRoundedLight;
+    box-sizing: border-box;
+    user-select:none;
+}
+
+@font-face {
+    font-family: GothamRoundedLight;
+    src: url("GothamRoundedLight.otf");
+  }
+
+body{
+    background-color: rgb(230, 230, 230);
+}
+
+.block{
+    position: relative;
+    width: 80%;
+    margin: 20px auto;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+    padding: 3% 3% 4% 3%;
+    border-radius: 3px;
+    background-color: white;
+    max-width: 1000px;
+}
+
+h1{
+    font-size: 30pt;
+    margin: 40px auto 25px auto;
+    text-align: center;
+}
+
+hr{
+    width: 120px;
+    margin: 0 auto 35px auto;
+}
+
+h2{
+    font-size: 23pt;
+    margin-bottom: 5%;
+}
+
+h3{
+    font-weight:normal;
+    margin-bottom:20px;
+}
+
+.content{
+    margin: 0 3%;
+}
+
+#choose-file{
+    display: inline-block;
+    position: relative;
+    padding: 8px;
+    background-color: rgb(52, 61, 70); /*rgb(230, 230, 230);*/
+    color: white;
+    font-size: 14pt;
+    border: none;   
+}
+
+.content{
+    font-size: 14pt;
+}
+
+input{
+    padding:8px;
+    font-size:14pt;
+    border: 1px solid rgb(52, 61, 70);
+    text-decoration: none;
+}
+
+input[type="checkbox"]{
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.check{
+    display: inline-block;
+    cursor: pointer;
+    margin: 0 10% 20px 0;
+}
+
+
+#file-path{
+    width:100%;
+}
+
+:focus{
+    outline: none;
+}
+
+::selection{
+    background-color:rgb(0, 150, 255, 0.25)
+}
+
+p{
+    margin-bottom: 20px;
+}
+
+.note{
+    color: rgb(190, 190, 190);
+    font-size: 11pt;
+}
+
+.button{
+    display: inline-block;
+    position: relative;
+    padding: 8px;
+    background-color: rgb(52, 61, 70); /*rgb(230, 230, 230);*/
+    color: white;
+    font-size: 14pt;
+    border: none;
+}
+
+.button:hover{
+    cursor: pointer;
+}
+
+.popup{
+    display:none;
+    position: fixed;
+    height:100%;
+    width:100%;
+    top: 0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color:rgb(0, 0, 0, 0.3)
+}
+
+.popup .popup-content{
+    position: absolute;
+    height:200px;
+    width: 330px;
+    margin:auto;
+    top: 0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color:rgb(240, 240, 240);
+    border-radius: 3px;
+}
+
+.popup .popup-title{
+    font-size: 20pt;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.popup .popup-info{
+    font-size: 11pt;
+    margin: 20px 20px;
+}
+
+.cancel{
+    background-color: transparent;
+    color: black;
+}
+
+.confirm{
+    float:right;
+}
+
+.popup .popup-buttons{
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    padding: 10px;
+}
