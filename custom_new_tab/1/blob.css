@@ -1,0 +1,206 @@
+#startpage-blob--container{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    transition: 0.15s ease;
+    z-index: 2147483638;
+    display:none;
+    overflow: visible;
+}
+
+
+.startpage-blob--circle-ready{
+    opacity: 0.8 !important;
+    transform: scale(0.9) !important;
+}
+
+.startpage-blob--circle-active{
+    opacity: 1 !important;
+    transform: scale(1) !important; 
+}
+
+.startpage-blob--background-circle-active{
+    opacity: 0.7 !important;
+    transform: scale(2.25) !important;
+}
+
+.startpage-blob--menu-container-active{
+    transform: scale(2.25) !important;
+}
+
+#startpage-blob--background-circle{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    transform: scale(0);
+    background-image: linear-gradient(135deg, #737efd, #b373fd);
+    border-radius: 50%;
+    overflow: visible;
+    opacity: 0;
+    transition-property: opacity, transform;
+    transition-duration: 0.15s, 0.25s;
+    transition-timing-function: ease, cubic-bezier(0.320, 0.230, 0.215, 1.350);
+    box-shadow: 2px 3px 11px rgb(0, 0, 0, 0.3);
+}
+
+#startpage-blob--menu-container{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    transform: scale(0);
+    display:none;
+    border-radius: 50%;
+    overflow: visible;
+    transition-property: transform;
+    transition-duration: 0.15s;
+    transition-timing-function: ease;
+}
+
+#startpage-blob--circle{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    width: 60px;
+    transform: scale(0);
+    background-image: linear-gradient(135deg, #90BEF7, #737efd);
+    margin: auto;
+    border-radius: 50%;
+    opacity: 0;
+    transition: 0.15s ease;
+    box-shadow: 2px 3px 11px rgb(0, 0, 0, 0.3);
+}
+
+#startpage-blob--menu{
+    height: 95%;
+    width: 95%;
+    max-width: 225 * 0.95 + px;
+    max-height: 225 * 0.95 + px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    overflow: visible;
+    position: absolute;
+    border-radius: 50%;
+}
+
+.startpage-blob--menu-item{
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    overflow:visible;
+    border-radius: 50%;
+}
+
+.startpage-blob--menu-item:hover .startpage-blob--menu-item-inner{
+    transform:scale(1.1) !important;
+}
+
+
+.startpage-blob--menu-item-inner-ready{
+    transform: scale(1) !important;
+    opacity: 1 !important;
+}
+
+.startpage-blob--menu-item-inner-active{
+    transform:scale(1.1) !important;
+}
+
+.startpage-blob--menu-item-inner{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    overflow: visible;
+    transform:scale(0.8);
+    box-shadow: 1px 2px 5px rgb(0, 0, 0, 0.25);
+    border-radius: 50%;
+    transition-property: transform, opacity;
+    transition-duration: 0.25s, 0.07s;
+    transition-timing-function: cubic-bezier(0.335, 0.305, 0.510, 1.650), ease;
+}
+
+#startpage-blob--dark{
+    display:none;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    background-color: rgb(0, 0, 0, 0.6);
+    z-index: 2147483637;
+}
+
+.startpage-blob--blur{
+    transition: filter 0.15s linear;
+    filter: blur(3px) !important;
+    user-select:none;
+}
+
+#startpage-blob--description-container{
+    position: absolute;
+    margin:auto;
+    width: 400px;
+    height: 200px;
+    top: 0;
+    bottom:0;
+    left: 200px;
+    /* background-color: rgb(255, 255, 255, 0.2) */
+}
+
+#startpage-blob--description-title-container{
+    position: absolute;
+    width:100%;
+    height:30%;
+    /* background-color: rgb(255, 255, 255, 0.3); */
+}
+
+.startpage-blob--description-title{
+    all:none;
+    position: absolute;
+    display: block;
+    top:0;
+    left: 5%;
+    line-height: 60px; /*hard-coded, handle with care*/
+    font-family: GothamRoundedLight;
+    font-size: 20pt;
+    color: white;
+    user-select:none;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.07s;
+    transition-timing-function: linear;
+}
+
+.startpage-blob--description-title-active{
+    opacity:1;
+}
+
+#startpage-blob--description-underline{
+    position:relative;
+    top: 25%;
+    left: 5%;
+    width: 100px;
+    height: 1px;
+    opacity:0;
+    background-color:white;
+    transform-origin: left;
+    transition-property: transform, opacity;
+    transition-duration: 0.1s, 0.07s;
+    transition-timing-function: ease, linear;
+}
+
+.startpage-blob--description-underline-active{
+    opacity:1 !important;
+}
