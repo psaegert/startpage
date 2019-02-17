@@ -2,7 +2,7 @@
 
 **1) Installation**
 
-**2) (sort of) hidden features**
+**2) Features**
 
 **3) Planned or being worked on**
 
@@ -17,19 +17,20 @@ Opening a new tab you need to enter the path to the startpages .html file on you
 Notice: Very strict Ad-Blockers will mess things up a bit, so make sure to whitelist cosmetic filtering and Javascript. 
 The startpage sould be working without the extension, bugfixes coming in the future bc I'm busy af at the moment
 
-# (sort of) hidden features:
+# Features:
+  - opens a new tab with this startpage
+  - intuitive quick access overlay on any website (optional)
   - cycle through search engines by pressing [TAB]
-  - cycle trough (visible) autocomplete suggestions with [SHIFT] + [TAB], selected will be highlighted. Next, press [ENTER] to search
+  - autocomplete based on your search history (optional)
+  - cycle trough visible autocomplete suggestions with [SHIFT] + [TAB], selected will be highlighted. Next, press [ENTER] to search
   - pressing any key will focus the search bar
   - moving your mouse close to the right edge opens a sidebar with additional information and websites (settings coming soon!)
   - right-clicking any rectangle opens a specific context menu
   - left-clicking the date in the top right corner will open google calendar
 
 # Planned or being worked on:
-- Dark mde
-- Toggle autocomplete (opt-out)
+- Dark mode
 - custom background
-- userfriendly settings with more degrees of freedom (colors, pages, background, custom links in dropdown menu, search engines maybe, ...)
 - ability to view and edit autocomplete suggestions
 - improvements in folder structure
 - bugfixes and performance improvements
@@ -46,6 +47,6 @@ startpage
 
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/home2.png)
 
-corner
+quick access overlay ("blob")
 
-![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/preview_corner.png)
+![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/blob.png)
