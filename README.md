@@ -10,9 +10,7 @@
 
 # Installation
 
-If you are using Chrome or Opera, go to settings and click "Load unpacked Extension". Select the Folder 'homeProjectCSS/custom_new_tab/1/'.
-
-Opening a new tab you need to enter the path to the startpages .html file on your local drive. Click "Set as startpage" and you're good to go!
+If you are using Chrome or Opera, go to settings and click "Load unpacked Extension". Select the downloaded (unzppied) Folder 'startpage' and click OK.
 
 Notice: Very strict Ad-Blockers will mess things up a bit, so make sure to whitelist cosmetic filtering and Javascript. 
 The startpage sould be working without the extension, bugfixes coming in the future bc I'm busy af at the moment
@@ -31,8 +29,8 @@ The startpage sould be working without the extension, bugfixes coming in the fut
 # Planned or being worked on:
 - Dark mode
 - custom background
-- ability to view and edit autocomplete suggestions
-- improvements in folder structure
+- ability to view and edit autocomplete suggestions [ADDED]
+- improvements in folder structure [ADDED]
 - bugfixes and performance improvements
 
 # Known bugs:
