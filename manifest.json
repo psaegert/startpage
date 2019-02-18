@@ -1,0 +1,30 @@
+{
+   "manifest_version": 2,
+   "name": "Startpage",
+   "version": "2",
+   "options_page": "/settings/settings.htm",
+   "permissions": [ "tabs", "storage", "file://*/*"],
+   "background": {
+      "scripts": ["/background/background.js" ]
+   },
+   "content_scripts":[
+      {
+         "matches": ["<all_urls>"],
+         "js": [ "jquery.js", "/content/blob/blob.js"],
+         "css": ["/content/blob/blob.css"],
+         "run_at": "document_end"
+      }
+   ],
+   "web_accessible_resources": [
+      "/content/blob/fonts/GothamRoundedLight.otf"
+   ],
+   "icons": {
+      "540": "/startpage/img/icon.png"
+   },
+   "browser_action": {
+      "default_icon": {
+         "540": "/startpage/img/icon.png"
+      }
+   },
+   "content_security_policy": "script-src 'self' https://api.darksky.net; object-src 'self'"
+}

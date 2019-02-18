@@ -1,5 +1,6 @@
 // ------------------------------------------ VARIABLES ---------------------------------------------------------------------------------------------------
 
+console.log("hi")
 
 var enable;
 chrome.storage.local.get('startpage_blob',function(e){
@@ -75,7 +76,7 @@ chrome.storage.local.get('custom_startpage',function(e){
     var styleNode           = document.createElement ("style");
     styleNode.type          = "text/css";
     styleNode.textContent   = "@font-face { font-family: GothamRoundedLight; src: url('"
-                            + chrome.extension.getURL ("GothamRoundedLight.otf")
+                            + chrome.extension.getURL("/content/blob/fonts/GothamRoundedLight.otf")
                             + "'); }"
                             ;
     document.head.appendChild (styleNode);

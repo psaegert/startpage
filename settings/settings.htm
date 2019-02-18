@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Startpage Options</title>
+		<script src="../jquery.js"></script>
+        <link rel="stylesheet" href="/settings/settings.css">
+	</head>
+
+	<body>
+		<h1>
+			Settings
+		</h1>
+		<hr>
+		<div class="block basic">
+			<h2>Basic Settings</h2>
+			<div class="content">
+				<div class="check"  id="darkmode">
+					<input type="checkbox">
+					<span>Dark Mode</span>
+				</div>
+
+				<h3>Autocomplete</h3>
+				
+				<div class="subcontent">
+					<div class="check" id="autocomplete">
+						<input type="checkbox">
+						<span>Turn on Autocomplete Suggestions</span>
+					</div>
+
+					<p class="note">(Note: press [SHIFT] + [ENTER] to dodge the saving of your current search query.)</p>
+
+					<p>Manage Suggestions</p>
+
+					<table class="manage" id="autocomplete-suggestions">
+						<tr>
+							<td class="item">jquery</td>
+							<td class="action"><div class="delete"><img src="bin.jpg" class="bin"></div></td>
+						</tr>
+						<tr>
+							<td class="item">javascript</td>
+							<td class="action"><div class="delete"><img src="bin.jpg" class="bin"></div></td>
+						</tr>
+					</table>
+
+					<div class="button" id="clearalldata">Clear All Data</div>
+
+					<p class="note">(Note: Autocomplete suggestions are kept in cache. They will be displayed until you reload the startpage.)</p>
+				</div>
+
+			</div>
+		</div>
+		<div class="block sidebar">
+			<h2>Sidebar</h2>
+			<div class="content">
+				<div class="check"  id="sidebar">
+					<input type="checkbox">
+					<span>Enable Sidebar</span>
+				</div>
+				<h3>Listed Websites</h3>
+				<div class="subcontent">
+					<p>Manage or edit websites displayed in the sidebar</p>
+					<p>*coming soon*</p>
+				</div>
+				
+			</div>
+		</div>
+		<div class="block blob">
+			<h2>Blob</h2>
+			<div class="content">
+				<div class="check" id="blob">
+					<input type="checkbox">
+					<span>Enable Blob</span>
+				</div>
+
+				<p class="note">Press and hold [SHIFT] on any website to open a menu at your cursor's position.<br> Point your mouse in the direction of the desired website and either <br><br> 1) left-click to open the site in the current tab or <br> 2) right-click to open it in a new tab. <br><br> Clicking the center will take you to the startpage. <br><br> Opening the menu will be delayed when focusing any input to avoid interference with typing capital letters.<br><br>(Note: Refresh the website in order for your changes to take effect.)</p>
+
+				<h3>Listed Websites</h3>
+
+				<div class="subcontent">
+					<p>*coming soon*</p>
+
+					<h3>Blacklist</h3>
+
+					<p>*coming soon*</p>
+				</div>
+
+			</div>
+		</div>
+		<div class="block weather">
+			<h2>Weather</h2>
+			<div class="content">
+				<div class="check" id="weather">
+					<input type="checkbox">
+					<span>Enable Weather</span>
+				</div>
+				<h3>Location</h3>
+				<div class="subcontent">
+					<p>Enter your coordinates</p>
+					<p>*coming soon*</p>
+				</div>
+				<h3>Key</h3>
+				<div class="subcontent">
+					<p>Enter your Darksky API key here</p>
+					<p>*coming soon*</p>
+				</div>
+			</div>
+		</div>
+		<div class="block custom">
+			<h2>Content</h2>
+			<div class="content">
+				<h3>Quick Access</h3>
+
+				<div class="subcontent">
+					<p>Select an Icon</p>
+					<p>Enter the URL</p>
+					<p>*coming soon*</p>
+				</div>
+
+				<h3>Search Engines</h3>
+
+				<div class="subcontent">
+					<p>Manage Search engines</p>
+					<p>*coming soon*</p>
+				</div>
+
+				<h3>Featured Websites</h3>
+				
+				<div class="subcontent">
+					<p>Manage Featured Websites</p>
+					<p>URL, color, image</p>
+					<p>*coming soon*</p>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="popup">
+			<div class="popup-content">
+				<p class="popup-title"> Title </p>
+				<p class="popup-info"> This is additional information about the action you have to confirm. </p>
+				<div class="popup-buttons">
+					<div class="button cancel">Cancel</div>
+					<div class="button confirm">Confirm</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="/settings/settings.js"></script>
+	</body>
+
+</html>

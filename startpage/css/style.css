@@ -8,18 +8,17 @@
 
 @font-face {
   font-family: GothamRoundedLight;
-  src: url("./GothamRoundedLight.otf") format("opentype");
+  src: url("/startpage/fonts/GothamRoundedLight.otf") format("opentype");
 }
 
 @font-face {
   font-family: GothamBold;
-  src: url("./GothamBold.otf") format("opentype");
+  src: url("/startpage/fonts/GothamBold.otf") format("opentype");
 }
 
 
 
 body {
-  /*background-image: url("./img/bg1.png");*/
   background-color: rgb(230, 230, 230);
   width: 100%;
   height: 100%;
@@ -28,7 +27,7 @@ body {
 
 body:after{
   content: "";
-  background: url("./img/bg1.png");
+  background: url("/startpage/img/bg1.png");
   opacity: 0.03;
   top: 0;
   left: 0;
@@ -457,6 +456,7 @@ body:after{
 
 .preview-big{
   position:absolute;
+  overflow:visible;
   left: 0;
   top: 60%;
   width: 100%;
@@ -523,6 +523,8 @@ body:after{
 #white img{
   filter: brightness(0.941);
   opacity: 0;
+  transform-origin: center center;
+  transform: scale(3);
   will-change: opacity;
 }
 
@@ -900,7 +902,7 @@ hr {
   width: 46px;
   height: 26px;
   top: 15%;
-  left:20%;
+  left:15%;
   outline:none;
 }
 
@@ -959,7 +961,7 @@ input:checked + .switch-slider:before {
   font-size: 12pt;
   color: rgb(230, 230, 230);
   font-family: GothamRoundedLight;
-  left: 40%;
+  left: 34%;
   top: 20%;
 }
 
@@ -1003,4 +1005,16 @@ input:checked + .switch-slider:before {
 
 .shiftLeft{
   left: -75px !important;
+}
+
+#settings{
+  position: absolute;
+  top: 20%;
+  right: 15%;
+  width: auto;
+  display: inline-block;
+  font-size: 12pt;
+  margin-top: -7px;
+  width: 30px;
+  height:auto;
 }
