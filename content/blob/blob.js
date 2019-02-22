@@ -149,6 +149,7 @@ $("#startpage-blob--description-container").append(underline);
 // KEY listener
 
 $(document).keydown(function (ev) {
+    console.log(ev.keyCode)
     if(ev.keyCode == 16){
         ev.preventDefault();
         pressed = true;
@@ -166,6 +167,7 @@ $(document).keydown(function (ev) {
     } else {
         if(ev.shiftKey){
             capital = new Date().getTime();
+            closeBlob();
         }
     }
 });
