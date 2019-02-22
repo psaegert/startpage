@@ -12,8 +12,7 @@
 
 If you are using Chrome or Opera, go to settings and click "Load unpacked Extension". Select the downloaded (unzppied) Folder 'startpage' and click OK.
 
-Notice: Very strict Ad-Blockers will mess things up a bit, so make sure to whitelist cosmetic filtering and Javascript. 
-The startpage sould be working without the extension, bugfixes coming in the future bc I'm busy af at the moment
+Notice: Very strict Ad-Blockers will mess things up a bit, so make sure to whitelist cosmetic filtering and Javascript.
 
 # Features:
   - opens a new tab with this startpage
