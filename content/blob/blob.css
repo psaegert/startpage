@@ -79,8 +79,8 @@
 #startpage-blob--menu{
     height: 95%;
     width: 95%;
-    max-width: 225 * 0.95 + px;
-    max-height: 225 * 0.95 + px;
+    /* max-width: 225 * 0.95 + px;
+    max-height: 225 * 0.95 + px; */
     top: 0;
     bottom: 0;
     left: 0;

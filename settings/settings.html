@@ -4,6 +4,7 @@
 		<meta charset="UTF-8">
 		<title>Startpage Options</title>
 		<script src="../jquery.js"></script>
+		<link rel="icon" href="/startpage/img/settings.png">
         <link rel="stylesheet" href="/settings/settings.css">
 	</head>
 
@@ -12,6 +13,33 @@
 			Settings
 		</h1>
 		<hr>
+		<div class="block resources">
+			<h2>Resources</h2>
+			<div class="content">
+				<p>To open the startpage on browser startup, copy this URL and add it to "Open a specific page or set of pages" in your browsers settings.</p>
+				<p id="path"></p>
+			</div>
+		</div>
+		<div class="block profiles">
+			<h2>Profiles</h2>
+			<div class="content">
+				<table class="manage" id="profile-list">
+					<tbody>
+						<td style="color:rgb(161, 0, 0)">An Error occured. Please reload the page before changing any settings.</td>
+					</tbody>
+				</table>
+
+				<div class="button" id="profile-new">New</div>
+				<div class="button" id="profile-import">Import</div>
+				<div class="button" id="profile-export">Export</div>
+				
+				<div class="button" id="profile-import-confirm">Confirm</div>
+
+				<textarea spellcheck="false" placeholder="Paste your JSON here (See 'Export' for more info about the structure)" name="profile-text-import" id="profile-text-import"></textarea>
+				<textarea spellcheck="false" readonly name="profile-text-export" id="profile-text-export">Export</textarea>
+			
+			</div>
+		</div>
 		<div class="block basic">
 			<h2>Basic Settings</h2>
 			<div class="content">
@@ -20,12 +48,12 @@
 					<span>Dark Mode</span>
 				</div>
 
-				<h3>Autocomplete</h3>
+				<h3>Autocomplete (Global)</h3>
 				
 				<div class="subcontent">
 					<div class="check" id="autocomplete">
 						<input type="checkbox">
-						<span>Turn on Autocomplete Suggestions</span>
+						<span>Autocomplete Suggestions</span>
 					</div>
 
 					<p class="note">(Note: press [SHIFT] + [ENTER] to dodge the saving of your current search query.)</p>
@@ -33,19 +61,20 @@
 					<p>Manage Suggestions</p>
 
 					<table class="manage" id="autocomplete-suggestions">
-						<tr>
-							<td class="item">jquery</td>
-							<td class="action"><div class="delete"><img src="bin.jpg" class="bin"></div></td>
-						</tr>
-						<tr>
-							<td class="item">javascript</td>
-							<td class="action"><div class="delete"><img src="bin.jpg" class="bin"></div></td>
-						</tr>
+						<tbody>
+							<tr>
+								<td style="color:rgb(161, 0, 0)">An Error occured. Please reload the page before changing any settings.</td>
+						</tbody>
 					</table>
 
 					<div class="button" id="clearalldata">Clear All Data</div>
 
 					<p class="note">(Note: Autocomplete suggestions are kept in cache. They will be displayed until you reload the startpage.)</p>
+				
+					<p>Search Engines</p>
+
+					<p>*coming soon*</p>
+				
 				</div>
 
 			</div>
@@ -59,8 +88,13 @@
 				</div>
 				<h3>Listed Websites</h3>
 				<div class="subcontent">
-					<p>Manage or edit websites displayed in the sidebar</p>
-					<p>*coming soon*</p>
+					<p>Manage Websites Displayed in the Sidebar</p>
+					<table class="manage" id="sidebar-websites">
+						<tbody>
+							<td style="color:rgb(161, 0, 0)">An Error occured. Please reload the page before changing any settings.</td>
+						</tbody>
+					</table>
+					<p class="note">PNG format recommended. Only icons in '/startpage/startpage/img/sidebar/' will be recognized.</p>
 				</div>
 				
 			</div>
@@ -73,7 +107,7 @@
 					<span>Enable Blob</span>
 				</div>
 
-				<p class="note">Press and hold [SHIFT] on any website to open a menu at your cursor's position.<br> Point your mouse in the direction of the desired website and either <br><br> 1) left-click to open the site in the current tab or <br> 2) right-click to open it in a new tab. <br><br> Clicking the center will take you to the startpage. <br><br> Opening the menu will be delayed when focusing any input to avoid interference with typing capital letters.<br><br>(Note: Refresh the website in order for your changes to take effect.)</p>
+				<p class="note">Press and hold [SHIFT] on any website to open a menu at your cursor's position.<br> Point your mouse in the direction of the desired website and either <br><br> 1) left-click to open the site in the current tab or <br> 2) right-click to open it in a new tab. <br><br> Clicking the center will take you to the startpage. <br><br> Opening the menu will be delayed when focusing any input to avoid interference with typing capital letters.</p>
 
 				<h3>Listed Websites</h3>
 
@@ -139,10 +173,17 @@
 			<div class="popup-content">
 				<p class="popup-title"> Title </p>
 				<p class="popup-info"> This is additional information about the action you have to confirm. </p>
+				<input spellcheck="false" type="text" id="popup-input" autofocus/>
 				<div class="popup-buttons">
 					<div class="button cancel">Cancel</div>
 					<div class="button confirm">Confirm</div>
 				</div>
+			</div>
+		</div>
+
+		<div class="message-container">
+			<div class="message">
+				This is a message
 			</div>
 		</div>
 

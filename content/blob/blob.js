@@ -1,10 +1,5 @@
 // ------------------------------------------ VARIABLES ---------------------------------------------------------------------------------------------------
 
-console.log("hi")
-
-var enable;
-chrome.storage.local.get('startpage_blob',function(e){
-    if(e.startpage_blob){
 
 
 
@@ -25,21 +20,20 @@ var menuCircles = [
 
 var mouse = [],
     open = false,
-    blobPos, an,
+    blobPos, an, capital = 1,
     segment = 2 * Math.PI / menuCircles.length,
     focus = -1,
-    focus_old, position, pressed = false,
-    key = 16;
+    focus_old, position, pressed = false;
 
-chrome.storage.local.get("custom_startpage_blob_position", function(e){
-    if(e.custom_startpage_blob_position != undefined){
+chrome.storage.local.get("startpage_blob_position", function(e){
+    if(e.startpage_blob_position != undefined){
         position = {
             mouse:{
-                x:e.custom_startpage_blob_position.x,
-                y:e.custom_startpage_blob_position.y},
+                x:e.startpage_blob_position.x,
+                y:e.startpage_blob_position.y},
             blob:{
-                x:e.custom_startpage_blob_position.x,
-                y:e.custom_startpage_blob_position.y},
+                x:e.startpage_blob_position.x,
+                y:e.startpage_blob_position.y},
             difference:{
                 x:0,
                 y:0
@@ -72,15 +66,13 @@ chrome.storage.local.get("custom_startpage_blob_position", function(e){
 
 // inject font
 
-chrome.storage.local.get('custom_startpage',function(e){
-    var styleNode           = document.createElement ("style");
-    styleNode.type          = "text/css";
-    styleNode.textContent   = "@font-face { font-family: GothamRoundedLight; src: url('"
-                            + chrome.extension.getURL("/content/blob/fonts/GothamRoundedLight.otf")
-                            + "'); }"
-                            ;
-    document.head.appendChild (styleNode);
-});
+var styleNode           = document.createElement ("style");
+styleNode.type          = "text/css";
+styleNode.textContent   = "@font-face { font-family: GothamRoundedLight; src: url('"
+                        + chrome.extension.getURL("/content/blob/fonts/GothamRoundedLight.otf")
+                        + "'); }"
+                        ;
+document.head.appendChild (styleNode);
 
 //
 
@@ -119,17 +111,13 @@ var menu = document.createElement("div");
 menu.id = "startpage-blob--menu";
 $("#startpage-blob--menu-container").append(menu);
 
-// var pointer = document.createElement("div");
-// pointer.id = "startpage-blob--pointer";
-// $("#startpage-blob--menu-container").append(pointer);
-
 menuCircles.forEach(menuC => {
     let menu = document.createElement("div"), ind = menuCircles.indexOf(menuC), a = 2 * Math.PI / menuCircles.length * ind;
     menu.id = "startpage-blob--menu-" + ind;
     $("#startpage-blob--menu").append(menu);
     $("#startpage-blob--menu-" + ind).css({
-        "top": ((1-Math.cos(a)) * $("#startpage-blob--menu").height() / 2 - 9) + "px",
-        "left": ((1-Math.sin(-a)) * $("#startpage-blob--menu").height() / 2 - 9) + "px"
+        "top": ((1-Math.cos(a)) * 95 / 2 - 9) + "px",
+        "left": ((1-Math.sin(-a)) * 95 / 2 - 9) + "px"
     });
     $("#startpage-blob--menu-" + ind).addClass("startpage-blob--menu-item");
 
@@ -161,25 +149,29 @@ $("#startpage-blob--description-container").append(underline);
 // KEY listener
 
 $(document).keydown(function (ev) {
-    if(ev.keyCode == key){
+    if(ev.keyCode == 16){
         ev.preventDefault();
         pressed = true;
         if(position != undefined){
             if(!open){
                 if(position.inWindow){
-                    if( $(":focus").length == 0){
+                    if($(":focus:not(div)").length == 0){
                         openBlob();
                     } else {
-                        setTimeout(function(){if(pressed)openBlob()}, 300);
+                        setTimeout(function(){if(pressed && (new Date().getTime() - capital) > 300)openBlob()}, 300);
                     }
                 }
             } 
+        }
+    } else {
+        if(ev.shiftKey){
+            capital = new Date().getTime();
         }
     }
 });
 
 $(document).keyup(function (ev) {
-    if(ev.keyCode == key){
+    if(ev.keyCode == 16){
         pressed = false;
         ev.preventDefault;
         if(open) {
@@ -214,25 +206,25 @@ $("#startpage-blob--container :not(#startbage-blob--container):not(#startpage-bl
 $("#startpage-blob--container").mousedown(function(ev){
     ev.preventDefault();
     if(ev.which == 1){
-        exit(0);
+        blobExit(0);
     }
 });
 
 $("#startpage-blob--dark").mousedown(function(ev){
     ev.preventDefault();
     if(ev.which == 1){
-        exit(0);
+        blobExit(0);
     }
 })
 
 $("#startpage-blob--container").contextmenu(function(ev){
     ev.preventDefault();
-    exit(1);
+    blobExit(1);
 });
 
 $("#startpage-blob--dark").contextmenu(function(ev){
     ev.preventDefault();
-    exit(1);
+    blobExit(1);
 })
 
 //
@@ -293,32 +285,37 @@ document.onmousemove = function(ev){
 // open, close animations
 
 function openBlob(){
-    chrome.storage.local.set({custom_startpage_blob_position: position.blob});
+    chrome.storage.local.set({startpage_blob_position: position.blob});
 
-    an = 0;
-    position.blob.x = position.mouse.x;
-    position.blob.y = position.mouse.y;
-    $("body > :not(#startpage-blob--container):not(#startpage-blob--dark)").each(function(){$(this).addClass("startpage-blob--blur")});
-    $("#startpage-blob--dark").fadeIn(100);
-    $("#startpage-blob--container").css({
-        "left": position.mouse.x - 50 + "px",
-        "top": position.mouse.y - 50 + "px"
-    }).show();
-    setTimeout(function(){
+    chrome.storage.local.get('startpage_settings',function(e){
+        if(e.startpage_settings.blob){
+                
+            an = 0;
+            position.blob.x = position.mouse.x;
+            position.blob.y = position.mouse.y;
+            $("body > :not(#startpage-blob--container):not(#startpage-blob--dark)").each(function(){$(this).addClass("startpage-blob--blur")});
+            $("#startpage-blob--dark").fadeIn(100);
+            $("#startpage-blob--container").css({
+                "left": position.mouse.x - 50 + "px",
+                "top": position.mouse.y - 50 + "px"
+            }).show();
+            setTimeout(function(){
 
-        $("#startpage-blob--circle").addClass("startpage-blob--circle-ready")
-        $("#startpage-blob--circle").addClass("startpage-blob--circle-active")
-        $("#startpage-blob--background-circle").addClass("startpage-blob--background-circle-active")
-        $("#startpage-blob--menu-container").show().addClass("startpage-blob--menu-container-active")
+                $("#startpage-blob--circle").addClass("startpage-blob--circle-ready")
+                $("#startpage-blob--circle").addClass("startpage-blob--circle-active")
+                $("#startpage-blob--background-circle").addClass("startpage-blob--background-circle-active")
+                $("#startpage-blob--menu-container").show().addClass("startpage-blob--menu-container-active")
 
-        for(let i = 0; i < menuCircles.length; i++){
-            $("#startpage-blob--menu-" + i + "-inner").delay(20 + 200 / menuCircles.length * i).queue(function (next) {
-                $(this).addClass("startpage-blob--menu-item-inner-ready")
-                next(); 
-            });
+                for(let i = 0; i < menuCircles.length; i++){
+                    $("#startpage-blob--menu-" + i + "-inner").delay(20 + 200 / menuCircles.length * i).queue(function (next) {
+                        $(this).addClass("startpage-blob--menu-item-inner-ready")
+                        next(); 
+                    });
+                }
+            }, 20);
+            open = true;
         }
-    }, 20);
-    open = true;
+    });
 }
 
 function closeBlob(){
@@ -365,8 +362,8 @@ function activateMenu(a){
 
 // exit
 
-function exit(newTab){
-    chrome.storage.local.set({custom_startpage_blob_position: position.mouse});
+function blobExit(newTab){
+    chrome.storage.local.set({startpage_blob_position: position.mouse});
     if(focus_old >= 0){
 
         switch (newTab) {
@@ -390,8 +387,3 @@ function exit(newTab){
 }
 
 //
-
-
-
-    }
-});

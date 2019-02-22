@@ -1,8 +1,8 @@
 {
    "manifest_version": 2,
    "name": "Startpage",
-   "version": "2",
-   "options_page": "/settings/settings.htm",
+   "version": "2.3.1",
+   "options_page": "/settings/settings.html",
    "permissions": [ "tabs", "storage", "file://*/*"],
    "background": {
       "scripts": ["/background/background.js" ]

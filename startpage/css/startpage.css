@@ -3,6 +3,7 @@
   margin: 0;
   font-size: 0;
   user-select: none;
+  outline: none;
   overflow:hidden;
 }
 
@@ -70,11 +71,11 @@ body:after{
   height: 75px;
   left: 50px;
   top: 27.5px;
+  z-index: 1;
 }
 
 .top_right_icon{
   position:absolute;
-  cursor: pointer;
   width: 75px;
   height: 75px;
   right: 50px;
@@ -84,6 +85,11 @@ body:after{
   text-align:center;
   will-change: opacity;
   transition: 0.2s opacity ease;
+  z-index: 1;
+}
+
+.top_right_icon:hover{
+  cursor: pointer;
 }
 
 .top_left_icon a{
@@ -91,16 +97,17 @@ body:after{
   display: flex;
 }
 
-#diversity{
+#top-left-icon{
   margin: auto auto;
   position:relative;
   width:100%;
   height: 100%;
+  opacity: 0.9;
   transition: 0.05s transform ease-in-out;
   will-change: transform;
 }
 
-#diversity:hover{
+#top-left-icon:hover{
   transform: scale(1.03);
 }
 
@@ -166,17 +173,16 @@ body:after{
 }
 
 .border-Google{
-  border-left: #2a7eeb59 10px solid !important;
+  border-left: #acc0e6 10px solid !important;
 }
 
 .border-Youtube{
-  border-left: rgba(255, 0, 0, 0.26) 10px solid !important;
+  border-left: #ecb2b0 10px solid !important;
 }
 
 .border-Soundcloud{
-  border-left: rgb(233, 183, 147) 10px solid !important;
+  border-left: #e9b793 10px solid !important;
 }
-
 
 #input::selection{
   color:#333c47;
@@ -523,6 +529,7 @@ body:after{
 #white img{
   filter: brightness(0.941);
   opacity: 0;
+  display:none;
   transform-origin: center center;
   transform: scale(3);
   will-change: opacity;
@@ -637,6 +644,7 @@ body:after{
 }
 
 .search-exit-fade img{
+  display: block;
   opacity: 1 !important;
   top: 0 !important;
   z-index: 133;
@@ -843,7 +851,35 @@ hr {
 .more-websites-list{
   position: relative;
   white-space: nowrap;
-  top: 5%
+  top: 5%;
+  overflow: auto;
+  height: 100%;
+}
+
+.more-websites-list li img{
+  height: 20px;
+}
+
+.more-websites-list li p{
+  display: inline-block;
+  font-size: 14pt;
+  position: absolute;
+  line-height: 19px;
+  left: 55px;
+}
+
+.more-websites-list li span{
+  display: inline-block;
+  font-family: GothamBold;
+  font-weight: lighter;
+  font-size: 19pt;
+  position: absolute;
+  line-height: 19px;
+  left: 26px;
+}
+
+ul.more-websites-list::-webkit-scrollbar {
+  width: 0;
 }
 
 .more-websites li{
@@ -999,6 +1035,11 @@ input:checked + .switch-slider:before {
   transition: 0.1s background-color;
 }
 
+.suggestions ul li:hover{
+  background-color: rgb(240, 240, 240) !important;
+
+}
+
 .highlighted{
   background-color: rgb(240, 240, 240) !important;
 }
@@ -1017,4 +1058,30 @@ input:checked + .switch-slider:before {
   margin-top: -7px;
   width: 30px;
   height:auto;
+}
+
+#settings:hover{
+  cursor: pointer;
+}
+
+.dark-dark{
+  background-color: rgb(10, 10, 10) !important;
+  color: rgb(240, 240, 240) !important;
+}
+
+.dark-light{
+  background-color: rgb(45, 45, 45) !important;
+  color: rgb(240, 240, 240) !important;
+}
+
+.white-font{
+  color:rgb(240, 240, 240) !important;
+}
+
+.white-background{
+  background-color: rgb(240, 240, 240) !important;
+}
+
+.notrans{
+  transition:none !important;
 }

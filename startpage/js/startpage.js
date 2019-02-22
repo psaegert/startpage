@@ -1,3 +1,46 @@
+chrome.storage.local.get('startpage_settings', function(e){
+	if(e.startpage_settings == undefined){
+		chrome.storage.local.set({startpage_settings:{
+			darkmode: false,
+			darkmode_auto: false,
+			blob: true,
+			sidebar: true,
+			sidebar_websites:[],
+			weather: true,
+		}});
+	}
+
+	chrome.storage.local.get('startpage_profiles', function(a){
+		chrome.storage.local.get('startpage_settings', function(s){
+			if(a.startpage_profiles == undefined){
+				chrome.storage.local.set({startpage_profiles:[{name: "Default", settings:s.startpage_settings}]});
+			}
+
+			chrome.storage.local.get('startpage_selected_profile', function(sp){
+				if(sp.startpage_selected_profile == undefined){
+					chrome.storage.local.get('startpage_profiles', function(pr){
+						if(pr.startpage_profiles.filter(profile => profile.name == "Default").length != 0){
+							chrome.storage.local.set({startpage_selected_profile:"Default"});
+						} else {
+							chrome.storage.local.set({startpage_selected_profile:""});
+						}
+					});
+				}
+			});
+		});
+	});
+});
+
+chrome.storage.local.get('startpage_autocomplete', function(e){
+	let startpage_autocomplete = e.startpage_autocomplete;
+	if(startpage_autocomplete == undefined){
+		chrome.storage.local.set({startpage_autocomplete:{
+			enabled: true,
+			suggestions: [],
+			last: ""
+		}});
+	}
+});
 
 var weather = {},
 
@@ -15,42 +58,24 @@ hovered = "",
 engines = ["Google", "Youtube", "Soundcloud"],
 
 darkmode,
+sidebar,
 queries,
 last,
+autocomplete,
 display_queries,
-old_display_queries,
-autocomplete;
+old_display_queries;
 
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-chrome.storage.local.get('startpage_darkmode', function(e){
-    darkmode = e.startpage_darkmode;
-    if(darkmode){
-        $(".dark-mode input").prop("checked", true);
-    }
-});
-
-chrome.storage.local.get('startpage_autocomplete', function(e){
-    autocomplete = e.startpage_autocomplete;
-    if(autocomplete){
-        
-        chrome.storage.local.get('startpage_autocomplete_queries', function(e){
-            try{
-                queries = JSON.parse(e.startpage_autocomplete_queries);
-            }catch(e){
-                queries = [];
-            }
-        });
-
-        chrome.storage.local.get('startpage_autocomplete_queries_last', function(e){
-            last = e.startpage_autocomplete_queries_last;
-        });
-    }
+chrome.storage.local.get('startpage_settings', function(e){
+    darkmode = e.startpage_settings.darkmode;
+    $(".dark-mode input").prop("checked", e.startpage_settings.darkmode);
+    updateDarkMode();
 });
 
 function getWeather(lat, lon) {
     $.ajax({
-        url: "https://api.darksky.net/forecast/9c4e8944261ed3b6f5f3438431a5cfa0/" + lat + "," + lon,
+        url: "https://api.darksky.net/forecast//" + lat + "," + lon,
         dataType: "jsonp",
         success: function(data) {
             weather.temp = ((data.currently.temperature.toFixed(2) - 32) * 5 / 9).toFixed(1);;
@@ -63,6 +88,24 @@ function getWeather(lat, lon) {
             data.currently.uvIndex / 11;
         }
     });
+}
+
+function startWeather(){
+    getWeather(49.4489522, 8.6715483);
+    updateWeatherDisplay();
+    var t = setTimeout(startWeather, 600000);
+}
+
+function updateWeatherDisplay(){
+    if(!(weather.descr === undefined || weather.temp === undefined)){
+        $(".weather-description").html(weather.descr);
+        $(".weather-degrees").html(weather.temp + " C");
+        $(".weather-container").css("opacity", 1);
+    } else {
+        $(".weather-container").css("opacity", 0);
+        $(".weather-description").html("asdf");
+        $(".weather-degrees").html("asdf");
+    }
 }
 
 function updateTimeDisplay(h, m){
@@ -252,7 +295,11 @@ function hoverIn(str){
     $(str + "-b .small-bar").addClass("small-bar-active");
     $(str + " .container-color-cover .cover").addClass("cover-active");
     $(str + " .container-color-cover").addClass("container-color-cover-active");
-    $(str + " .image-container img").addClass("preview-small-img-active");
+    if(darkmode){
+        $(str + " .image-container img").css("opacity", "0.9");
+    } else {
+        $(str + " .image-container img").addClass("preview-small-img-active");
+    }
     $(str + " .container-color .outer-rect").addClass("outer-rect-active");
     $(str + " .container-white .inner-rect").addClass("inner-rect-active");
     $(str + "-text .text-site").addClass("text-site-active");
@@ -271,7 +318,11 @@ function hoverOut(str){
     $(str + "-b .small-bar").removeClass("small-bar-active");
     $(str + " .container-color-cover .cover").removeClass("cover-active");
     $(str + " .container-color-cover").removeClass("container-color-cover-active");
-    $(str + " .image-container img").removeClass("preview-small-img-active");
+    if(darkmode){
+        $(str + " .image-container img").css("opacity", "0");
+    } else {
+        $(str + " .image-container img").removeClass("preview-small-img-active");
+    }
     $(str + " .container-color .outer-rect").removeClass("outer-rect-active");
     $(str + " .container-white .inner-rect").removeClass("inner-rect-active");
     $(str + "-text .text-site").removeClass("text-site-active");
@@ -279,18 +330,6 @@ function hoverOut(str){
     $(str + "-text .text-site").removeClass("text-opacity-active");
     $(str + "-text .text-underline").removeClass("text-opacity-active");
 
-}
-
-function updateWeatherDisplay(){
-    if(!(weather.descr === undefined || weather.temp === undefined)){
-        $(".weather-description").html(weather.descr);
-        $(".weather-degrees").html(weather.temp + " C");
-        $(".weather-container").css("opacity", 1);
-    } else {
-        $(".weather-container").css("opacity", 0);
-        $(".weather-description").html("asdf");
-        $(".weather-degrees").html("asdf");
-    }
 }
 
 function startFocusOut(preview){
@@ -328,14 +367,116 @@ function enginePrefix(query){
 }
 
 function searchSelect(selected_index){
-    $.each($(".suggestions ul li"), function(index, element) {
-        if(index == selected_index){
-            $(".suggestions ul li").eq(index).addClass("highlighted")
-            // console.log($(".suggestions ul li").eq(index).html(), $(".suggestions ul li").eq(index))
-        } else {
+    if(selected_index >= 0){
+        $.each($(".suggestions ul li"), function(index, element) {
+            if(index == selected_index){
+                $(".suggestions ul li").eq(index).addClass("highlighted")
+            } else {
+                $(".suggestions ul li").eq(index).removeClass("highlighted")
+            }
+        });
+    } else {
+        $.each($(".suggestions ul li"), function(index, element) {
             $(".suggestions ul li").eq(index).removeClass("highlighted")
+        });
+    }
+}
+
+function updateDarkMode(){
+    if(darkmode){
+        $("body").addClass("dark-light");
+        $("#input").addClass("notrans");
+        setTimeout(function(){
+            $("#input").removeClass("notrans");
+        }, 10);
+        $("#input").addClass("dark-light");
+        $(".clock span").addClass("white-font");
+        $(".text-underline").addClass("white-background");
+        $(".white").addClass("dark-light");
+        $(".triangle-white").css("border-bottom-color", "rgb(45, 45, 45)");
+    } else {
+        $("body").removeClass("dark-light");
+        $("#input").removeClass("dark-light");
+        $("#input").addClass("notrans");
+        setTimeout(function(){
+            $("#input").removeClass("notrans");
+        }, 10);
+        $(".clock span").removeClass("white-font");
+        $(".text-underline").removeClass("white-background");
+        $(".white").removeClass("dark-light");
+        $(".triangle-white").css("border-bottom-color", "white");
+    }
+}
+
+function loadSidebar(i){
+    chrome.storage.local.get("startpage_settings", function(e){
+        if(i < e.startpage_settings.sidebar_websites.length){
+            let website = e.startpage_settings.sidebar_websites[i];
+            src = "/startpage/img/sidebar/" + website.img
+                    
+            if(website.img.replace(/\s/g, '') != "" && website.img.split(".").length > 1){
+                $.get(src)
+                .done(function() { 
+                    var li = document.createElement("li")
+        
+                        var img = document.createElement("img");
+                        img.src = src;
+                        li.append(img)
+        
+                        var p = document.createElement("p")
+                        p.innerText = website.name
+                        li.append(p);
+            
+                    $(".more-websites-list").append(li);
+        
+                    loadSidebar(i+1)
+                }).fail(function() { 
+                    var li = document.createElement("li")
+    
+                        var big = document.createElement("span")
+                        big.innerText = website.name[0].toUpperCase();
+    
+                        li.append(big)
+        
+                        var p = document.createElement("p")
+                        p.innerText = website.name
+                        li.append(p);
+            
+                    $(".more-websites-list").append(li);
+        
+                    loadSidebar(i+1)
+                })
+            } else {
+                var li = document.createElement("li")
+    
+                var big = document.createElement("span")
+                big.innerText = website.name[0].toUpperCase();
+
+                li.append(big)
+
+                var p = document.createElement("p")
+                p.innerText = website.name
+                li.append(p);
+    
+                $(".more-websites-list").append(li);
+
+                loadSidebar(i+1)
+            }
+        } else {
+            $.each($(".more-websites-list li"), function(index, element){
+                $(".more-websites-list li").eq(index).on("click", function(){
+                    name = $(this).find("p").text()
+                    chrome.storage.local.get("startpage_settings", function(e){
+                        console.log(e.startpage_settings.sidebar_websites.filter(website => website.name == name)[0].url)
+                        chrome.runtime.sendMessage({
+                            navigate: e.startpage_settings.sidebar_websites.filter(website => website.name == name)[0].url,
+                            newTab: "false"
+                        });
+                    });
+                })
+            })
         }
-    });
+    })
 }
 
 $(function() {
@@ -344,11 +485,22 @@ $(function() {
 
     startTime();
 
+    updateDarkMode();
+
+    chrome.storage.local.get('startpage_settings', function(e){
+        if(!e.startpage_settings.sidebar){
+            $(".sidebar").hide();
+        } else {
+            loadSidebar(0);
+        }
+    });
+
     // ---------------------------------------------------- SEARCH BAR -------------------------------------------------------------------
 
     $("#input").val("")
 
     $("#input").keydown(function(e) {
+        let val = $(this).val();
         switch(e.keyCode){
             case 9: // TAB
                 keyDodge = true;
@@ -380,64 +532,92 @@ $(function() {
                 
             case 13: // ENTER
                 keyDodge = true;
-                if(!e.shiftKey){
-                    if($(".highlighted").length == 0){
-                        try{
-                            queries.filter(query => {
-                                return (query.query.toUpperCase() == $("#input").val().toUpperCase() && query.engine == $("#input").attr("class").slice(7, $("#input").attr("class").length));
-                            })[0].p++;
-                        } catch(e){
-                            queries.push(
-                                {
-                                    engine: $("#input").attr("class").slice(7, $("#input").attr("class").length),
-                                    query: $(this).val(),
-                                    p: 1
-                                }
-                            )
+                chrome.storage.local.get("startpage_autocomplete", function(e){
+                    queries = e.startpage_autocomplete.suggestions;
+                    last = e.startpage_autocomplete.last;
+                    autocomplete = e.startpage_autocomplete.enabled;
+                    if(!e.shiftKey && autocomplete){
+                        if($(".highlighted").length == 0){
+                            try{
+                                queries.filter(query => {
+                                    return (query.query.toUpperCase() == val.toUpperCase() && query.engine ==  $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
+                                })[0].p++;
+                                queries.filter(query => {
+                                    return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
+                                })[0].time = new Date().getTime();
+                            } catch(e){
+                                
+                                queries.push(
+                                    {
+                                        engine: $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length),
+                                        query: val,
+                                        p: 1,
+                                        time: new Date().getTime()
+                                    }
+                                )
+                            }
+                            queries.sort(function (a, b) {
+                                return b.p - a.p;
+                            });
+
+                                chrome.storage.local.set({startpage_autocomplete:{
+                                    enabled: autocomplete,
+                                    suggestions: queries,
+                                    last: val
+                                }})
+                                
+                                searchExit(enginePrefix(val));
+
+
+                        } else {
+                            
+                            try{
+                                queries.filter(query => {
+                                    return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
+                                })[0].p++;
+                                queries.filter(query => {
+                                    return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
+                                })[0].time = new Date().getTime();
+                            } catch(e){
+                                queries.push(
+                                    {
+                                        engine: $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length),
+                                        query: $(".highlighted").eq(0).html(),
+                                        p: 1,
+                                        time: new Date().getTime()
+                                    }
+                                )
+                            }
+                            
+                            queries.sort(function (a, b) {
+                                return b.p - a.p;
+                            });
+
+                                chrome.storage.local.set({startpage_autocomplete:{
+                                    enabled: autocomplete,
+                                    suggestions: queries,
+                                    last: $(".highlighted").eq(0).html()
+                                }})
+                                
+                                searchExit(enginePrefix($(".highlighted").eq(0).html()));
+                            
                         }
-                        queries.sort(function (a, b) {
-                            return b.p - a.p;
-                        });
-                        chrome.storage.local.set({
-                            startpage_autocomplete_queries: JSON.stringify(queries),
-                            startpage_autocomplete_queries_last: $("#input").val()
-                        });
-                        
-                        searchExit(enginePrefix($(this).val()));
                     } else {
-                        try{
-                            queries.filter(query => {
-                                return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == $("#input").attr("class").slice(7, $("#input").attr("class").length));
-                            })[0].p++;
-                        } catch(e){
-                            queries.push(
-                                {
-                                    engine: $("#input").attr("class").slice(7, $("#input").attr("class").length),
-                                    query: $(".highlighted").eq(0).html(),
-                                    p: 1
-                                }
-                            )
+                        if($(".highlighted").length == 0){
+                            searchExit(enginePrefix(val));
+                        } else {
+                            searchExit(enginePrefix($(".highlighted").eq(0).html()));
                         }
-                        queries.sort(function (a, b) {
-                            return b.p - a.p;
-                        });
-                        chrome.storage.local.set({
-                            startpage_autocomplete_queries: JSON.stringify(queries),
-                            startpage_autocomplete_queries_last: $(".highlighted").eq(0).html()
-                        });
-                        
-                        searchExit(enginePrefix($(".highlighted").eq(0).html()));
                     }
-                } else {
-                    if($(".highlighted").length == 0){
-                        searchExit(enginePrefix($(this).val()));
-                    } else {
-                        searchExit(enginePrefix($(".highlighted").eq(0).html()));
-                    }
-                }
+                    
+                });
                 break;
 
-            default: 
+            case 27: // ESC
+                searchSelect(-1);
+            break;
+
+            default:
                 if($(".highlighted").length != 0){
                     old = $(".highlighted").eq(0).html();
                     setTimeout(function(){
@@ -449,75 +629,80 @@ $(function() {
                             }
                         });
                     }, 10);
-                    
                 }
+                
             break;
         }
 
-        setTimeout(function(){
-            if($("#input").val() != ""){
+        chrome.storage.local.get("startpage_autocomplete", function(e){
+            queries = e.startpage_autocomplete.suggestions;
+            last = e.startpage_autocomplete.last;
+            autocomplete = e.startpage_autocomplete.enabled;
+            setTimeout(function(){
+                if($("#input").val() != "" && autocomplete){
 
-                if(display_queries){
-                    old_display_queries = display_queries;
-                }
+                    if(display_queries){
+                        old_display_queries = display_queries;
+                    }
 
+                    display_queries = queries.filter(query => {
+                        return (query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length) && query.query.toUpperCase().includes($("#input").val().toUpperCase()));
+                    })
 
-                display_queries = queries.filter(query => {
-                    return query.engine == $("#input").attr("class").slice(7, $("#input").attr("class").length) && query.query.toUpperCase().includes($("#input").val().toUpperCase());
-                })
-
-                //fist letter sort
-                if($("#input").val().length == 1){
-                    display_queries.sort(function (a, b) {
-                        if(a.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && b.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
-                            return -1
-                        } else if (b.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && a.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
-                            return 1;
-                        }
-                        return 0;
-                    });
-                }
-
-                //last search bias
-                if(last != undefined && last != ""){
-                    if(display_queries.filter(display_query => {
-                        return display_query.query.toUpperCase() == last.toUpperCase();
-                    }).length != 0 && ($("#input").val().length != 1 || $("#input").val().toUpperCase()[0] == last.toUpperCase()[0])){
+                    //fist letter sort
+                    if($("#input").val().length == 1){
                         display_queries.sort(function (a, b) {
-                            if(a.query.toUpperCase() == last.toUpperCase()){
+                            if(a.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && b.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
                                 return -1
-                            } else if (a.query.toUpperCase() != last.toUpperCase()){
+                            } else if (b.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && a.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
                                 return 1;
                             }
                             return 0;
                         });
                     }
-                }
-                
-                // shift Tab dodge ?
-                if(!(e.keyCode == 16)){
-                    // console.log(display_queries != old_display_queries) //NOT WORKING ?
+
+                    //last search bias
+                    if(last != undefined && last != ""){
+                        if(display_queries.filter(display_query => {
+                            return display_query.query.toUpperCase() == last.toUpperCase();
+                        }).length != 0 && ($("#input").val().length != 1 || $("#input").val().toUpperCase()[0] == last.toUpperCase()[0])){
+                            display_queries.sort(function (a, b) {
+                                if(a.query.toUpperCase() == last.toUpperCase()){
+                                    return -1
+                                } else if (a.query.toUpperCase() != last.toUpperCase()){
+                                    return 1;
+                                }
+                                return 0;
+                            });
+                        }
+                    }
+
+                    // dont update when...
+                    if(![16, 13].includes(e.keyCode)){
                     $(".suggestions ul").html("");
-                    display_queries.forEach(display_query => {
-                        $(".suggestions ul").append($('<li>' + display_query.query + '</li>'))
-                    });
-                    $(".suggestions").css("display", "block")
+                        display_queries.forEach(display_query => {
+                            $(".suggestions ul").append($('<li>' + display_query.query + '</li>'))
+                        });
+                        $(".suggestions").css("display", "block")
+                    }
+                } else {
+                    $(".suggestions").css("display", "none")
                 }
-            } else {
-                $(".suggestions").css("display", "none")
-            }
-        }, 5);
-        
+
+                $('.suggestions ul li').click(function(e){
+                    console.log("hi")
+                    $("#input").val($(this).html());
+                    searchExit(enginePrefix($(this).html()))
+                })
+                
+            }, 5);
+        });
+
         if(keyDodge){
             e.preventDefault();
         }
         return;
     });
-
-	$('.suggestions ul li').click(function(e){
-        $("#input").val($(this).html());
-        searchExit(enginePrefix($(this).html()))
-    })
 
     $(document).keydown(function(e) {
         $("#input").focus();
@@ -531,10 +716,6 @@ $(function() {
             e.preventDefault();
         }
         keyDodge = false;
-        $('.suggestions ul li').click(function(e){
-            $("#input").val($(this).html());
-            searchExit(enginePrefix($(this).html()))
-        })
         return;
     });
 
@@ -563,6 +744,8 @@ $(function() {
             }, 2900);
         }, 800);
     }, 150);
+
+    setTimeout(startWeather, 600000)
 
 
     // ---------------------------------------------------- CLICK HANDLERS -------------------------------------------------------------------
@@ -604,6 +787,7 @@ $(function() {
     $("#tw img").hover(function(){if(!exitPage)hoverIn("#tw")}, function(){setTimeout(function(){if(!exitPage && !dropdown_hovered)hoverOut("#tw")}, 10)});
     $("#g img").hover(function(){if(!exitPage)hoverIn("#g")}, function(){setTimeout(function(){if(!exitPage && !dropdown_hovered)hoverOut("#g")}, 10)});
     $(".sidebar").hover(function(){$(".top_right_icon").addClass("opacity-0")}, function(){$(".top_right_icon").removeClass("opacity-0")});
+    $(".settings p").click(function(){searchExit("https://github.com/Usernameeeeeeeee/startpage")})
 
     // dropdown
 
@@ -649,19 +833,32 @@ $(function() {
     
     $(".dropdown").hover(function(){
         dropdown_hovered = true;
-        console.log("hover in dropdown")
     },function(){
-        console.log("hover out dropdown")
         manageHovered();
     }); 
 
 	$(".dark-mode input").click(function(){
 		darkmode = !darkmode;
-		chrome.storage.local.set({startpage_darkmode:darkmode});
+        chrome.storage.local.get("startpage_settings", function(e){
+            let startpage_settings = e.startpage_settings;
+            startpage_settings.darkmode = darkmode;
+            chrome.storage.local.set({startpage_settings:startpage_settings})
+            updateDarkMode();
+        });
+        chrome.storage.local.get("startpage_selected_profile", function(a){
+            let startpage_selected_profile = a.startpage_selected_profile;
+            if(startpage_selected_profile != ""){
+                chrome.storage.local.get("startpage_profiles", function(pr){
+                    let startpage_profiles = pr.startpage_profiles;
+                    startpage_profiles.filter(profile => profile.name == startpage_selected_profile)[0].settings.darkmode = darkmode;
+                    
+                    chrome.storage.local.set({startpage_profiles:startpage_profiles})
+                });
+            }
+        });
     });
 
     $("#settings").click(function(){
-        chrome.runtime.sendMessage({navigate:"/settings/settings.htm", newTab: "true"});
+        chrome.runtime.sendMessage({navigate:"/settings/settings.html", newTab: "true"});
     })
-    
 });

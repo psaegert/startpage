@@ -1,42 +1,59 @@
 // DEFAULTS
 
-chrome.storage.local.get('startpage_darkmode', function(e){
-	if(e.startpage_darkmode == undefined){
-		chrome.storage.local.set({startpage_darkmode:false});
+chrome.storage.local.get('startpage_settings', function(e){
+	if(e.startpage_settings == undefined){
+		chrome.storage.local.set({startpage_settings:{
+			darkmode: false,
+			darkmode_auto: false,
+			blob: true,
+			sidebar: true,
+			sidebar_websites:[],
+			weather: true,
+		}});
 	}
+
+	chrome.storage.local.get('startpage_profiles', function(a){
+		chrome.storage.local.get('startpage_settings', function(s){
+			if(a.startpage_profiles == undefined){
+				chrome.storage.local.set({startpage_profiles:[{name: "Default", settings:s.startpage_settings}]});
+			}
+
+			chrome.storage.local.get('startpage_selected_profile', function(sp){
+				if(sp.startpage_selected_profile == undefined){
+					chrome.storage.local.get('startpage_profiles', function(pr){
+						if(pr.startpage_profiles.filter(profile => profile.name == "Default").length != 0){
+							chrome.storage.local.set({startpage_selected_profile:"Default"});
+						} else {
+							chrome.storage.local.set({startpage_selected_profile:""});
+						}
+					});
+				}
+			});
+		});
+	});
 });
 
 chrome.storage.local.get('startpage_autocomplete', function(e){
-	if(e.startpage_autocomplete == undefined){
-		chrome.storage.local.set({startpage_autocomplete:true});
+	let startpage_autocomplete = e.startpage_autocomplete;
+	if(startpage_autocomplete == undefined){
+		chrome.storage.local.set({startpage_autocomplete:{
+			enabled: true,
+			suggestions: [],
+			last: ""
+		}});
 	}
 });
 
-chrome.storage.local.get('startpage_autocomplete_queries', function(e){
-	if(e.startpage_autocomplete_queries == undefined){
-		chrome.storage.local.set({startpage_autocomplete_queries:[]});
-	}
-});
-
-chrome.storage.local.get('startpage_blob', function(e){
-	if(e.startpage_blob == undefined){
-		chrome.storage.local.set({startpage_blob:true});
-	}
-});
-
-chrome.storage.local.get('startpage_sidebar', function(e){
-	if(e.startpage_sidebar == undefined){
-		chrome.storage.local.set({startpage_sidebar:true});
-	}
-});
-
-chrome.tabs.create({ url: "/settings/settings.htm" });
 
 // MAIN
 
 var redir = ['opera://startpage/', 'browser://startpage/', 'chrome://startpage/'];
 
-var startpage_path = "/startpage/index.html"
+var startpage_path = "/startpage/startpage.html"
+
+chrome.tabs.onUpdated.addListener(function(tab){
+	
+});
 
 chrome.tabs.onCreated.addListener(function(tab){
 	
@@ -48,23 +65,24 @@ chrome.tabs.onCreated.addListener(function(tab){
 	};
 
 	chrome.tabs.create({
-		url:"/startpage/index.html"
+		url:"/startpage/startpage.html"
 	});
 	chrome.tabs.remove(tab.id);
 	
 });
 
-chrome.runtime.onMessage.addListener(
-	function(request, sender, sendResponse) {
+// BLOB
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		if (request.navigate == "home"){
 			if(request.newTab == "true"){
 				chrome.tabs.create({
-					url:"/startpage/index.html"
+					url:"/startpage/startpage.html"
 				});
 
 			} else if(request.newTab == "false") {
 				chrome.tabs.getSelected(function (tab) {
-					chrome.tabs.update(tab.id, {url:"/startpage/index.html"});
+					chrome.tabs.update(tab.id, {url:"/startpage/startpage.html"});
 				});
 			}
 		} else {
@@ -75,7 +93,7 @@ chrome.runtime.onMessage.addListener(
 					});
 				} else {
 					chrome.tabs.create({
-						url:"settings.htm"
+						url:"settings.html"
 					});
 				}
 			} else if(request.newTab == "false") {
@@ -84,7 +102,7 @@ chrome.runtime.onMessage.addListener(
 						chrome.tabs.update(tab.id, {url: request.navigate});
 					} else {
 						chrome.tabs.create({
-							url:"settings.htm"
+							url:"settings.html"
 						});
 					}
 				});
