@@ -147,9 +147,7 @@ $("#startpage-blob--description-container").append(underline);
 
 
 // KEY listener
-
 $(document).keydown(function (ev) {
-    console.log(ev.keyCode)
     if(ev.keyCode == 16){
         ev.preventDefault();
         pressed = true;

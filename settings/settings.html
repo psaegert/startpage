@@ -13,6 +13,17 @@
 			Settings
 		</h1>
 		<hr>
+		<div class="side">
+			<div class="side-content">
+				<h4>Resources</h4>
+				<h4>Profiles</h4>
+				<h4>Basic Settings</h4>
+				<h4>Sidebar</h4>
+				<h4>Blob</h4>
+				<h4>Weather</h4>
+				<h4>Content</h4>
+			</div>
+		</div>
 		<div class="block resources">
 			<h2>Resources</h2>
 			<div class="content">
@@ -48,12 +59,28 @@
 					<span>Dark Mode</span>
 				</div>
 
-				<h3>Autocomplete (Global)</h3>
+				<div class="check"  id="darkmode_auto">
+					<input type="checkbox">
+					<span>Scheduled Dark Mode</span>
+				</div>
+
+				<div class="time" style="margin-left: -35px;">
+					<span>From</span>
+					<div class="time-input">
+						<input type="time">
+					</div>
+					<span>To</span>
+					<div class="time-input">
+						<input type="time">
+					</div>
+				</div>
+
+				<h3>Autocomplete</h3>
 				
 				<div class="subcontent">
 					<div class="check" id="autocomplete">
 						<input type="checkbox">
-						<span>Autocomplete Suggestions</span>
+						<span>Autocomplete Suggestions (Global)</span>
 					</div>
 
 					<p class="note">(Note: press [SHIFT] + [ENTER] to dodge the saving of your current search query.)</p>
@@ -73,7 +100,13 @@
 				
 					<p>Search Engines</p>
 
-					<p>*coming soon*</p>
+					<table class="manage" id="search-engines">
+						<tbody>
+							<td style="color:rgb(161, 0, 0)">An Error occured. Please reload the page before changing any settings.</td>
+						</tbody>
+					</table>
+
+					<p class="note">Pick your favorite color here: <a target="_blank" href="https://www.webfx.com/web-design/color-picker/">https://www.webfx.com/web-design/color-picker/</a></p>
 				
 				</div>
 
@@ -94,7 +127,7 @@
 							<td style="color:rgb(161, 0, 0)">An Error occured. Please reload the page before changing any settings.</td>
 						</tbody>
 					</table>
-					<p class="note">PNG format recommended. Only icons in '/startpage/startpage/img/sidebar/' will be recognized.</p>
+					<p class="note">PNG or SVG format recommended. http(s):// or file:/// protocol and icons in '/startpage/startpage/img/sidebar/' will be accepted.</p>
 				</div>
 				
 			</div>
@@ -131,12 +164,23 @@
 				<h3>Location</h3>
 				<div class="subcontent">
 					<p>Enter your coordinates</p>
-					<p>*coming soon*</p>
+					<div class="location">
+						<div class="lat">
+							<span>Lat:</span>
+							<input placeholder="12.34567" type="text">
+						</div>
+						<div class="lon">
+							<span>Lon:</span>
+							<input placeholder="76.54321" type="text">
+						</div>
+					</div>
+					<p class="note">Dont know your coordinates? Try searching for your place here: <a target="_blank" href="https://www.latlong.net/">https://www.latlong.net/</a></p>
 				</div>
 				<h3>Key</h3>
 				<div class="subcontent">
 					<p>Enter your Darksky API key here</p>
-					<p>*coming soon*</p>
+					<input type="text" id="darksky" spellcheck="false">
+					<p class="note">Don't have a key? Get one here: <a target="_blank" href="https://darksky.net/dev">https://darksky.net/dev</a> (Account required)</p>
 				</div>
 			</div>
 		</div>
@@ -144,19 +188,6 @@
 			<h2>Content</h2>
 			<div class="content">
 				<h3>Quick Access</h3>
-
-				<div class="subcontent">
-					<p>Select an Icon</p>
-					<p>Enter the URL</p>
-					<p>*coming soon*</p>
-				</div>
-
-				<h3>Search Engines</h3>
-
-				<div class="subcontent">
-					<p>Manage Search engines</p>
-					<p>*coming soon*</p>
-				</div>
 
 				<h3>Featured Websites</h3>
 				
@@ -181,10 +212,8 @@
 			</div>
 		</div>
 
-		<div class="message-container">
-			<div class="message">
-				This is a message
-			</div>
+		<div class="drag">
+			
 		</div>
 
 		<script src="/settings/settings.js"></script>

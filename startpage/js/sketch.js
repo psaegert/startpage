@@ -5,21 +5,12 @@ Math.easeInOutQuad = function (t, b, c, d) {
 	return -c/2 * (t*(t-2) - 1) + b;
 };
 
+
+
 function displayWeather(){
     let center = {x: 35, y: 54};
-    colors = {sun: color(255, 225, 160),
-        white: color(240, 240, 240),
-        fog: color(240, 240, 240, 70),
-        cloud: color(180, 180, 180),
-        rain: color(180, 180, 180),
-        hum: color(141, 228, 239),
-        ice: color(141, 228, 239),
-        clcover: color(165, 165, 165),
-        uv: color(198, 160, 219),
-        darkcloud: color(110, 110, 110),
-        grey: color(240, 240, 240, Math.easeInOutQuad(framePercentage(40, 60), 0, 1, 1)*70),
-        blue: color(52, 61, 70, 255)
-    };
+    colors.grey= color(240, 240, 240, Math.easeInOutQuad(framePercentage(40, 60), 0, 1, 1)*70);
+    colors.grey_absolute= color(168, 168, 168, Math.easeInOutQuad(framePercentage(40, 60), 0, 1, 1));
 
     push();
     noStroke();
@@ -194,7 +185,24 @@ var randoms = [{x: 5, y: 11, r: 1.3},
     {x: 12, y: -5, r: 1.5},
     {x: -20, y: 11, r: 1.9}];
 
+var colors;
+
 function setup(){
+    colors = {
+        sun: color(255, 225, 160),
+        white: color(240, 240, 240),
+        fog: color(240, 240, 240, 70),
+        cloud: color(180, 180, 180),
+        rain: color(180, 180, 180),
+        hum: color(141, 228, 239),
+        ice: color(141, 228, 239),
+        clcover: color(165, 165, 165),
+        uv: color(198, 160, 219),
+        darkcloud: color(110, 110, 110),
+        grey: color(240, 240, 240, Math.easeInOutQuad(framePercentage(40, 60), 0, 1, 1)*70),
+        grey_absolute: color(168, 168, 168, Math.easeInOutQuad(framePercentage(40, 60), 0, 1, 1)),
+        blue: color(52, 61, 70, 255)
+    }
     createCanvas(250, 110);
     jQuery("#defaultCanvas0").detach().appendTo('.weather-container')
     $("#defaultCanvas0").css("position", "absolute");

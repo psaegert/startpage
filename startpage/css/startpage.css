@@ -37,6 +37,11 @@ body:after{
   position: absolute;
   z-index: -1;  
 }
+
+.smooth-bg{
+  transition: 0.5s background-color ease;
+}
+
 .header{
   height: 131px;
   width: 100%;
@@ -64,7 +69,6 @@ body:after{
 }
 
 .top_left_icon{
-  overflow: visible;
   position:absolute;
   display:flex;
   width: 75px;
@@ -72,6 +76,9 @@ body:after{
   left: 50px;
   top: 27.5px;
   z-index: 1;
+  transition-property: opacity;
+  transition-duration: 0.3s;
+  transition-timing-function: ease; 
 }
 
 .top_right_icon{
@@ -83,8 +90,6 @@ body:after{
   font-family: GothamRoundedLight;
   color: rgb(230, 230, 230);
   text-align:center;
-  will-change: opacity;
-  transition: 0.2s opacity ease;
   z-index: 1;
 }
 
@@ -103,12 +108,14 @@ body:after{
   width:100%;
   height: 100%;
   opacity: 0.9;
-  transition: 0.05s transform ease-in-out;
+  transition-property: transform,;
+  transition-duration: 0.15s;
+  transition-timing-function: ease; 
   will-change: transform;
 }
 
 #top-left-icon:hover{
-  transform: scale(1.03);
+  transform: scale(1.1);
 }
 
 .input{
@@ -157,10 +164,13 @@ body:after{
   height: 50px;
   background-color: #e3e3e3;
   border: none;
+  border-left: 10px rgb(230, 230, 230) solid;
+  border-color: rgb(170, 170, 170);
   font-size: 13pt;
   float: left;
   color: #333c47;
   padding-left: 45px;
+  padding-right: 25px;
   border-radius: 5px;
   text-decoration: none;
 
@@ -856,8 +866,17 @@ hr {
   height: 100%;
 }
 
+.more-websites-list li{
+  position:relative;
+}
+
 .more-websites-list li img{
+  position: absolute;
   height: 20px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  border-radius: 18%;
 }
 
 .more-websites-list li p{
@@ -865,12 +884,12 @@ hr {
   font-size: 14pt;
   position: absolute;
   line-height: 19px;
-  left: 55px;
+  left: 65px;
 }
 
 .more-websites-list li span{
   display: inline-block;
-  font-family: GothamBold;
+  /* font-family: GothamBold; */
   font-weight: lighter;
   font-size: 19pt;
   position: absolute;
@@ -883,7 +902,7 @@ ul.more-websites-list::-webkit-scrollbar {
 }
 
 .more-websites li{
-  padding: 8px;
+  padding: 12px;
   padding-left: 7%;
   font-size: 12pt;
   font-family: GothamRoundedLight;
@@ -1052,6 +1071,7 @@ input:checked + .switch-slider:before {
   position: absolute;
   top: 20%;
   right: 15%;
+  opacity: 0.8;
   width: auto;
   display: inline-block;
   font-size: 12pt;
@@ -1062,6 +1082,25 @@ input:checked + .switch-slider:before {
 
 #settings:hover{
   cursor: pointer;
+  opacity: 1;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 2px;
+  background-color: rgb(230, 230, 230);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background-color: rgb(200, 200, 200); 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(170, 170, 170); 
 }
 
 .dark-dark{

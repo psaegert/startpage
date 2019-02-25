@@ -1,47 +1,3 @@
-chrome.storage.local.get('startpage_settings', function(e){
-	if(e.startpage_settings == undefined){
-		chrome.storage.local.set({startpage_settings:{
-			darkmode: false,
-			darkmode_auto: false,
-			blob: true,
-			sidebar: true,
-			sidebar_websites:[],
-			weather: true,
-		}});
-	}
-
-	chrome.storage.local.get('startpage_profiles', function(a){
-		chrome.storage.local.get('startpage_settings', function(s){
-			if(a.startpage_profiles == undefined){
-				chrome.storage.local.set({startpage_profiles:[{name: "Default", settings:s.startpage_settings}]});
-			}
-
-			chrome.storage.local.get('startpage_selected_profile', function(sp){
-				if(sp.startpage_selected_profile == undefined){
-					chrome.storage.local.get('startpage_profiles', function(pr){
-						if(pr.startpage_profiles.filter(profile => profile.name == "Default").length != 0){
-							chrome.storage.local.set({startpage_selected_profile:"Default"});
-						} else {
-							chrome.storage.local.set({startpage_selected_profile:""});
-						}
-					});
-				}
-			});
-		});
-	});
-});
-
-chrome.storage.local.get('startpage_autocomplete', function(e){
-	let startpage_autocomplete = e.startpage_autocomplete;
-	if(startpage_autocomplete == undefined){
-		chrome.storage.local.set({startpage_autocomplete:{
-			enabled: true,
-			suggestions: [],
-			last: ""
-		}});
-	}
-});
-
 var weather = {},
 
 dropdown_hovered = false,
@@ -55,8 +11,9 @@ s_index = -1,
 progress = 0,
 
 hovered = "",
-engines = ["Google", "Youtube", "Soundcloud"],
+engines = [],
 
+showWeather,
 darkmode,
 sidebar,
 queries,
@@ -67,37 +24,42 @@ old_display_queries;
 
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-chrome.storage.local.get('startpage_settings', function(e){
-    darkmode = e.startpage_settings.darkmode;
-    $(".dark-mode input").prop("checked", e.startpage_settings.darkmode);
-    updateDarkMode();
-});
-
-function getWeather(lat, lon) {
-    $.ajax({
-        url: "https://api.darksky.net/forecast//" + lat + "," + lon,
-        dataType: "jsonp",
-        success: function(data) {
-            weather.temp = ((data.currently.temperature.toFixed(2) - 32) * 5 / 9).toFixed(1);;
-            weather.icon = data.currently.icon.toUpperCase();
-            weather.descr = data.currently.summary;
-
-            weather.hum = data.currently.humidity;
-            weather.clcover = data.currently.cloudCover;
-            weather.uv = data.currently.uvIndex / 11;
-            data.currently.uvIndex / 11;
-        }
-    });
+function getWeather() {
+    if(showWeather){
+        chrome.storage.local.get("startpage_settings", function(e){
+            let dkey = e.startpage_settings.darksky_key.replace(/\s/g, '');
+            let lat = e.startpage_settings.darksky_loc.lat;
+            let lon = e.startpage_settings.darksky_loc.lon;
+            if(dkey != ""){
+                $.ajax({
+                    url: "https://api.darksky.net/forecast/" + dkey + "/" + lat + "," + lon + "?exclude=[minutely,hourly,alerts,flags]",
+                    dataType: "jsonp",
+                    success: function(data) {
+                        weather.temp = ((data.currently.temperature.toFixed(2) - 32) * 5 / 9).toFixed(1);;
+                        weather.icon = data.currently.icon.toUpperCase();
+                        weather.descr = data.currently.summary;
+            
+                        weather.hum = data.currently.humidity;
+                        weather.clcover = data.currently.cloudCover;
+                        weather.uv = data.currently.uvIndex / 11;
+                        data.currently.uvIndex / 11;
+                    }
+                });
+            }
+        })
+    }
 }
 
 function startWeather(){
-    getWeather(49.4489522, 8.6715483);
-    updateWeatherDisplay();
+    if(showWeather){
+        getWeather();
+        updateWeatherDisplay();
+    }
     var t = setTimeout(startWeather, 600000);
 }
 
 function updateWeatherDisplay(){
-    if(!(weather.descr === undefined || weather.temp === undefined)){
+    if(!(weather.descr === undefined || weather.temp === undefined) && showWeather){
         $(".weather-description").html(weather.descr);
         $(".weather-degrees").html(weather.temp + " C");
         $(".weather-container").css("opacity", 1);
@@ -196,6 +158,13 @@ function startTime() {
 function checkTime(i) {
     if (i < 10) {i = "0" + i};
     return i;
+}
+
+function startDarkCheck(){
+    chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
+		updateDarkMode();
+    });
+    var t = setTimeout(startDarkCheck, 30000)
 }
 
 function monthToStr(mt){
@@ -352,18 +321,11 @@ function manageHovered(){
 }
 
 function enginePrefix(query){
-    switch(engine_index){
-        case 0:
-            query = "https://www.google.de/search?client=opera&q=" + query;
-            break;
-        case 1:
-            query = "https://www.youtube.com/results?search_query=" + query;
-            break;
-        case 2:
-            query = "https://soundcloud.com/search?q="  + query;
-            break;
+    if(engines[engine_index].url.replace(/\s/g, '') != ""){
+        return engines[engine_index].url + query
+    } else {
+        return "www.google.com/search?q=" + query
     }
-    return query;
 }
 
 function searchSelect(selected_index){
@@ -383,44 +345,46 @@ function searchSelect(selected_index){
 }
 
 function updateDarkMode(){
-    if(darkmode){
-        $("body").addClass("dark-light");
-        $("#input").addClass("notrans");
-        setTimeout(function(){
-            $("#input").removeClass("notrans");
-        }, 10);
-        $("#input").addClass("dark-light");
-        $(".clock span").addClass("white-font");
-        $(".text-underline").addClass("white-background");
-        $(".white").addClass("dark-light");
-        $(".triangle-white").css("border-bottom-color", "rgb(45, 45, 45)");
-    } else {
-        $("body").removeClass("dark-light");
-        $("#input").removeClass("dark-light");
-        $("#input").addClass("notrans");
-        setTimeout(function(){
-            $("#input").removeClass("notrans");
-        }, 10);
-        $(".clock span").removeClass("white-font");
-        $(".text-underline").removeClass("white-background");
-        $(".white").removeClass("dark-light");
-        $(".triangle-white").css("border-bottom-color", "white");
-    }
+    chrome.storage.local.get('startpage_settings', function(e){
+        darkmode = e.startpage_settings.darkmode;
+        $(".dark-mode input").prop("checked", e.startpage_settings.darkmode);
+        
+        if(darkmode){
+            $("body").addClass("dark-light");
+            $("#input").addClass("dark-light");
+            $(".clock span").addClass("white-font");
+            $(".text-underline").addClass("white-background");
+            $(".white").addClass("dark-light");
+            $(".triangle-white").css("border-bottom-color", "rgb(45, 45, 45)");
+        } else {
+            $("body").removeClass("dark-light");
+            $("#input").removeClass("dark-light");
+            $(".clock span").removeClass("white-font");
+            $(".text-underline").removeClass("white-background");
+            $(".white").removeClass("dark-light");
+            $(".triangle-white").css("border-bottom-color", "white");
+        }
+    });
 }
 
 function loadSidebar(i){
     chrome.storage.local.get("startpage_settings", function(e){
         if(i < e.startpage_settings.sidebar_websites.length){
             let website = e.startpage_settings.sidebar_websites[i];
-            src = "/startpage/img/sidebar/" + website.img
+            if(website.img.indexOf("file:///") == 0 || website.img.indexOf("http://") == 0 || website.img.indexOf("https://") == 0){
+                src = website.img;
+            } else {
+                src = "/startpage/img/sidebar/" + website.img
+            }
                     
-            if(website.img.replace(/\s/g, '') != "" && website.img.split(".").length > 1){
+            if(src.replace(/\s/g, '') != "" && src.split(".").length > 1){
                 $.get(src)
                 .done(function() { 
                     var li = document.createElement("li")
         
                         var img = document.createElement("img");
                         img.src = src;
+                        
                         li.append(img)
         
                         var p = document.createElement("p")
@@ -467,11 +431,12 @@ function loadSidebar(i){
                 $(".more-websites-list li").eq(index).on("click", function(){
                     name = $(this).find("p").text()
                     chrome.storage.local.get("startpage_settings", function(e){
-                        console.log(e.startpage_settings.sidebar_websites.filter(website => website.name == name)[0].url)
-                        chrome.runtime.sendMessage({
-                            navigate: e.startpage_settings.sidebar_websites.filter(website => website.name == name)[0].url,
-                            newTab: "false"
-                        });
+                        if(e.startpage_settings.sidebar_websites.filter(website => website.name == name)[0].url.replace(/\s/g, '') != ""){
+                            chrome.runtime.sendMessage({
+                                navigate: e.startpage_settings.sidebar_websites.filter(website => website.name == name)[0].url,
+                                newTab: "false"
+                            });
+                        }
                     });
                 })
             })
@@ -479,25 +444,42 @@ function loadSidebar(i){
     })
 }
 
+chrome.storage.local.get('startpage_settings', function(e){
+    engines = e.startpage_settings.search_engines;
+});
 $(function() {
-    
-    getWeather(49.4489522, 8.6715483);
-
-    startTime();
-
-    updateDarkMode();
 
     chrome.storage.local.get('startpage_settings', function(e){
+        showWeather = e.startpage_settings.weather;
         if(!e.startpage_settings.sidebar){
             $(".sidebar").hide();
         } else {
             loadSidebar(0);
         }
+    
+        getWeather();
     });
+
+    
+    $("#input").addClass("notrans");
+    setTimeout(function(){
+        $("#input").removeClass("notrans");
+    }, 100);
+
+    startTime();
+
+    startDarkCheck();
+
+    setTimeout(function(){
+		$("body").addClass("smooth-bg")
+	}, 1000)
 
     // ---------------------------------------------------- SEARCH BAR -------------------------------------------------------------------
 
     $("#input").val("")
+
+    $("input").attr("placeholder", "Search " + engines[0].name)
+    $("#input").css("border-color", engines[0].color)
 
     $("#input").keydown(function(e) {
         let val = $(this).val();
@@ -518,15 +500,17 @@ $(function() {
                         }
                     }
                 } else {
-                    last_index = engine_index;
-                    s_index = -1;
-    
-                    engine_index++;
-                    if(engine_index >= engines.length) engine_index = 0;
-    
-                    $(this).attr("placeholder", "Search " + engines[engine_index])
-                    $(this).removeClass("border-" + engines[last_index]); 
-                    $(this).addClass("border-" + engines[engine_index]);
+                    chrome.storage.local.get("startpage_settings", function(s){
+                        engines = s.startpage_settings.search_engines;
+                        last_index = engine_index;
+                        s_index = -1;
+        
+                        engine_index++;
+                        if(engine_index >= engines.length) engine_index = 0;
+        
+                        $("#input").attr("placeholder", "Search " + engines[engine_index].name)
+                        $("#input").css("border-color", engines[engine_index].color)
+                    })
                 }
                 break;
                 
@@ -536,80 +520,84 @@ $(function() {
                     queries = e.startpage_autocomplete.suggestions;
                     last = e.startpage_autocomplete.last;
                     autocomplete = e.startpage_autocomplete.enabled;
-                    if(!e.shiftKey && autocomplete){
-                        if($(".highlighted").length == 0){
-                            try{
-                                queries.filter(query => {
-                                    return (query.query.toUpperCase() == val.toUpperCase() && query.engine ==  $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
-                                })[0].p++;
-                                queries.filter(query => {
-                                    return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
-                                })[0].time = new Date().getTime();
-                            } catch(e){
-                                
-                                queries.push(
-                                    {
-                                        engine: $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length),
-                                        query: val,
-                                        p: 1,
-                                        time: new Date().getTime()
-                                    }
-                                )
-                            }
-                            queries.sort(function (a, b) {
-                                return b.p - a.p;
-                            });
-
-                                chrome.storage.local.set({startpage_autocomplete:{
-                                    enabled: autocomplete,
-                                    suggestions: queries,
-                                    last: val
-                                }})
-                                
-                                searchExit(enginePrefix(val));
-
-
-                        } else {
-                            
-                            try{
-                                queries.filter(query => {
-                                    return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
-                                })[0].p++;
-                                queries.filter(query => {
-                                    return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length));
-                                })[0].time = new Date().getTime();
-                            } catch(e){
-                                queries.push(
-                                    {
-                                        engine: $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length),
-                                        query: $(".highlighted").eq(0).html(),
-                                        p: 1,
-                                        time: new Date().getTime()
-                                    }
-                                )
-                            }
-                            
-                            queries.sort(function (a, b) {
-                                return b.p - a.p;
-                            });
-
-                                chrome.storage.local.set({startpage_autocomplete:{
-                                    enabled: autocomplete,
-                                    suggestions: queries,
-                                    last: $(".highlighted").eq(0).html()
-                                }})
-                                
-                                searchExit(enginePrefix($(".highlighted").eq(0).html()));
-                            
-                        }
-                    } else {
-                        if($(".highlighted").length == 0){
-                            searchExit(enginePrefix(val));
-                        } else {
-                            searchExit(enginePrefix($(".highlighted").eq(0).html()));
-                        }
-                    }
                     
+                    chrome.storage.local.get("startpage_settings", function(s){
+                        engines = s.startpage_settings.search_engines;
+
+                        if(!e.shiftKey && autocomplete){
+                            if($(".highlighted").length == 0){
+                                try{
+                                    queries.filter(query => {
+                                        return (query.query.toUpperCase() == val.toUpperCase() && query.engine ==  engines[engine_index].name);
+                                    })[0].p++;
+                                    queries.filter(query => {
+                                        return (query.query.toUpperCase() == val.toUpperCase() && query.engine == engines[engine_index].name);
+                                    })[0].time = new Date().getTime();
+                                } catch(e){
+                                    
+                                    queries.push(
+                                        {
+                                            engine: engines[engine_index].name,
+                                            query: val,
+                                            p: 1,
+                                            time: new Date().getTime()
+                                        }
+                                    )
+                                }
+                                queries.sort(function (a, b) {
+                                    return b.p - a.p;
+                                });
+    
+                                    chrome.storage.local.set({startpage_autocomplete:{
+                                        enabled: autocomplete,
+                                        suggestions: queries,
+                                        last: val
+                                    }})
+                                    
+                                    searchExit(enginePrefix(val));
+    
+    
+                            } else {
+                                
+                                try{
+                                    queries.filter(query => {
+                                        return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == engines[engine_index].name);
+                                    })[0].p++;
+                                    queries.filter(query => {
+                                        return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == engines[engine_index].name);
+                                    })[0].time = new Date().getTime();
+                                } catch(e){
+                                    queries.push(
+                                        {
+                                            engine: engines[engine_index].name,
+                                            query: $(".highlighted").eq(0).html(),
+                                            p: 1,
+                                            time: new Date().getTime()
+                                        }
+                                    )
+                                }
+                                
+                                queries.sort(function (a, b) {
+                                    return b.p - a.p;
+                                });
+    
+                                    chrome.storage.local.set({startpage_autocomplete:{
+                                        enabled: autocomplete,
+                                        suggestions: queries,
+                                        last: $(".highlighted").eq(0).html()
+                                    }})
+                                    
+                                    searchExit(enginePrefix($(".highlighted").eq(0).html()));
+                                
+                            }
+                        } else {
+                            if($(".highlighted").length == 0){
+                                searchExit(enginePrefix(val));
+                            } else {
+                                searchExit(enginePrefix($(".highlighted").eq(0).html()));
+                            }
+                        }
+                    });
                 });
                 break;
 
@@ -638,64 +626,106 @@ $(function() {
             queries = e.startpage_autocomplete.suggestions;
             last = e.startpage_autocomplete.last;
             autocomplete = e.startpage_autocomplete.enabled;
-            setTimeout(function(){
-                if($("#input").val() != "" && autocomplete){
-
-                    if(display_queries){
-                        old_display_queries = display_queries;
-                    }
-
-                    display_queries = queries.filter(query => {
-                        return (query.engine == $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].slice(7, $("#input").attr("class").split(" ").filter(className => className.indexOf("border-") >= 0)[0].length) && query.query.toUpperCase().includes($("#input").val().toUpperCase()));
-                    })
-
-                    //fist letter sort
-                    if($("#input").val().length == 1){
-                        display_queries.sort(function (a, b) {
-                            if(a.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && b.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
-                                return -1
-                            } else if (b.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && a.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
-                                return 1;
-                            }
-                            return 0;
-                        });
-                    }
-
-                    //last search bias
-                    if(last != undefined && last != ""){
-                        if(display_queries.filter(display_query => {
-                            return display_query.query.toUpperCase() == last.toUpperCase();
-                        }).length != 0 && ($("#input").val().length != 1 || $("#input").val().toUpperCase()[0] == last.toUpperCase()[0])){
+            
+            chrome.storage.local.get("startpage_settings", function(s){
+                engines = s.startpage_settings.search_engines;
+                setTimeout(function(){
+                    if($("#input").val() != "" && autocomplete){
+    
+                        if(display_queries){
+                            old_display_queries = display_queries;
+                        }
+    
+                        display_queries = queries.filter(query => {
+                            return (query.engine == engines[engine_index].name && query.query.toUpperCase().includes($("#input").val().toUpperCase()));
+                        })
+    
+                        //fist letter sort
+                        if($("#input").val().length == 1){
                             display_queries.sort(function (a, b) {
-                                if(a.query.toUpperCase() == last.toUpperCase()){
+                                if(a.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && b.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
                                     return -1
-                                } else if (a.query.toUpperCase() != last.toUpperCase()){
+                                } else if (b.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && a.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
                                     return 1;
                                 }
                                 return 0;
                             });
                         }
+    
+                        //last search bias
+                        if(last != undefined && last != ""){
+                            if(display_queries.filter(display_query => {
+                                return display_query.query.toUpperCase() == last.toUpperCase();
+                            }).length != 0 && ($("#input").val().length != 1 || $("#input").val().toUpperCase()[0] == last.toUpperCase()[0])){
+                                display_queries.sort(function (a, b) {
+                                    if(a.query.toUpperCase() == last.toUpperCase()){
+                                        return -1
+                                    } else if (a.query.toUpperCase() != last.toUpperCase()){
+                                        return 1;
+                                    }
+                                    return 0;
+                                });
+                            }
+                        }
+    
+                        // dont update when...
+                        if(![16, 13].includes(e.keyCode)){
+                        $(".suggestions ul").html("");
+                            display_queries.forEach(display_query => {
+                                $(".suggestions ul").append($('<li>' + display_query.query + '</li>'))
+                            });
+                            $(".suggestions").css("display", "block")
+                        }
+                    } else {
+                        $(".suggestions").css("display", "none")
                     }
-
-                    // dont update when...
-                    if(![16, 13].includes(e.keyCode)){
-                    $(".suggestions ul").html("");
-                        display_queries.forEach(display_query => {
-                            $(".suggestions ul").append($('<li>' + display_query.query + '</li>'))
+    
+                    $('.suggestions ul li').click(function(e){
+                        clickedQuery = $(this).text()
+                        chrome.storage.local.get("startpage_autocomplete", function(e){
+                            queries = e.startpage_autocomplete.suggestions;
+                            last = e.startpage_autocomplete.last;
+                            autocomplete = e.startpage_autocomplete.enabled;
+    
+    
+                            try{
+                                queries.filter(query => {
+                                    return (query.query.toUpperCase() == clickedQuery.toUpperCase() && query.engine == engines[engine_index].name);
+                                })[0].p++;
+                                queries.filter(query => {
+                                    return (query.query.toUpperCase() == clickedQuery.toUpperCase() && query.engine == engines[engine_index].name);
+                                })[0].time = new Date().getTime();
+                            } catch(e){
+                                queries.push(
+                                    {
+                                        engine: engines[engine_index].name,
+                                        query: $(".highlighted").eq(0).html(),
+                                        p: 1,
+                                        time: new Date().getTime()
+                                    }
+                                )
+                            }
+                            
+                            queries.sort(function (a, b) {
+                                return b.p - a.p;
+                            });
+    
+    
+                            chrome.storage.local.set({startpage_autocomplete:{
+                                enabled: autocomplete,
+                                suggestions: queries,
+                                last: clickedQuery
+                            }})
+    
+    
+                            searchExit(enginePrefix(clickedQuery))
+                            $("#input").val(clickedQuery);
+    
+    
                         });
-                        $(".suggestions").css("display", "block")
-                    }
-                } else {
-                    $(".suggestions").css("display", "none")
-                }
-
-                $('.suggestions ul li').click(function(e){
-                    console.log("hi")
-                    $("#input").val($(this).html());
-                    searchExit(enginePrefix($(this).html()))
-                })
-                
-            }, 5);
+                    })
+                }, 5);
+            });
         });
 
         if(keyDodge){
@@ -724,6 +754,7 @@ $(function() {
     setTimeout(function(){
         $(".bar_ini").addClass("bar");
         $(".bar_ini").removeClass("bar_ini");
+        $(".top_left_icon").removeClass("opacity-0");
         setTimeout(function(){
             updateWeatherDisplay();
         }, 500);
