@@ -47,7 +47,7 @@ Note: Very strict Ad-Blockers will mess things up a bit, so make sure to whiteli
 
 # 4) Known bugs:
 - portrait mode animation not adapted (low priority)
-- weather display: circles overlap when close to 100%
+- weather display: circles overlap when close to 100% [FIXED]
 - not working on safari
 
 # 5) Preview:
@@ -63,6 +63,6 @@ quick access overlay ("blob")
 settings
 
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_1.png)
-![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_1_1.png)
+![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_1_2.png)
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_3.png)
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_4.png)
