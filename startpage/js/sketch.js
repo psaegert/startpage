@@ -141,20 +141,20 @@ function displayWeather(){
             case 0:
                 if(weather.hum > 0){
                     stroke(colors.hum);
-                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(70, 130), 0, 1, 1) * TWO_PI * weather.hum * 0.99 - HALF_PI);
+                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(70, 130), 0, 1, 1) * TWO_PI * weather.hum * 0.97 - HALF_PI);
                 }
                 break;
             case 1:
                 if(weather.clcover > 0){
                     stroke(colors.clcover);
-                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(80, 140), 0, 1, 1) * TWO_PI * weather.clcover * 0.99 - HALF_PI);
+                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(80, 140), 0, 1, 1) * TWO_PI * weather.clcover * 0.97 - HALF_PI);
                     
                 }
                 break;
             case 2:
                 if(weather.uv > 0){
                     stroke(colors.uv);
-                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(90, 150), 0, 1, 1) * TWO_PI * weather.uv * 0.99 - HALF_PI);
+                    arc(x, y, 12, 12, - HALF_PI, Math.easeInOutQuad(framePercentage(90, 150), 0, 1, 1) * TWO_PI * weather.uv * 0.97 - HALF_PI);
                     
                 }
                 break;                

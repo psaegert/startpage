@@ -3,7 +3,6 @@ var weather = {},
 dropdown_hovered = false,
 clockoverflow = true,
 exitPage = false,
-keyDodge = false,
 done = false,
 
 engine_index = 0,
@@ -23,6 +22,7 @@ suggestionsHovered = false;
 
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+// weather
 function getWeather() {
     if(showWeather){
         chrome.storage.local.get("startpage_settings", function(e){
@@ -69,6 +69,7 @@ function updateWeatherDisplay(){
     }
 }
 
+// clock
 function updateTimeDisplay(h, m){
     if(done){
         progress = (h * 3600 + m * 60) / (24 * 36);
@@ -154,16 +155,11 @@ function startTime() {
     }
 }
 
+// formatting
+
 function checkTime(i) {
     if (i < 10) {i = "0" + i};
     return i;
-}
-
-function startDarkCheck(){
-    chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
-		updateDarkMode();
-    });
-    var t = setTimeout(startDarkCheck, 30000)
 }
 
 function monthToStr(mt){
@@ -183,156 +179,12 @@ function monthToStr(mt){
     }
 }
 
-function nth_occurrence (string, char, nth) {
-    var first_index = string.indexOf(char);
-    var length_up_to_first_index = first_index + 1;
-
-    if (nth == 1) {
-        return first_index;
-    } else {
-        var string_after_first_occurrence = string.slice(length_up_to_first_index);
-        var next_occurrence = nth_occurrence(string_after_first_occurrence, char, nth - 1);
-
-        if (next_occurrence === -1) {
-            return -1;
-        } else {
-            return length_up_to_first_index + next_occurrence;  
-        }
-    }
-}
-
-function searchExit(query, save){
-    url = enginePrefix(query);
-    if(save){
-        chrome.storage.local.get("startpage_autocomplete", function(a){
-            let auto = a.startpage_autocomplete;
-            let sugs = auto.suggestions;
-
-            try{
-                sugs.filter(sug => {
-                    return (sug.query.toUpperCase() == query.toUpperCase() && sug.engine == engines[engine_index].name);
-                })[0].p++;
-                sugs.filter(sug => {
-                    return (sug.query.toUpperCase() == query.toUpperCase() && sug.engine == engines[engine_index].name);
-                })[0].time = new Date().getTime();
-            } catch(e){
-                sugs.push(
-                    {
-                        engine: engines[engine_index].name,
-                        query: query,
-                        p: 1,
-                        time: new Date().getTime()
-                    }
-                )
-            }
-            
-            sugs.sort(function (a, b) {
-                return b.p - a.p;
-            });
-
-            auto.suggestions = sugs;
-
-            chrome.storage.local.set({startpage_autocomplete:auto})
-        })
-    }
-    $("#white").addClass("search-exit-fade");
-    setTimeout(function(){
-        window.location = url;
-    }, 70)
-}
-
-function leave(h, url){
-    exitPage = true;
-    $("#big-" + h).addClass("preview-active-exit");
-    $("#big-" + h + " .small-bar").addClass("small-bar-active-exit");
-    
-    $(".content").addClass("fade-out");
-    $(".header").addClass("fade-out");
-    $(".slider").addClass("display");
-
-    setTimeout(function(){
-        $(".triangle-colored").css("border-bottom-color", mains[h].cover)
-        $(".triangle-colored").addClass("triangle-colored-exit");
-        $(".triangle-white").addClass("triangle-white-exit");
-        setTimeout(function(){
-            
-            if(url != undefined){
-                chrome.runtime.sendMessage({navigate: url, newTab:false})       
-            } else {
-                chrome.runtime.sendMessage({navigate: mains[h].url, newTab:false})
-            }
-        }, 400)
-    }, 350)
-
-}
-
-function hoverIn(i){
-    hovered = i;
-
-    $(".main-" + i + " .cover-container .cover").addClass("cover-active")
-    $(".main-" + i + " .outer").addClass("outer-active")
-    $(".main-" + i + " .inner").addClass("inner-active")
-
-    $("#big-" + i).addClass("preview-active")
-    $("#big-" + i + " .small-bar").addClass("small-bar-active");
-    
-    $("#text-" + i + " .text-site").addClass("text-site-active");
-    $("#text-" + i + " .text-underline").addClass("text-underline-active");
-    $("#text-" + i + " .text-site").addClass("text-opacity-active");
-    $("#text-" + i + " .text-underline").addClass("text-opacity-active");
-}
-
-function hoverOut(i){
-    if(!dropdown_hovered){
-        hovered = -1
-    }
-    
-    $(".main-" + i + " .cover-container .cover").removeClass("cover-active")
-    $(".main-" + i + " .outer").removeClass("outer-active")
-    $(".main-" + i + " .inner").removeClass("inner-active")
-
-    $("#big-" + i).removeClass("preview-active")
-    $("#big-" + i + " .small-bar").removeClass("small-bar-active");
-    
-    $("#text-" + i + " .text-site").removeClass("text-site-active");
-    $("#text-" + i + " .text-underline").removeClass("text-underline-active");
-    $("#text-" + i + " .text-site").removeClass("text-opacity-active");
-    $("#text-" + i + " .text-underline").removeClass("text-opacity-active");
-
-}
-
-function startFocusOut(){
-    $(document).on("click",function(){
-        $(".dropdown").hide(); 
-        $(document).off("click");
+// load settings
+function startDarkCheck(){
+    chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
+		updateDarkMode();
     });
-} 
-
-function manageHovered(){
-    h = hovered;
-    hovered = -1;
-    $(".dropdown").hide();
-    setTimeout(function(){
-        if(hovered != h){
-            hoverOut(h);
-        }
-        dropdown_hovered = false;
-    }, 5)
-}
-
-function enginePrefix(query){
-    if(engines[engine_index].url.replace(/\s/g, '') != ""){
-        return engines[engine_index].url + query
-    } else {
-        return "www.google.com/search?q=" + query
-    }
-}
-
-function searchSelect(j){
-    for(let i = 0; i < $(".suggestions ul li").length; i++){
-        i == j ? $(".suggestions ul li").eq(i).addClass("highlighted") : $(".suggestions ul li").eq(i).removeClass("highlighted")
-    }
-    $("#input").val($(".highlighted").text());
+    var t = setTimeout(startDarkCheck, 30000)
 }
 
 function updateDarkMode(){
@@ -473,6 +325,32 @@ function loadSidebar(i){
     })
 }
 
+// input processing
+function nth_occurrence (string, char, nth) {
+    var first_index = string.indexOf(char);
+    var length_up_to_first_index = first_index + 1;
+
+    if (nth == 1) {
+        return first_index;
+    } else {
+        var string_after_first_occurrence = string.slice(length_up_to_first_index);
+        var next_occurrence = nth_occurrence(string_after_first_occurrence, char, nth - 1);
+
+        if (next_occurrence === -1) {
+            return -1;
+        } else {
+            return length_up_to_first_index + next_occurrence;  
+        }
+    }
+}
+
+function searchSelect(j){
+    for(let i = 0; i < $(".suggestions ul li").length; i++){
+        i == j ? $(".suggestions ul li").eq(i).addClass("highlighted") : $(".suggestions ul li").eq(i).removeClass("highlighted")
+    }
+    $("#input").val($(".highlighted").text());
+}
+
 function similarity(s1, s2) {
     var longer = s1;
     var shorter = s2;
@@ -521,6 +399,9 @@ function getScoredDisplay(array, local, val){
     // table = []
     // table.push(["response", "query", "match", "query", "pop", "last", "score"])
 
+    let timeNow = new Date().getTime();
+    times = []
+
     array.forEach(response => {
 
         let score = 0;
@@ -533,7 +414,11 @@ function getScoredDisplay(array, local, val){
 
             lastbias = (query.query == last ? 0.1 : 0);
 
-            score += querysim + popbias + lastbias;
+            recent = 1 / (timeNow - query.time)
+
+            // times.push([timeNow - query.time, (timeNow - query.time)/1000, (timeNow - query.time)/60000, (timeNow - query.time)/3600000])
+
+            score += querysim + popbias + lastbias + recent;
 
             // text = "";
             // for(let i = 0; i < (querysim + popbias + lastbias) * 10; i++){
@@ -547,6 +432,17 @@ function getScoredDisplay(array, local, val){
         inputsim = Math.pow(similarity(val, response), 2) * 10;
 
         score += inputsim;
+
+        // times.sort(function(a, b){
+        //     if(a[0] < b[0]) return 1;
+        //     if (a[0] > b[0]) return -1;
+        //     return 0;
+        // })
+
+        // times.forEach(time => {
+        //     time[4] = 1 / time[3]
+        // });
+        // console.table(times)
         
         // table.push([response, "-", "-", "-", "-", "-", inputsim, score])
 
@@ -613,11 +509,16 @@ function tabThroughSuggestions(i){
             }
     
         }
+
+        if($(".highlighted").length != 0) {
+            document.getElementsByClassName("highlighted")[0].scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+        }
     }
 }
 
 function tabThroughEngines(i){
     chrome.storage.local.get("startpage_settings", function(s){
+        $("#input").val(lastHumanInput)
         engines = s.startpage_settings.search_engines;
         last_index = engine_index;
         s_index = -1;
@@ -640,9 +541,263 @@ function tabThroughEngines(i){
     })
 }
 
-chrome.storage.local.get('startpage_settings', function(e){
-    engines = e.startpage_settings.search_engines;
-    mains = e.startpage_settings.mains
+function handleControls(e){
+    let val = $("#input").val();
+
+    switch(e.keyCode){
+        case 9: // TAB
+            getAutocomplete()
+            if(e.shiftKey){
+                tabThroughEngines(-1);
+            } else {
+                tabThroughEngines(1);
+            }
+            break;
+
+        case 38: // UP
+            e.preventDefault();
+            if($(".input-typing").length != 0){
+                tabThroughSuggestions(-1);
+            }
+            break;
+
+        case 40: // DOWN
+            e.preventDefault();
+            if($(".input-typing").length != 0){
+                tabThroughSuggestions(1);
+            }
+            break;
+            
+        case 13: // ENTER
+
+            chrome.storage.local.get("startpage_autocomplete", function(e){
+
+                searchExit(
+                    ($(".highlighted").length == 0) ? val : display[Number.parseInt($(".highlighted").attr("id").slice(8, 11))].query,
+                    !e.shiftKey && e.startpage_autocomplete.enabled
+                );
+                  
+            });
+
+            break;
+
+        case 27: // ESC
+            $("#input").blur();
+            break;
+    }
+}
+
+function displayAutocomplete(display){
+    html = ""
+
+    if(display.length != 0){
+        
+        display.forEach(d => {
+            html += "<li id='display-" + display.indexOf(d) + "'>" + d.query.replace("<", "").replace(">", "") + "</li>"
+        });
+
+        $(".suggestions ul").html(boldString(html, val.replace("<", "").replace(">", "")))
+
+    }
+}
+
+function getAutocomplete(){
+    chrome.storage.local.get("startpage_autocomplete", function(e){
+        local_queries = e.startpage_autocomplete.suggestions;
+        last = e.startpage_autocomplete.last;
+        autocomplete = e.startpage_autocomplete.enabled;
+        
+        if(autocomplete){
+            s_index = -1;
+            val = $("#input").val()[$("#input").val().length - 1] == " " ? $("#input").val().slice(0, $("#input").val().length - 1) : $("#input").val()
+            chrome.storage.local.get("startpage_settings", function(s){
+                engines = s.startpage_settings.search_engines;
+                
+                if(val.replace(/\s/g, '') != ""){
+
+                    if(engines[engine_index].name.toUpperCase() == "GOOGLE"){
+
+                        $.get("http://suggestqueries.google.com/complete/search?client=firefox&q=" + val, function(google) {
+
+                            google = JSON.parse(google)[1]
+                            local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
+
+                            displayAutocomplete(getScoredDisplay(google, local, val));
+
+                        });
+    
+                    } else if (engines[engine_index].name.toUpperCase() == "YOUTUBE"){
+
+                        $.get("http://suggestqueries.google.com/complete/search?client=youtube&ds=yt&client=firefox&q=" + val, function(youtube) {
+
+                            youtube = JSON.parse(youtube)[1]
+                            local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
+                        
+                            displayAutocomplete(getScoredDisplay(youtube, local, val));
+
+                        });
+
+                    } else {
+
+                        $.get("http://suggestqueries.google.com/complete/search?client=firefox&q=" + engines[engine_index].name + " " + val, function(general) {
+
+                            general = JSON.parse(general)[1]
+                            local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
+
+                            for(let i = 0; i < general.length; i++){
+                                if(general[i].toUpperCase().search((engines[engine_index].name + " ").toUpperCase()) == 0){
+                                    general[i] = general[i].slice((engines[engine_index].name + " ").length, general[i].length)
+                                }
+                            }
+                            
+                            displayAutocomplete(getScoredDisplay(general, local, val));
+
+                        });
+                    }
+
+                } else {
+
+                    $(".suggestions ul").html("")
+
+                }
+            });
+        }
+    });
+}
+
+// actions, animations
+function searchExit(query, save){
+    url = enginePrefix(query);
+    if(save){
+        chrome.storage.local.get("startpage_autocomplete", function(a){
+            let auto = a.startpage_autocomplete;
+            let sugs = auto.suggestions;
+
+            try{
+                sugs.filter(sug => {
+                    return (sug.query.toUpperCase() == query.toUpperCase() && sug.engine == engines[engine_index].name);
+                })[0].p++;
+                sugs.filter(sug => {
+                    return (sug.query.toUpperCase() == query.toUpperCase() && sug.engine == engines[engine_index].name);
+                })[0].time = new Date().getTime();
+            } catch(e){
+                sugs.push(
+                    {
+                        engine: engines[engine_index].name,
+                        query: query,
+                        p: 1,
+                        time: new Date().getTime()
+                    }
+                )
+            }
+            
+            sugs.sort(function (a, b) {
+                return b.p - a.p;
+            });
+
+            auto.suggestions = sugs;
+
+            chrome.storage.local.set({startpage_autocomplete:auto})
+        })
+    }
+    $("#white").addClass("search-exit-fade");
+    setTimeout(function(){
+        window.location = url;
+    }, 70)
+}
+
+function leave(h, url){
+    exitPage = true;
+    $("#big-" + h).addClass("preview-active-exit");
+    $("#big-" + h + " .small-bar").addClass("small-bar-active-exit");
+    
+    $(".content").addClass("fade-out");
+    $(".header").addClass("fade-out");
+    $(".slider").addClass("display");
+
+    setTimeout(function(){
+        $(".triangle-colored").css("border-bottom-color", mains[h].cover)
+        $(".triangle-colored").addClass("triangle-colored-exit");
+        $(".triangle-white").addClass("triangle-white-exit");
+        setTimeout(function(){
+            
+            if(url != undefined){
+                chrome.runtime.sendMessage({navigate: url, newTab:false})       
+            } else {
+                chrome.runtime.sendMessage({navigate: mains[h].url, newTab:false})
+            }
+        }, 400)
+    }, 350)
+
+}
+
+function hoverIn(i){
+    hovered = i;
+
+    $(".main-" + i + " .cover-container .cover").addClass("cover-active")
+    $(".main-" + i + " .outer").addClass("outer-active")
+    $(".main-" + i + " .inner").addClass("inner-active")
+
+    $("#big-" + i).addClass("preview-active")
+    $("#big-" + i + " .small-bar").addClass("small-bar-active");
+    
+    $("#text-" + i + " .text-site").addClass("text-site-active");
+    $("#text-" + i + " .text-underline").addClass("text-underline-active");
+    $("#text-" + i + " .text-site").addClass("text-opacity-active");
+    $("#text-" + i + " .text-underline").addClass("text-opacity-active");
+}
+
+function hoverOut(i){
+    if(!dropdown_hovered){
+        hovered = -1
+    }
+    
+    $(".main-" + i + " .cover-container .cover").removeClass("cover-active")
+    $(".main-" + i + " .outer").removeClass("outer-active")
+    $(".main-" + i + " .inner").removeClass("inner-active")
+
+    $("#big-" + i).removeClass("preview-active")
+    $("#big-" + i + " .small-bar").removeClass("small-bar-active");
+    
+    $("#text-" + i + " .text-site").removeClass("text-site-active");
+    $("#text-" + i + " .text-underline").removeClass("text-underline-active");
+    $("#text-" + i + " .text-site").removeClass("text-opacity-active");
+    $("#text-" + i + " .text-underline").removeClass("text-opacity-active");
+
+}
+
+function enginePrefix(query){
+    if(engines[engine_index].url.replace(/\s/g, '') != ""){
+        return engines[engine_index].url + query
+    } else {
+        return "www.google.com/search?q=" + query
+    }
+}
+
+// dropdown
+function startFocusOut(){
+    $(document).on("click",function(){
+        $(".dropdown").hide(); 
+        $(document).off("click");
+    });
+} 
+
+function manageHovered(){
+    h = hovered;
+    hovered = -1;
+    $(".dropdown").hide();
+    setTimeout(function(){
+        if(hovered != h){
+            hoverOut(h);
+        }
+        dropdown_hovered = false;
+    }, 5)
+}
+
+
+chrome.storage.local.get('startpage_settings', function(e){ // maybe change dynamically
+engines = e.startpage_settings.search_engines;
+mains = e.startpage_settings.mains
 
 startDarkCheck();
 
@@ -682,209 +837,31 @@ $(function() {
 
     // typing
 
-    $("#input").keydown(function(e) {
-
-        let val = $(this).val();
-
-        switch(e.keyCode){
-            case 9: // TAB
-
-                if(e.shiftKey){
-                    // if($("#input").val() != "") tabThroughSuggestions(1);
-                    
-                    tabThroughEngines(-1);
-                } else {
-                    tabThroughEngines(1);
-                }
-                break;
-
-            case 38: // UP
-                e.preventDefault();
-                tabThroughSuggestions(-1);
-                break;
-
-            case 40: // DOWN
-                e.preventDefault();
-                tabThroughSuggestions(1);
-                break;
-
-            case 39: // RIGHT
-                // if($(".highlighted").length == 1){
-                //     lastHumanInput = display[Number.parseInt($(".highlighted").attr("id").slice(8, 11))].query
-                // }
-                break;
-                
-            case 13: // ENTER
-
-                chrome.storage.local.get("startpage_autocomplete", function(e){
-
-                    console.log(display, $(".highlighted"))
-
-                    searchExit(
-                        ($(".highlighted").length == 0) ? val : display[Number.parseInt($(".highlighted").attr("id").slice(8, 11))].query,
-                        !e.shiftKey && e.startpage_autocomplete.enabled
-                    );
-                      
-                });
-
-                break;
-
-            case 27: // ESC
-
-                $("#input").blur();
-
-                break;
-
-            default:
-
-                if($(".highlighted").length != 0){
-                    old = $(".highlighted").eq(0).html();
-                    setTimeout(function(){
-                        $.each($(".suggestions ul li"), function(index, element) {
-                            if($(".suggestions ul li").eq(index).html() == old){
-                                $(".suggestions ul li").eq(index).addClass("highlighted")
-                            } else {
-                                $(".suggestions ul li").eq(index).removeClass("highlighted")
-                            }
-                        });
-                    }, 10);
-                }
-                
-                break;
-        }
-
-        // autocomplete
-
-        if(![27, 13, 16, 17, 18, 20, 38, 40, 37, 39].includes(e.keyCode) && !(e.shiftKey && e.keyCode == 9)){
-            chrome.storage.local.get("startpage_autocomplete", function(e){
-                local_queries = e.startpage_autocomplete.suggestions;
-                last = e.startpage_autocomplete.last;
-                autocomplete = e.startpage_autocomplete.enabled;
-                
-                if(autocomplete){
-                    val = $("#input").val()[$("#input").val().length - 1] == " " ? $("#input").val().slice(0, $("#input").val().length - 1) : $("#input").val()
-                    chrome.storage.local.get("startpage_settings", function(s){
-                        engines = s.startpage_settings.search_engines;
-                        
-                        if(val.replace(/\s/g, '') != ""){
-
-                            if(engines[engine_index].name.toUpperCase() == "GOOGLE"){
-
-                                    $(".input").addClass("input-typing")
-
-                                    $.get("http://suggestqueries.google.com/complete/search?client=firefox&q=" + val, function(google) {
-
-                                        google = JSON.parse(google)[1]
-                                        local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
-
-                                        display = getScoredDisplay(google, local, val)
-                                        html = ""
-
-                                        if(display.length != 0){
-                                            
-                                            display.forEach(d => {
-                                                html += "<li id='display-" + display.indexOf(d) + "'>" + d.query.replace("<", "").replace(">", "") + "</li>"
-                                            });
-
-                                            $(".suggestions ul").html(boldString(html, val.replace("<", "").replace(">", "")))
-
-                                        }
-
-                                        $(".suggestions").css("display", "block")
-
-                                    });
-
-                                
-            
-                            } else if (engines[engine_index].name.toUpperCase() == "YOUTUBE"){
-
-                                    $(".input").addClass("input-typing")
-            
-                                    $.get("http://suggestqueries.google.com/complete/search?client=youtube&ds=yt&client=firefox&q=" + val, function(youtube) {
-
-                                        youtube = JSON.parse(youtube)[1]
-                                        local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
-                                    
-                                        display = getScoredDisplay(youtube, local, val)
-                                        html = ""
-
-                                        if(display.length != 0){
-                                            
-                                            display.forEach(d => {
-                                                html += "<li id='display-" + display.indexOf(d) + "'>" + d.query.replace("<", "").replace(">", "") + "</li>"
-                                            });
-
-                                            $(".suggestions ul").html(boldString(html, val.replace("<", "").replace(">", "")))
-
-                                        }
-
-                                        $(".suggestions").css("display", "block")
-
-                                    });
-
-                            } else {
-
-                                $(".input").addClass("input-typing")
-
-                                $.get("http://suggestqueries.google.com/complete/search?client=firefox&q=" + engines[engine_index].name + " " + val, function(general) {
-
-                                    general = JSON.parse(general)[1]
-                                    local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
-
-                                    for(let i = 0; i < general.length; i++){
-                                        if(general[i].toUpperCase().search((engines[engine_index].name + " ").toUpperCase()) == 0){
-                                            general[i] = general[i].slice((engines[engine_index].name + " ").length, general[i].length)
-                                        }
-                                    }
-
-                                    display = getScoredDisplay(general, local, val)
-                                    html = ""
-
-                                    if(display.length != 0){
-                                            
-                                        display.forEach(d => {
-                                            html += "<li id='display-" + display.indexOf(d) + "'>" + d.query.replace("<", "").replace(">", "") + "</li>"
-                                        });
-
-                                        $(".suggestions ul").html(boldString(html, val.replace("<", "").replace(">", "")))
-
-                                    }
-
-                                    $(".suggestions").css("display", "block")
-
-                                });
-
-                            }
-
-                        } else {
-
-                            $(".suggestions ul").html("")
-                            $(".suggestions").css("display", "none")
-                            $(".input").removeClass("input-typing")
-
-                        }
-                    });
-                }
-            });
-        }
-
-        if(keyDodge || [9, 13].includes(e.KeyCode)){
-            keyDodge = true;
-            e.preventDefault();
-        }
-        return;
-    });
-
-    $(document).keydown(function(e) {
-        if(![27, 16].includes(e.keyCode)){
-            $("#input").focus();
-            if(e.keyCode == 9) e.preventDefault();
-        }
+    $(document).on("keydown", function(e) {
+        handleControls(e);
+        $("#input").focus();
+        if(e.keyCode == 9) e.preventDefault();
     });
 
     $(document).on("focusout", "#input", function(ev){
-        if(!suggestionsHovered) $(".suggestions").css("display", "none")
         $(".input").removeClass("input-typing")
+    })
+
+    $(document).bind("input propertychange", "#input", function(e){
+        if($("#input").val().length > 0){
+            $(".input").addClass("input-typing")
+            getAutocomplete()
+        } else {
+            $(".input").removeClass("input-typing")
+        }
+    })
+
+    $(document).on("focusin", "#input", function(){
+        if($("#input").val().length > 0){
+            $(".input").addClass("input-typing")
+        } else {
+            $(".input").removeClass("input-typing")
+        }
     })
 
     $(".suggestions").hover(function(){
@@ -893,24 +870,7 @@ $(function() {
         suggestionsHovered = false;
     })
 
-    $(document).on("click", "#input", function(ev){
-        if($("#input").val().length > 0){
-            $(".suggestions").css("display", "block")
-            $(".input").addClass("input-typing")
-        }
-    })
-
-    $("#input").keyup(function(e) {
-        if(keyDodge){
-            e.preventDefault();
-        }
-        keyDodge = false;
-
-    });
-
     $(document).on("click", ".suggestions ul li", function(ev){
-        
-        console.log(display, $(".highlighted"))
 
         let val = display[Number.parseInt($(this).attr("id").slice(8, 11))].query
 

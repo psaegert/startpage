@@ -1120,6 +1120,7 @@ function startDarkCheck(){
 	if($(":focus").length == 0){
 		chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
 			updateDisplay();
+			loadMain(mainIndex);
 		});
 	}
     var t = setTimeout(startDarkCheck, 30000)
