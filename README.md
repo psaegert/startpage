@@ -63,6 +63,6 @@ quick access overlay ("blob")
 settings
 
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_1.png)
-![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_2.png)
+![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_.png)
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_3.png)
 ![alt text](https://github.com/Usernameeeeeeeee/startpage/blob/master/settings_preview_4.png)
