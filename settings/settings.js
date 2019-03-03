@@ -16,6 +16,7 @@ function updateDisplay(){
 					q.className = "variable-item";
 
 						let qinp = document.createElement("input");
+						qinp.autocomplete= "off";
 						qinp.value = query.query;
 						qinp.name = query.query;
 						qinp.alt = query.engine;
@@ -67,7 +68,6 @@ function updateDisplay(){
 				chrome.storage.local.get("startpage_autocomplete", function(e){
 					startpage_autocomplete = e.startpage_autocomplete;
 					suggestions = startpage_autocomplete.suggestions;
-					console.log(suggestions.filter(sug => sug.query.toUpperCase() == val.toUpperCase() && sug.engine == engine))
 					if(val.replace(/\s/g, '') != "" && suggestions.filter(sug => sug.query.toUpperCase() == val.toUpperCase() && sug.engine == engine).length == 0){
 						suggestions.filter(sug => sug.query == name)[0].query = val;
 						$("#autocomplete-suggestions .variable-item input[name = '" + name + "'][alt ='" + engine + "']").attr("name", val);
@@ -77,6 +77,8 @@ function updateDisplay(){
 							suggestions: suggestions,
 							last: startpage_autocomplete.last
 						}})
+						
+						loadToProfile()
 					}
 				});
 			});
@@ -258,6 +260,7 @@ function updateDisplay(){
 				n.className = "variable-website";
 
 					let ninp = document.createElement("input");
+					ninp.autocomplete= "off";
 					ninp.value = website.name;
 					ninp.name = website.name;
 					ninp.spellcheck = false;
@@ -270,6 +273,7 @@ function updateDisplay(){
 				url.className = "variable-url";
 
 					let urlinp = document.createElement("input");
+					urlinp.autocomplete= "off";
 					urlinp.value = website.url;
 					urlinp.spellcheck = false;
 
@@ -281,12 +285,30 @@ function updateDisplay(){
 				img.className = "variable-img";
 
 					let imginp = document.createElement("input");
+					imginp.autocomplete= "off";
 					imginp.value = website.img;
 					imginp.spellcheck = false;
 
 					img.appendChild(imginp);
 
 				tr.appendChild(img);
+
+				let s = document.createElement("td");
+					s.className = "property";
+
+						let sdiv = document.createElement("div");
+						sdiv.className = "table-icon";
+
+							let simg = document.createElement("img");
+							simg.className = "table-icon-img";
+
+							sdiv.appendChild(simg)
+						
+
+						s.appendChild(sdiv);
+
+
+					tr.appendChild(s);
 
 
 				let a = document.createElement("td");
@@ -323,6 +345,7 @@ function updateDisplay(){
 		n.className = "add-website";
 
 			let ninp = document.createElement("input");
+			ninp.autocomplete= "off";
 			ninp.spellcheck = false;
 			ninp.placeholder = "Name"
 
@@ -335,6 +358,7 @@ function updateDisplay(){
 		u.className = "add-url";
 
 			let uinp = document.createElement("input");
+			uinp.autocomplete= "off";
 			uinp.spellcheck = false;
 			uinp.placeholder = "http(s)://www.example.com"
 
@@ -347,6 +371,7 @@ function updateDisplay(){
 		im.className = "add-img";
 
 			let iminp = document.createElement("input");
+			iminp.autocomplete= "off";
 			iminp.spellcheck = false;
 			iminp.placeholder = "example.png"
 
@@ -357,7 +382,7 @@ function updateDisplay(){
 		$("#sidebar-websites tbody").append(tr)
 
 		$("#sidebar-websites input").bind('input propertychange', function() {
-			Sidebar.focusedInput = {name: $(this).parent().prop("class") == "add-website" ? $(this).val() : $(this).parent().siblings().eq(0).children().eq(0).val(), input:$(this).parent().prop("class").slice().slice(3, 100)}
+			Sidebar.focusedInput = {name: $(this).parent().prop("class") == "add-website" ? $(this).val() : $(this).parent().parent().find(".add-website").find("input").val(), input:$(this).parent().prop("class").slice().slice(3, 100)}
 			
 			let className = $(this).parent().prop("class")
 			let val = $(this).val()
@@ -365,79 +390,62 @@ function updateDisplay(){
 			var editName = $(this).parent().parent().find(".variable-website").find("input").attr("name");
 
 			chrome.storage.local.get("startpage_settings" , function(e){
-				chrome.storage.local.get("startpage_selected_profile", function(sp){
-					chrome.storage.local.get("startpage_profiles", function(p){
-						let selected = sp.startpage_selected_profile
-						let startpage_profiles = p.startpage_profiles
-						let settings = e.startpage_settings
-						let websites = settings.sidebar_websites
+				let settings = e.startpage_settings
+				let websites = settings.sidebar_websites
 
-						if(className.includes("add")){
-							if(!Sidebar.checkEmpty()){
-								if(!Sidebar.exists(websites)){
-									websites.push({
-										name: $("#sidebar-websites .add-website input").val(),
-										url: $("#sidebar-websites .add-url input").val(),
-										img: $("#sidebar-websites .add-img input").val()
-									})
-									settings.sidebar_websites = websites;
-									chrome.storage.local.set({startpage_settings: settings})
+				if(className.includes("add")){
+					if(!Sidebar.checkEmpty()){
+						if(!Sidebar.exists(websites)){
+							websites.push({
+								name: $("#sidebar-websites .add-website input").val(),
+								url: $("#sidebar-websites .add-url input").val(),
+								img: $("#sidebar-websites .add-img input").val()
+							})
+							settings.sidebar_websites = websites;
+							chrome.storage.local.set({startpage_settings: settings})
 
-									if(selected != ""){
-										startpage_profiles.filter(profile => profile.name == selected)[0].settings.sidebar_websites = websites
-										chrome.storage.local.set({startpage_profiles: startpage_profiles})
-									}
+							loadToProfile(true)
 
-									updateDisplay();
-								}		
+						}		
+					}
+				} else {
+					switch(className){
+						case "variable-website":
+							if(val.replace(/\s/g, '') != "" && websites.filter(website => website.name == val).length == 0){
+								websites.filter(website => website.name == name)[0].name = val;
+								$("#sidebar-websites .variable-website input[name = '" + name + "']").attr("name", val);
+								settings.sidebar_websites = websites;
+								chrome.storage.local.set({startpage_settings: settings})
+
+								loadToProfile(false)
 							}
-						} else {
-							switch(className){
-								case "variable-website":
-									if(val.replace(/\s/g, '') != "" && websites.filter(website => website.name == val).length == 0){
-										websites.filter(website => website.name == name)[0].name = val;
-										$("#sidebar-websites .variable-website input[name = '" + name + "']").attr("name", val);
-										settings.sidebar_websites = websites;
-										chrome.storage.local.set({startpage_settings: settings})
+						break;
+						case "variable-url":
+							if(val.replace(/\s/g, '') != "" && websites.filter(website => website.name == editName).length == 1){
+								websites.filter(website => website.name == editName)[0].url = val;
+								settings.sidebar_websites = websites;
+								chrome.storage.local.set({startpage_settings: settings})
 
-										if(selected != ""){
-											startpage_profiles.filter(profile => profile.name == selected)[0].settings.sidebar_websites = websites
-											chrome.storage.local.set({startpage_profiles: startpage_profiles})
-										}
-									}
-								break;
-								case "variable-url":
-									if(val.replace(/\s/g, '') != "" && websites.filter(website => website.name == editName).length == 1){
-										websites.filter(website => website.name == editName)[0].url = val;
-										settings.sidebar_websites = websites;
-										chrome.storage.local.set({startpage_settings: settings})
-
-										if(selected != ""){
-											startpage_profiles.filter(profile => profile.name == selected)[0].settings.sidebar_websites = websites
-											chrome.storage.local.set({startpage_profiles: startpage_profiles})
-										}
-									}
-								break;
-								case "variable-img":
-									if(websites.filter(website => website.name == editName).length == 1){
-										websites.filter(website => website.name == editName)[0].img = val;
-										settings.sidebar_websites = websites;
-										chrome.storage.local.set({startpage_settings: settings})
-
-										if(selected != ""){
-											startpage_profiles.filter(profile => profile.name == selected)[0].settings.sidebar_websites = websites
-											chrome.storage.local.set({startpage_profiles: startpage_profiles})
-										}
-									}
-								break;
+								loadToProfile(false)
 							}
-						}
+						break;
+						case "variable-img":
+							if(websites.filter(website => website.name == editName).length == 1){
+								websites.filter(website => website.name == editName)[0].img = val;
+								settings.sidebar_websites = websites;
+								chrome.storage.local.set({startpage_settings: settings})
 
-					});
-				});
+								loadToProfile(false)
+							}
+						break;
+					}
+				}
+
 			});
 		});
-		
+
+		loadIcons(0)
+
 		// sidebar websites -
 
 		let engines = e.startpage_settings.search_engines;
@@ -471,6 +479,7 @@ function updateDisplay(){
 				n.className = "variable-engine";
 
 					let ninp = document.createElement("input");
+					ninp.autocomplete= "off";
 					ninp.value = engine.name;
 					ninp.name = engine.name;
 					ninp.spellcheck = false;
@@ -483,6 +492,7 @@ function updateDisplay(){
 				url.className = "variable-url";
 
 					let urlinp = document.createElement("input");
+					urlinp.autocomplete= "off";
 					urlinp.value = engine.url;
 					urlinp.spellcheck = false;
 
@@ -494,6 +504,8 @@ function updateDisplay(){
 				col.className = "variable-color";
 
 					let colinp = document.createElement("input");
+					colinp.autocomplete= "off";
+					colinp.className = "save-color"
 					colinp.spellcheck = false;
 					colinp.value = engine.color;
 
@@ -547,6 +559,7 @@ function updateDisplay(){
 		ne.className = "add-engine";
 
 			let neinp = document.createElement("input");
+			neinp.autocomplete= "off";
 			neinp.spellcheck = false;
 			neinp.placeholder = "Name"
 
@@ -559,6 +572,7 @@ function updateDisplay(){
 		ue.className = "add-url";
 
 			let ueinp = document.createElement("input");
+			ueinp.autocomplete= "off";
 			ueinp.spellcheck = false;
 			ueinp.placeholder = "...example.com/search?q="
 
@@ -571,6 +585,7 @@ function updateDisplay(){
 		co.className = "add-col";
 
 			let coinp = document.createElement("input");
+			coinp.autocomplete= "off";
 			coinp.spellcheck = false;
 			coinp.placeholder = "#ffffff"
 
@@ -581,7 +596,7 @@ function updateDisplay(){
 		$("#search-engines tbody").append(tre)
 
 		$("#search-engines input").bind('input propertychange', function() {
-			Engines.focusedInput = {name: $(this).parent().prop("class") == "add-engine" ? $(this).val() : $(this).parent().siblings().eq(0).children().eq(0).val(), input:$(this).parent().prop("class").slice().slice(3, 100)}
+			Engines.focusedInput = {name: $(this).parent().prop("class") == "add-engine" ? $(this).val() : $(this).parent().parent().find(".add-engine").find("input").val(), input:$(this).parent().prop("class").slice().slice(3, 100)}
 			
 			let className = $(this).parent().prop("class")
 			let val = $(this).val()
@@ -591,61 +606,55 @@ function updateDisplay(){
 			if(className == "variable-color") $(this).parent().parent().find(".property").find(".table-icon-color").css("background-color", val)
 
 			chrome.storage.local.get("startpage_settings" , function(e){
-				chrome.storage.local.get("startpage_selected_profile", function(sp){
-					chrome.storage.local.get("startpage_profiles", function(p){
-						let selected = sp.startpage_selected_profile;
-						let startpage_profiles = p.startpage_profiles;
-						let settings = e.startpage_settings;
-						let engines = settings.search_engines;
+				let settings = e.startpage_settings;
+				let engines = settings.search_engines;
 
-						if(className.includes("add")){
-							if(!Engines.checkEmpty()){
-								if(!Engines.exists(engines)){
-									engines.push({
-										name: $("#search-engines .add-engine input").val(),
-										url: $("#search-engines .add-url input").val(),
-										color: $("#search-engines .add-col input").val()
-									})
-									settings.search_engines = engines;
-									chrome.storage.local.set({startpage_settings: settings})
+				if(className.includes("add")){
+					if(!Engines.checkEmpty()){
+						if(!Engines.exists(engines)){
+							engines.push({
+								name: $("#search-engines .add-engine input").val(),
+								url: $("#search-engines .add-url input").val(),
+								color: $("#search-engines .add-col input").val()
+							})
+							settings.search_engines = engines;
+							chrome.storage.local.set({startpage_settings: settings})
 
-									loadToProfile(true);
-								}		
+							loadToProfile(true);
+						}		
+					}
+				} else {
+					switch(className){
+						case "variable-engine":
+							if(val.replace(/\s/g, '') != "" && engines.filter(engine => engine.name == val).length == 0){
+								engines.filter(engine => engine.name == name)[0].name = val;
+								$("#search-engines .variable-engine input[name = '" + name + "']").attr("name", val);
+								settings.search_engines = engines;
+								chrome.storage.local.set({startpage_settings: settings})
+
+								loadToProfile(false);
 							}
-						} else {
-							switch(className){
-								case "variable-engine":
-									if(val.replace(/\s/g, '') != "" && engines.filter(engine => engine.name == val).length == 0){
-										engines.filter(engine => engine.name == name)[0].name = val;
-										$("#search-engines .variable-engine input[name = '" + name + "']").attr("name", val);
-										settings.search_engines = engines;
-										chrome.storage.local.set({startpage_settings: settings})
+						break;
+						case "variable-url":
+							if(val.replace(/\s/g, '') != "" && engines.filter(engine => engine.name == editName).length == 1){
+								engines.filter(engine => engine.name == editName)[0].url = val;
+								settings.search_engines = engines;
+								chrome.storage.local.set({startpage_settings: settings})
 
-										loadToProfile(false);
-									}
-								break;
-								case "variable-url":
-									if(val.replace(/\s/g, '') != "" && engines.filter(engine => engine.name == editName).length == 1){
-										engines.filter(engine => engine.name == editName)[0].url = val;
-										settings.search_engines = engines;
-										chrome.storage.local.set({startpage_settings: settings})
-
-										loadToProfile(false);
-									}
-								break;
-								case "variable-color":
-									if(engines.filter(engine => engine.name == editName).length == 1){
-										engines.filter(engine => engine.name == editName)[0].color = val;
-										settings.search_engines = engines;
-										chrome.storage.local.set({startpage_settings: settings})
-
-										loadToProfile(false);
-									}
-								break;
+								loadToProfile(false);
 							}
-						}
-					});
-				});
+						break;
+						case "variable-color":
+							if(engines.filter(engine => engine.name == editName).length == 1){
+								engines.filter(engine => engine.name == editName)[0].color = val;
+								settings.search_engines = engines;
+								chrome.storage.local.set({startpage_settings: settings})
+
+								loadToProfile(false);
+							}
+						break;
+					}
+				}
 			});
 		});
 
@@ -685,7 +694,6 @@ function updateDisplay(){
 		$("#search-engines tr").eq($("#search-engines tr").length - 2).find(".variable" + Engines.focusedInput.input + " input").focus();
 		Engines.focusedInput = {input: undefined, name: undefined};
 
-
 		$('#blob input').prop("checked", e.startpage_settings.blob);
 		
 
@@ -697,11 +705,297 @@ function updateDisplay(){
 
 		$("#darksky").val(e.startpage_settings.darksky_key);
 
-		setAnchors(100)
+		setAnchors(200)
 
 		updateMoveCenters();
-
 	})
+}
+
+function loadMain(i){
+
+	mainIndex = i;
+
+	$(".custom .subcontent .navigation ul li").removeClass("tab-active");
+	$("#main-" + i).addClass("tab-active");
+
+	chrome.storage.local.get("startpage_settings", function(s){
+		mains = s.startpage_settings.mains;
+
+		$(".custom .main-name").val(mains[i].name)
+
+		$(".custom .main-outer").val(mains[i].outer)
+		$(".custom .main-inner").val(mains[i].inner)
+		$(".custom .main-fill").val(mains[i].fill)
+		$(".custom .main-cover").val(mains[i].cover)
+		$(".custom .main-bar").val(mains[i].bar)
+
+		$(".custom .main-url").val(mains[i].url)
+
+		loadMainPreview(mains[i]);
+		checkAdvanced();
+
+		let context_menu = mains[i].context;
+
+		// sidebar websites
+
+		$("#context-menu tbody").html("")
+
+		context_menu.forEach(context => {
+			let tr = document.createElement("tr");
+
+				let m = document.createElement("td");
+				m.className = "move";
+
+					let mdiv = document.createElement("div");
+					mdiv.className = "table-move";
+
+						let mdivi = document.createElement("img");
+						chrome.storage.local.get('startpage_settings', function(e){
+							mdivi.src = s.startpage_settings.darkmode ? "./img/iconfinder_1-icon-music-10_3694736_dark.png" : "./img/iconfinder_1-icon-music-10_3694736.png";
+						});
+
+						mdiv.appendChild(mdivi)
+
+					m.appendChild(mdiv);
+
+				tr.appendChild(m);
+
+
+				let n = document.createElement("td");
+				n.className = "variable-context";
+
+					let ninp = document.createElement("input");
+					ninp.autocomplete= "off";
+					ninp.value = context.name;
+					ninp.name = context.name;
+					ninp.spellcheck = false;
+
+					n.appendChild(ninp);
+
+				tr.appendChild(n);
+
+				let url = document.createElement("td");
+				url.className = "variable-url";
+
+					let urlinp = document.createElement("input");
+					urlinp.autocomplete= "off";
+					urlinp.value = context.url;
+					urlinp.spellcheck = false;
+
+					url.appendChild(urlinp);
+
+				tr.appendChild(url);
+
+				let a = document.createElement("td");
+				a.className = "action";
+
+					let d = document.createElement("div");
+					d.className = "table-icon";
+
+						let i = document.createElement("img");
+						chrome.storage.local.get('startpage_settings', function(e){
+							i.src = s.startpage_settings.darkmode ? "./img/bin_dark.jpg" : "./img/bin.jpg";
+						});
+						i.className = "bin";
+
+						d.appendChild(i)
+
+					a.appendChild(d);
+
+				tr.appendChild(a);
+
+			
+			$("#context-menu tbody").append(tr)
+
+		});
+
+		let tr = document.createElement("tr");
+		tr.className="add"
+
+		let sp = document.createElement("td")
+
+		tr.appendChild(sp)
+
+		let n = document.createElement("td");
+		n.className = "add-context";
+
+			let ninp = document.createElement("input");
+			ninp.autocomplete= "off";
+			ninp.spellcheck = false;
+			ninp.placeholder = "Name"
+
+			n.appendChild(ninp);
+
+		tr.appendChild(n);
+
+
+		let u = document.createElement("td");
+		u.className = "add-url";
+
+			let uinp = document.createElement("input");
+			uinp.autocomplete= "off";
+			uinp.spellcheck = false;
+			uinp.placeholder = "http(s)://www.example.com"
+
+			u.appendChild(uinp);
+
+		tr.appendChild(u);
+
+
+		$("#context-menu tbody").append(tr)
+
+		$("#context-menu input").bind('input propertychange', function() {
+			Context.focusedInput = {name: $(this).parent().prop("class") == "add-context" ? $(this).val() : $(this).parent().parent().find(".add-context").find("input").val(), input:$(this).parent().prop("class").slice().slice(3, 100)}
+			let className = $(this).parent().prop("class")
+			let val = $(this).val()
+			let name = $(this).attr("name")
+			var editName = $(this).parent().parent().find(".variable-context").find("input").attr("name");
+
+			chrome.storage.local.get("startpage_settings" , function(e){
+				let settings = e.startpage_settings
+				let context_menu = settings.mains[mainIndex].context
+
+
+				if(className.includes("add")){
+					if(!Context.checkEmpty()){
+						if(!Context.exists(context_menu)){
+							context_menu.push({
+								name: $("#context-menu .add-context input").val(),
+								url: $("#context-menu .add-url input").val()
+							})
+							settings.mains[mainIndex].context = context_menu;
+							chrome.storage.local.set({startpage_settings: settings})
+
+							loadToProfile(false);
+							loadMain(mainIndex);
+
+						}		
+					}
+				} else {
+					switch(className){
+						case "variable-context":
+							if(val.replace(/\s/g, '') != "" && context_menu.filter(context => context.name == val).length == 0){
+								context_menu.filter(context => context.name == name)[0].name = val;
+								$("#context-menu .variable-context input[name = '" + name + "']").attr("name", val);
+								settings.mains[mainIndex].context = context_menu;
+								chrome.storage.local.set({startpage_settings: settings})
+
+								loadToProfile(false);
+								loadMain(mainIndex);
+							}
+						break;
+						case "variable-url":
+							if(val.replace(/\s/g, '') != "" && context_menu.filter(context => context.name == editName).length == 1){
+								context_menu.filter(context => context.name == editName)[0].url = val;
+								settings.mains[mainIndex] = context_menu;
+								chrome.storage.local.set({startpage_settings: settings})
+
+								loadToProfile(false);
+								loadMain(mainIndex);
+							}
+						break;
+					}
+				}
+			});
+		});
+
+		
+		$("#context-menu tr").eq($("#context-menu tr").length - 2).find(".variable" + Context.focusedInput.input + " input").focus();
+		Context.focusedInput = {input: undefined, name: undefined};
+	})
+
+}
+
+function loadMainPreview(main){
+
+	$(".main-1 .outer").css("border-color", "rgb(170, 170, 170)")
+	$(".main-1 .outer").css("background-color", "rgb(170, 170, 170, 0.15)")
+	$(".main-1 .inner").css("border-color", "rgb(170, 170, 170)")
+	$(".main-1 .cover").css("background-color", "rgb(170, 170, 170)")
+
+	if(main.advanced){
+
+		$(".main-1 .outer").css("border-color", main.cover)
+		$(".main-1 .outer").css("background-color", main.cover)
+		$(".main-1 .inner").css("border-color", main.cover)
+		$(".main-1 .cover").css("background-color", main.cover)
+
+		$(".main-1 .outer").css("border-color", main.outer)
+		$(".main-1 .outer").css("background-color", main.fill)
+		$(".main-1 .inner").css("border-color", main.inner)
+		$(".main-1 .cover").css("background-color", main.cover)
+
+	} else {
+		cover = main.cover
+		$(".main-1 .outer").css("border-color", cover)
+		$(".main-1 .inner").css("border-color", cover)
+		$(".main-1 .cover").css("background-color", cover)
+		
+		if(cover.replace(/\s/g, '') != ""){
+			if(cover.indexOf(",") != -1){
+				if(cover.match(new RegExp(",", "g")).length == 3){
+					$(".main-1 .outer").css("background-color", cover.slice(0, nth_occurrence(cover, ",", 3)) + ", 0.15)")
+				} else if(cover.match(new RegExp(",", "g")).length == 2){
+					$(".main-1 .outer").css("background-color", cover.slice(0, cover.length-1) + ", 0.15)")
+				}
+			} else {
+				if(cover.indexOf("#") == 0){
+					if(cover.length == 7){
+						$(".main-1 .outer").css("background-color", cover + "26")
+					}
+				}
+			}
+		}
+	}
+	
+	$(".custom .main-img").val(main.img)
+
+	let src = ""
+	if(main.img.indexOf("file:///") == 0 || main.img.indexOf("http://") == 0 || main.img.indexOf("https://") == 0){
+		src = main.img;
+	} else {
+		src = "/startpage/img/main/" + main.img
+	}
+
+	if(src.replace(/\s/g, '') != "" && src.split(".").length > 1){
+		$.get(src)
+		.done(function() { 
+	
+			$(".img-1").attr("src", src)
+
+		}).fail(function() { 
+
+			$(".img-1").attr("src", src)
+		})
+	} else {
+		
+		$(".img-1").attr("src", src)
+	}
+}
+
+function checkAdvanced(){
+	chrome.storage.local.get("startpage_settings", function(s){
+		if(!s.startpage_settings.mains[mainIndex].advanced){
+			$(".custom .advanced-container").css("display", "none")
+			$(".advanced").css("transform", "rotate(0deg)")
+			$(".main-preview").removeClass("main-preview-active")
+			$(".main-p-resources").css("margin-top", "90px");
+			$(".main #main-color").text("")
+			$(".main #main-color-mode").removeClass("main-color-mode-advanced")
+		} else {
+			$(".custom .advanced-container").css("display", "block")
+			$(".advanced").css("transform", "rotate(90deg)")
+			$(".main-preview").addClass("main-preview-active")
+			$(".main-p-resources").css("margin-top", "30px");
+			$(".main #main-color").text("Cover:")
+			$(".main #main-color-mode").addClass("main-color-mode-advanced")
+		}
+		loadMainPreview(s.startpage_settings.mains[mainIndex]);
+	})
+
+	setAnchors(200);
+	
+	// updateMoveCenters();
 }
 
 function highlight(i){
@@ -712,6 +1006,25 @@ function highlight(i){
 			$(".side-content h4").eq(j).removeClass("opacity-1");
 		}
 	})
+}
+
+function loadIcons(i){
+	if(i < $("#sidebar-websites .variable-website").length){
+		let val = $("#sidebar-websites .variable-website").eq(i).parent().find(".variable-img").find("input").val()
+		if(!(val.indexOf("file:///") == 0 || val.indexOf("http://") == 0 || val.indexOf("https://") == 0)) val =  "/startpage/img/sidebar/" + val
+		
+		if(val.replace(/\s/g, '') != "" && val.split(".").length > 1){
+			$.get(val)
+			.done(function() { 
+				$("#sidebar-websites .variable-website").eq(i).parent().find(".property").find(".table-icon-img").attr("src", val)
+				loadIcons(i + 1)
+			}).fail(function() { 
+				loadIcons(i + 1)
+			})
+		} else {
+			loadIcons(i + 1)
+		}
+	}
 }
 
 function loadFromProfile(name, force){
@@ -789,6 +1102,20 @@ function moveEngineFromTo(from, to, settings){
 	}
 }
 
+function moveContextFromTo(from, to, settings){
+	let context_menu = settings.mains[mainIndex].context;
+	if(from != to && from < context_menu.length && to <= context_menu.length && from >= 0 && to >= 0){
+		let movingElement = context_menu[from];
+		context_menu[from] = undefined;
+		to == context_menu.length ? context_menu.push(movingElement) : context_menu.splice(to, 0, movingElement)
+		context_menu.splice(context_menu.indexOf(undefined), 1)
+		settings.mains[mainIndex].context = context_menu;
+		chrome.storage.local.set({startpage_settings: settings})
+		loadToProfile(true)
+		loadMain(mainIndex);
+	}
+}
+
 function startDarkCheck(){
 	if($(":focus").length == 0){
 		chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
@@ -807,12 +1134,19 @@ function updateMoveCenters(){
 		})
 	})
 	Drag.sidebar.centers = []
-		$.each($("#sidebar-websites .move"), function(i){
-			Drag.sidebar.centers.push({
-				name: $("#sidebar-websites .move").eq(i).parent().find(".variable-website").find("input").val(),
-				mid: $("#sidebar-websites .move").eq(i).find("div").find("img").offset().top + 11
-			})
+	$.each($("#sidebar-websites .move"), function(i){
+		Drag.sidebar.centers.push({
+			name: $("#sidebar-websites .move").eq(i).parent().find(".variable-website").find("input").val(),
+			mid: $("#sidebar-websites .move").eq(i).find("div").find("img").offset().top + 11
 		})
+	})
+	Drag.context.centers = []
+	$.each($("#context-menu .move"), function(i){
+		Drag.context.centers.push({
+			name: $("#context-menu .move").eq(i).parent().find(".variable-context").find("input").val(),
+			mid: $("#context-menu .move").eq(i).find("div").find("img").offset().top + 11
+		})
+	})
 }
 
 function setAnchors(offset){
@@ -821,10 +1155,56 @@ function setAnchors(offset){
 		$(".profiles").offset().top - offset,
 		$(".basic").offset().top - offset,
 		$(".sidebar").offset().top - offset,
+		$(".custom").offset().top - offset,
 		$(".blob").offset().top - offset,
-		$(".weather").offset().top - offset,
-		$(".custom").offset().top - offset
+		$(".weather").offset().top - offset
 	]
+}
+
+function getAverageRGB(imgEl) {
+
+    var blockSize = 5, // only visit every 5 pixels
+        defaultRGB = {r:0,g:0,b:0}, // for non-supporting envs
+        canvas = document.createElement('canvas'),
+        context = canvas.getContext && canvas.getContext('2d'),
+        data, width, height,
+        i = -4,
+        length,
+        rgb = {r:0,g:0,b:0},
+        count = 0;
+
+    if (!context) {
+        return defaultRGB;
+    }
+
+    height = canvas.height = imgEl.naturalHeight || imgEl.offsetHeight || imgEl.height;
+    width = canvas.width = imgEl.naturalWidth || imgEl.offsetWidth || imgEl.width;
+
+    context.drawImage(imgEl, 0, 0);
+
+    try {
+        data = context.getImageData(0, 0, width, height);
+    } catch(e) {
+        /* security error, img on diff domain */
+        return defaultRGB;
+    }
+
+    length = data.data.length;
+
+    while ( (i += blockSize * 4) < length ) {
+        ++count;
+        rgb.r += data.data[i];
+        rgb.g += data.data[i+1];
+        rgb.b += data.data[i+2];
+    }
+
+    // ~~ used to floor values
+    rgb.r = ~~(rgb.r/count);
+    rgb.g = ~~(rgb.g/count);
+    rgb.b = ~~(rgb.b/count);
+
+    return rgb;
+
 }
 
 var Profile_io = {
@@ -878,7 +1258,7 @@ var Profile_io = {
 					$("#profile-export").removeClass("button-action-active")
 				break;
 			}
-			setTimeout(function(){setAnchors(100); updateMoveCenters()}, 100);
+			setTimeout(function(){setAnchors(200); updateMoveCenters()}, 100);
 		},
 		import: function(){
 			chrome.storage.local.get("startpage_profiles", function(e){
@@ -902,6 +1282,7 @@ var Profile_io = {
 					Profile_io.active = "";
 					Profile_io.action();
 					updateDisplay();
+					loadMain[mainIndex]
 				});
 			});
 		},
@@ -923,7 +1304,41 @@ var Profile_io = {
 						}
 					}
 
-					if(!Array.isArray(profile.settings.search_engines)) valid = false;
+					if(!Array.isArray(profile.settings.search_engines)) {valid = false;} else {
+						profile.settings.search_engines.forEach(engine => {
+							if(typeof(engine.color) !== "string") valid = false;
+							if(typeof(engine.name) !== "string" || engine.name.replace(/\s/g, '') == "") valid = false;
+							if(typeof(engine.url) !== "string" || engine.url.replace(/\s/g, '') == "") valid = false;
+						});
+					}
+
+					if(!Array.isArray(profile.settings.mains)) {valid = false;} else {
+						profile.settings.mains.forEach(main => {
+
+							if(typeof(main.name) !== "string" || main.name.replace(/\s/g, '') == "") valid = false;
+
+							if(typeof(main.advanced) !== "boolean") valid = false;
+
+							if(typeof(main.cover) !== "string" || main.cover.replace(/\s/g, '') == "") valid = false;
+
+							if(typeof(main.bar) !== "string") valid = false;
+							if(typeof(main.fill) !== "string") valid = false;
+							if(typeof(main.inner) !== "string") valid = false;
+							if(typeof(main.outer) !== "string") valid = false;
+							
+							if(typeof(main.img) !== "string") valid = false;
+
+							if(typeof(main.url) !== "string" || main.url.replace(/\s/g, '') == "") valid = false;
+						
+							if(!Array.isArray(main.context)) {valid = false;} else {
+								main.context.forEach(context => {
+								
+									if(typeof(context.name) !== "string" || context.name.replace(/\s/g, '') == "") valid = false;
+									if(typeof(context.url) !== "string" || context.url.replace(/\s/g, '') == "") valid = false;
+								});
+							}
+						});
+					}
 
 	
 					if(typeof(profile.settings.darksky_key) !== "string") valid = false;
@@ -933,7 +1348,17 @@ var Profile_io = {
 					}
 	
 					if(typeof(profile.settings.sidebar) !== "boolean") valid = false;
-					if(!Array.isArray(profile.settings.sidebar_websites)) valid = false;
+					if(!Array.isArray(profile.settings.sidebar_websites)) {valid = false} else {
+
+						profile.settings.sidebar_websites.forEach(website => {
+							if(typeof(website) !== "object") {valid = false;} else {
+								if(typeof(website.img) !== "string") valid = false;
+								if(typeof(website.name) !== "string" || website.name.replace(/\s/g, '') == "") valid = false;
+								if(typeof(website.url) !== "string" || website.url.replace(/\s/g, '') == "") valid = false;
+							}
+						});
+					}
+					console.log(valid)
 					if(typeof(profile.settings.weather) !== "boolean") valid = false;
 				}
 			});
@@ -1052,6 +1477,23 @@ var Profile_io = {
 		focusedInput: {name: undefined, input:undefined},
 		lastValidEntry: undefined
 	},
+	Context = {
+		checkEmpty: function(){
+			if($(":focus").length != 0){
+				if($(":focus").val().replace(/\s/g, '') == "") return true;
+				if($(":focus").parent().parent().find(".add-context").find("input").val().replace(/\s/g, '') == "") return true;
+				if($(":focus").parent().parent().find(".add-url").find("input").val().replace(/\s/g, '') == "") return true;
+			}
+			return false;
+		},
+		exists:function(context_menu){
+			return context_menu.filter(context => {
+				return context.name == $("#context-menu .add-context input").val()
+			}).length != 0;
+		},
+		focusedInput: {name: undefined, input:undefined},
+		lastValidEntry: undefined
+	},
 	Engines = {
 		checkEmpty: function(){
 			if($(":focus").length != 0){
@@ -1081,6 +1523,18 @@ var Profile_io = {
 			element: undefined,
 			newIndex: -1,
 			centers: []
+		},
+		context: {
+			dragging: false,
+			element: undefined,
+			newIndex: -1,
+			centers: []
+		}
+	},
+	autoIcon = {
+		get: function(url, name){
+			chrome.storage.local.set({startpage_autoIcon: {active: true, href: "", name: name}});
+			chrome.runtime.sendMessage({navigate: url, newTab: true})
 		}
 	},
 	checkboxes = [
@@ -1091,11 +1545,15 @@ var Profile_io = {
 		"weather"
 	],
 	autocompleteLastValidEntry,
-	anchor;
+	anchor = [],
+	mainIndex = -1;
+
+	
+startDarkCheck();
 
 $(function(){
 
-	startDarkCheck();
+	loadMain(0)
 
 	setTimeout(function(){
 		$(window).on("scroll", function(){
@@ -1131,23 +1589,11 @@ $(function(){
 		$(this).parent().css("width", $(this).width()  - 30 + "px")
 		val = $(this).val();
 		chrome.storage.local.get("startpage_settings", function(e){
-			chrome.storage.local.get("startpage_selected_profile", function(sp){
-				chrome.storage.local.get("startpage_profiles", function(pr){
-					profiles = pr.startpage_profiles;
-					selected = sp.startpage_selected_profile;
-	
-					settings = e.startpage_settings;
-					settings.darkmode_auto_time.from = val;
-					chrome.storage.local.set({startpage_settings:settings})
-	
-					if(profiles.filter(profile => profile.name == selected).length != 0){
-						profiles.filter(profile => profile.name == selected)[0].settings = settings
-						
-						chrome.storage.local.set({startpage_profiles: profiles})
-	
-					}
-				})
-			})
+			settings = e.startpage_settings;
+			settings.darkmode_auto_time.from = val;
+			chrome.storage.local.set({startpage_settings:settings})
+
+			loadToProfile(false);
 		})
 	});
 	
@@ -1155,23 +1601,11 @@ $(function(){
 		$(this).parent().css("width", $(this).width()  - 30 + "px")
 		val = $(this).val();
 		chrome.storage.local.get("startpage_settings", function(e){
-			chrome.storage.local.get("startpage_selected_profile", function(sp){
-				chrome.storage.local.get("startpage_profiles", function(pr){
-					profiles = pr.startpage_profiles;
-					selected = sp.startpage_selected_profile;
-	
-					settings = e.startpage_settings;
-					settings.darkmode_auto_time.to = val;
-					chrome.storage.local.set({startpage_settings:settings})
-	
-					if(profiles.filter(profile => profile.name == selected).length != 0){
-						profiles.filter(profile => profile.name == selected)[0].settings = settings
-						
-						chrome.storage.local.set({startpage_profiles: profiles})
-	
-					}
-				})
-			})
+			settings = e.startpage_settings;
+			settings.darkmode_auto_time.to = val;
+			chrome.storage.local.set({startpage_settings:settings})
+
+			loadToProfile(false);
 		})
 	});
 	
@@ -1250,6 +1684,14 @@ $(function(){
 			}
 			updateDisplay();
 		});				
+	});
+
+	$(document).on("focusout", "#autocomplete-suggestions .variable-url input" ,function(){
+		loadToProfile(true)
+	});
+
+	$(document).on("focusout", "#autocomplete-suggestions .variable-color input" ,function(){
+		loadToProfile(true)
 	});
 	
 	$(document).on("click", "#autocomplete-suggestions .action", function(){
@@ -1372,6 +1814,7 @@ $(function(){
 	$(document).on("click", "#profile-list .edit", function(){
 		removeElement("edit");
 		let input = document.createElement("input");
+		input.autocomplete= "off";
 		input.id = "edit";
 		input.spellcheck = false;
 		$(this).parent().siblings().eq(0).append(input);
@@ -1463,20 +1906,24 @@ $(function(){
 	
 		chrome.storage.local.get("startpage_profiles", function(e){
 			let startpage_profiles = e.startpage_profiles;
+			let index;
 			startpage_profiles.forEach(profile => {
 				if(profile.name == name){
-					startpage_profiles.splice(startpage_profiles.indexOf(profile), 1)
+					index = startpage_profiles.indexOf(profile)
+					startpage_profiles.splice(index, 1)
 				}
 			});
 			chrome.storage.local.set({startpage_profiles:startpage_profiles})
-			updateDisplay();
+			if(index > 0){
+				loadFromProfile(startpage_profiles[index-1].name)
+			}
 		})
 	})
 	
 	$(document).on("click", "#profile-list .item-text", function(){
 		if($(this).find("#edit").length == 0){
 			let name = this.innerText;
-			loadFromProfile(name, false)
+			loadFromProfile(name, false);
 		}
 	})
 	
@@ -1581,9 +2028,8 @@ $(function(){
 	});
 	
 	// websites
-	
+
 	$(document).on("focusin", "#sidebar-websites .variable-website input", function(){
-				
 		var name = $(this).attr("name")
 		Sidebar.lastValidEntry = name
 	});
@@ -1650,6 +2096,25 @@ $(function(){
 			
 			loadToProfile(true);
 		});				
+	});
+
+	$(document).on("focusout", "#sidebar-websites .variable-url input" ,function(){
+		loadToProfile(true)
+	});
+
+	$(document).on("focusout", "#sidebar-websites .variable-img input" ,function(){
+		loadToProfile(true)
+	});
+
+	$(document).on("click", "#sidebar-websites .property", function(){
+		url = $(this).parent().find(".variable-url").find("input").val();
+		if(url.indexOf("://") > 0){
+			autoIcon.get(url, $(this).parent().find(".variable-website").find("input").val());
+			setTimeout(function(){
+				loadToProfile(true)
+				chrome.storage.local.set({startpage_autoIcon: {active: false, href:"", name:""}})
+			}, 3000);
+		}
 	});
 	
 	// websites move
@@ -1745,7 +2210,57 @@ $(function(){
 			$(".drag").css("left", e.clientX + 20)
 		}
 	})
+
+	// context move
+
+	$(document).on("mousedown", "#context-menu .table-move img", function(e){
+		Drag.context.dragging = true;
+		Drag.context.element = $(this).parent().parent().parent().find(".variable-context").find("input").val()
+		$(".drag").css("top", e.clientY - 13)
+		$(".drag").css("left", e.clientX + 20)
+		$(".drag").css("display", "block")
+		return false;
+	})
 	
+	$(document).on("mouseup", "#context-menu", function(e){
+		if(Drag.context.dragging){
+	
+			chrome.storage.local.get("startpage_settings", function(e){
+				settings = e.startpage_settings;
+				context_menu = settings.mains[mainIndex].context;
+	
+				moveContextFromTo(context_menu.indexOf(context_menu.filter(engine => engine.name == Drag.context.element)[0]), Drag.context.newIndex, settings)
+	
+				Drag.context.dragging = false;
+				$(".drag").css("display", "none")
+			})
+		}
+	})
+	
+	$(document).on("mousemove", "#context-menu", function(e){
+		if(Drag.context.dragging){
+	
+			let to = {name: "", d: 1000, above: undefined};
+			Drag.context.centers.forEach(center => {
+				if(to.d > Math.abs(center.mid - e.pageY)){
+					to.name = center.name;
+					to.d = Math.abs(center.mid-e.pageY);
+					to.above = center.mid-e.pageY > 0;
+				}
+			});
+	
+			let index = Drag.context.centers.indexOf(Drag.context.centers.filter(center => center.name == to.name)[0]);
+
+			Drag.context.newIndex = to.above ? index :  index + 1
+
+			console.log(Drag.context.newIndex)
+	
+			$(".drag").css("top", e.clientY - 13)
+			$(".drag").css("left", e.clientX + 20)
+		}
+	})
+
+
 	$(document).on("mouseup", function(e){
 		if(Drag.sidebar.dragging){
 			Drag.sidebar.dragging = false;
@@ -1756,69 +2271,299 @@ $(function(){
 			Drag.engines.dragging = false;
 			$(".drag").css("display", "none")
 		}
+
+		if(Drag.context.dragging){
+			Drag.context.dragging = false;
+			$(".drag").css("display", "none")
+		}
 	})
+
+	// context move
+
+
+
+	// content
+
+	for(let i = 0; i < 5; i++){
+		$("#main-" + i).on("click", function(){
+			loadMain(i);
+		})
+	}
+
+	chrome.storage.local.get("startpage_settings", function(s){
+		mains = s.startpage_settings.mains;
+		for(let i = 0; i < 5; i++){
+			$("#main-" + i).text(mains[i].name)
+		}
+	})
+
+	$('.main .main-name').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].name = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+		});
+	});
+
+	$('.main .main-cover').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].cover = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
+		});
+	});
+
+	$('.main .main-outer').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].outer = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
+		});
+	});
+
+	$('.main .main-inner').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].inner = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
+		});
+	});
+
+	$('.main .main-fill').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].fill = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
+		});
+	});
+
+	$('.main .main-bar').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].bar = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
+		});
+	});
+
+	$('.main .main-img').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].img = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
+		});
+	});
+
+	$('.main .main-url').bind('input propertychange', function() {
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+	
+			settings.mains[mainIndex].url = val;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
+		});
+	});
+
+	$(document).on("focusout", ".save-color", function(){
+		let val = $(this).val();
+		chrome.storage.local.get("startpage_saved_colors", function (s){
+			let colors = s.startpage_saved_colors;
+			if(colors.filter(color => color == val).length == 0){
+				colors.splice(0, 0, val);
+			}
+			chrome.storage.local.set({startpage_saved_colors: colors})
+		})
+	})
+
+
+	$(".main input").on("focusout", updateDisplay)
+
+	$(".advanced").on("click", function(){
+		chrome.storage.local.get("startpage_settings", function(s){
+			let settings = s.startpage_settings;
+			settings.mains[mainIndex].advanced = !settings.mains[mainIndex].advanced;
+
+			chrome.storage.local.set({startpage_settings: settings})
+
+			loadToProfile(true);
+
+			checkAdvanced();
+		})
+	});
+
+	// context
+
+	$(document).on("focusin", "#context-menu .variable-context input", function(){
+		var name = $(this).attr("name")
+		Context.lastValidEntry = name
+	});
+	
+	$(document).on("click", "#context-menu .action", function(){
+		let name = $(this).parent().find(".variable-context").children(0).val()
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+			let context_menu = settings.mains[mainIndex].context;
+			context_menu.forEach(context => {
+				if(context.name == name){
+					context_menu.splice(context_menu.indexOf(context), 1)
+				}
+			});
+	
+			settings.mains[mainIndex].context = context_menu;
+			chrome.storage.local.set({startpage_settings:settings});
+			
+			loadToProfile(false);
+			loadMain(mainIndex);
+		})
+	})
+	
+	$(document).on("keypress", "#context-menu .variable-context input", function(e){
+		if(e.which == 13){
+			let lastValid = Context.lastValidEntry;
+			let val = $(this).val()
+			let name = $(this).attr("name")
+			chrome.storage.local.get("startpage_settings", function(e){
+				settings = e.startpage_settings;
+				context_menu = settings.mains[mainIndex].context;
+	
+				if(val.replace(/\s/g, '') == "" || val != name){
+					if(lastValid != undefined){
+						context_menu.filter(context => context.name == name)[0].name = lastValid;
+						$("#context-menu .variable-context input[name = '" + name + "']").val(lastValid)
+						$("#context-menu .variable-context input[name = '" + name + "']").attr("name", lastValid)
+						settings.mains[mainIndex].context = context_menu;
+						chrome.storage.local.set({startpage_settings: settings});
+					}
+				}
+	
+				loadToProfile(false);
+				loadMain(mainIndex);
+			});	
+		}
+	})
+	
+	$(document).on("focusout", "#context-menu .variable-context input" , function(){
+		let lastValid = Context.lastValidEntry;
+		let val = $(this).val()
+		let name = $(this).attr("name")
+		chrome.storage.local.get("startpage_settings", function(e){
+			settings = e.startpage_settings;
+			context_menu = settings.mains[mainIndex].context;
+	
+			if(val.replace(/\s/g, '') == "" || val != name){
+				if(lastValid != undefined){
+					context_menu.filter(context => context.name == name)[0].name = lastValid;
+					$("#context-menu .variable-context input[name = '" + name + "']").val(lastValid)
+					$("#context-menu .variable-context input[name = '" + name + "']").attr("name", lastValid)
+					settings.mains[mainIndex].context = context_menu;
+					chrome.storage.local.set({startpage_settings: settings});
+				}
+			}
+			
+			loadToProfile(false);
+			loadMain(mainIndex);
+		});				
+	});
+
+	$(document).on("focusout", "#context-menu .variable-context-url input" ,function(){
+		loadToProfile(false);
+		loadMain(mainIndex);
+	});
 
 	// weather
 	
 	$('.weather .location .lat input').bind('input propertychange', function() {
 		let val = $(this).val();
 		chrome.storage.local.get("startpage_settings", function(e){
-			chrome.storage.local.get("startpage_selected_profile", function(sp){
-				chrome.storage.local.get("startpage_profiles", function(pr){
-					let settings = e.startpage_settings;
-					let selected = sp.startpage_selected_profile;
-					let profiles = pr.startpage_profiles;
-					let location = settings.darksky_loc;
-			
-					if(val.split(".").length < 3){
-						if(val.indexOf(".") == 0) {
-							location.lat = Number.parseFloat("0" + val)
-						} else if (val.indexOf(".") == val.length - 1) {
-							location.lat = Number.parseFloat(val + "0")
-						} else {
-							location.lat = Number.parseFloat(val)
-						}
-					}
-					settings.darksky_loc = location;
-					chrome.storage.local.set({startpage_settings: settings})
+			let settings = e.startpage_settings;
+			let location = settings.darksky_loc;
+	
+			if(val.split(".").length < 3){
+				if(val.indexOf(".") == 0) {
+					location.lat = Number.parseFloat("0" + val)
+				} else if (val.indexOf(".") == val.length - 1) {
+					location.lat = Number.parseFloat(val + "0")
+				} else {
+					location.lat = Number.parseFloat(val)
+				}
+			}
+			settings.darksky_loc = location;
+			chrome.storage.local.set({startpage_settings: settings})
 
-					if(selected != ""){
-						profiles.filter(profile => profile.name == selected)[0].settings.darksky_loc = location;
-						chrome.storage.local.set({startpage_profiles: profiles})
-					}
-				});
-			});
+			loadToProfile(false)
 		});
 	});
 	
 	$('.weather .location .lon input').bind('input propertychange', function() {
 		let val = $(this).val();
 		chrome.storage.local.get("startpage_settings", function(e){
-			chrome.storage.local.get("startpage_selected_profile", function(sp){
-				chrome.storage.local.get("startpage_profiles", function(pr){
-					let settings = e.startpage_settings;
-					let selected = sp.startpage_selected_profile;
-					let profiles = pr.startpage_profiles;
-					let location = settings.darksky_loc;
-			
-					if(val.split(".").length < 3){
-						if(val.indexOf(".") == 0) {
-							location.lon = Number.parseFloat("0" + val)
-						} else if (val.indexOf(".") == val.length - 1) {
-							location.lon = Number.parseFloat(val + "0")
-						} else {
-							location.lon = Number.parseFloat(val)
-						}
-					}
-					settings.darksky_loc = location;
-					chrome.storage.local.set({startpage_settings: settings})
+			let settings = e.startpage_settings;
+			let location = settings.darksky_loc;
+	
+			if(val.split(".").length < 3){
+				if(val.indexOf(".") == 0) {
+					location.lon = Number.parseFloat("0" + val)
+				} else if (val.indexOf(".") == val.length - 1) {
+					location.lon = Number.parseFloat(val + "0")
+				} else {
+					location.lon = Number.parseFloat(val)
+				}
+			}
+			settings.darksky_loc = location;
+			chrome.storage.local.set({startpage_settings: settings})
 
-					if(selected != ""){
-						profiles.filter(profile => profile.name == selected)[0].settings.darksky_loc = location;
-						chrome.storage.local.set({startpage_profiles: profiles})
-					}
-				});
-			});
+			loadToProfile(false);
 		});
 	});
 
@@ -1827,22 +2572,13 @@ $(function(){
 	$("#darksky").bind('input propertychange', function() {
 		newKey = $(this).val();
 		chrome.storage.local.get("startpage_settings", function(e){
-			chrome.storage.local.get("startpage_selected_profile", function(sp){
-				chrome.storage.local.get("startpage_profiles", function(pr){
-					let settings = e.startpage_settings;
-					let selected = sp.startpage_selected_profile;
-					let profiles = pr.startpage_profiles;
-					
-					settings.darksky_key = newKey;
+			let settings = e.startpage_settings;
+			
+			settings.darksky_key = newKey;
 
-					chrome.storage.local.set({startpage_settings: settings})
+			chrome.storage.local.set({startpage_settings: settings})
 
-					if(selected != ""){
-						profiles.filter(profile => profile.name == selected)[0].settings.darksky_key = newKey;
-						chrome.storage.local.set({startpage_profiles: profiles})
-					}
-				});
-			});
+			loadToProfile(false);
 		});
 	});
 	
@@ -1853,7 +2589,7 @@ $(function(){
 	$.each($(".side-content h4"), function(i){
 		$(this).on("click", function(ev){
 			$([document.documentElement, document.body]).animate({
-				scrollTop: anchor[i] + 1
+				scrollTop: anchor[i] + 185
 			}, 500);
 		})
 	})
@@ -1912,88 +2648,61 @@ $(function(){
 			$("#" + checkbox + " input").on("change", function(){
 	
 				chrome.storage.local.get("startpage_settings", function(s){
-					chrome.storage.local.get("startpage_profiles", function(e){
-						chrome.storage.local.get("startpage_selected_profile", function(a){
-							let startpage_profiles = e.startpage_profiles;
-							let settings = s.startpage_settings;
-							settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
-							chrome.storage.local.set({startpage_settings:settings})
-	
-							if(startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile).length != 0){
-								startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile)[0].settings[checkbox] = $("#" + checkbox + " input").prop("checked");
-								chrome.storage.local.set({startpage_profiles:startpage_profiles})
-							}
-							updateDisplay();
-						});
-					})
-				})
+					let settings = s.startpage_settings;
+					settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
+					chrome.storage.local.set({startpage_settings:settings})
+
+					loadToProfile(true);
+					loadMain(mainIndex);
+				});
 			})
 		
 			$("#" + checkbox + " span").on("click", function(){
 				chrome.storage.local.get("startpage_settings", function(s){
-					chrome.storage.local.get("startpage_profiles", function(e){
-						chrome.storage.local.get("startpage_selected_profile", function(a){
-							let startpage_profiles = e.startpage_profiles;
-							let settings = s.startpage_settings;
-							settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
-							chrome.storage.local.set({startpage_settings:settings})
-	
-							if(startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile).length != 0){
-								startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile)[0].settings[checkbox] = $("#" + checkbox + " input").prop("checked");
-								chrome.storage.local.set({startpage_profiles:startpage_profiles})
-							}
-							updateDisplay();
-						});
-					})
-				})
+					let settings = s.startpage_settings;
+					settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
+					chrome.storage.local.set({startpage_settings:settings})
+
+					loadToProfile(true);
+					loadMain(mainIndex);
+				});
 			})
 		} else {
 			$("#" + checkbox + " input").on("change", function(){
 
 				chrome.storage.local.get("startpage_settings", function(s){
-					chrome.storage.local.get("startpage_profiles", function(e){
-						chrome.storage.local.get("startpage_selected_profile", function(a){
-							let startpage_profiles = e.startpage_profiles;
-							let settings = s.startpage_settings;
-							settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
-							chrome.storage.local.set({startpage_settings:settings})
+					let settings = s.startpage_settings;
+					settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
+					chrome.storage.local.set({startpage_settings:settings})
 
-							if(startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile).length != 0){
-								startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile)[0].settings[checkbox] = $("#" + checkbox + " input").prop("checked");
-								chrome.storage.local.set({startpage_profiles:startpage_profiles})
-							}
-							chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
-								updateDisplay();
-							});
-						});
-					})
-				})
+					loadToProfile(false)
+					chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
+						updateDisplay();
+						loadMain(mainIndex);
+					});
+				});
 			})
 		
 			$("#" + checkbox + " span").on("click", function(){
 				chrome.storage.local.get("startpage_settings", function(s){
-					chrome.storage.local.get("startpage_profiles", function(e){
-						chrome.storage.local.get("startpage_selected_profile", function(a){
-							let startpage_profiles = e.startpage_profiles;
-							let settings = s.startpage_settings;
-							settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
-							chrome.storage.local.set({startpage_settings:settings})
+					let settings = s.startpage_settings;
+					settings[checkbox] =  $("#" + checkbox + " input").prop("checked");
+					chrome.storage.local.set({startpage_settings:settings})
 
-							if(startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile).length != 0){
-								startpage_profiles.filter(profile => profile.name == a.startpage_selected_profile)[0].settings[checkbox] = $("#" + checkbox + " input").prop("checked");
-								chrome.storage.local.set({startpage_profiles:startpage_profiles})
-							}
-							chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
-								updateDisplay();
-							});
-						});
-					})
-				})
+					
+
+					loadToProfile(false);
+					chrome.runtime.sendMessage({action: "update_dark"}, function(response) {
+						updateDisplay();
+						loadMain(mainIndex);
+					});
+				});
 			})
 		}
 	});
 
 	// Autocomplete checkbox
+
 	$("#autocomplete input").on("change", function(){
 
 		chrome.storage.local.get("startpage_autocomplete", function(e){

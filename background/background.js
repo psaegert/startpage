@@ -2,18 +2,143 @@ chrome.runtime.onInstalled.addListener(function(details){
     chrome.storage.local.get('startpage_settings', function(e){
 		if(e.startpage_settings == undefined){
 			chrome.storage.local.set({startpage_settings:{
-				darkmode: false,
-				darkmode_auto: false,
-				darkmode_auto_time: {from: "19:00", to:"08:00"},
 				blob: true,
-				sidebar: true,
-				sidebar_websites:[],
-				search_engines: [
-					{name: "Google", url: "https://www.google.de/search?q=", color: "#acc0e6"}
+				darkmode: false,
+				darkmode_auto: true,
+				darkmode_auto_time: {
+							from: "18:10",
+							to: "07:30"
+				},
+				darksky_key: "9c4e8944261ed3b6f5f3438431a5cfa0",
+				darksky_loc: {
+							lat: 49.4489522,
+							lon: 8.6715483
+				},
+				mains: [
+							{
+										advanced: false,
+										bar: "",
+										context: [
+													{
+																name: "Subscriptions",
+																url: "https://www.youtube.com/feed/subscriptions"
+													}
+										],
+										cover: "rgb(255, 160, 160)",
+										fill: "",
+										img: "Youtube.png",
+										inner: "",
+										name: "Youtube",
+										outer: "",
+										url: "https://www.youtube.com/"
+							},
+							{
+										advanced: false,
+										bar: "",
+										context: [
+													{
+																name: "Likes",
+																url: "https://soundcloud.com/you/likes"
+													},
+													{
+																name: "History",
+																url: "https://soundcloud.com/you/history"
+													},
+													{
+																name: "Stream",
+																url: "https://soundcloud.com/stream"
+													}
+										],
+										cover: "rgb(255, 200, 160)",
+										fill: "",
+										img: "Soundcloud.png",
+										inner: "",
+										name: "Soundcloud",
+										outer: "",
+										url: "https://soundcloud.com/discover/"
+							},
+							{
+										advanced: false,
+										bar: "",
+										context: [
+													{
+																name: "22:00",
+																url: "https://www.tvspielfilm.de/tv-programm/sendungen/fernsehprogramm-nachts.html"
+													}
+										],
+										cover: "rgb(160, 160, 255)",
+										fill: "",
+										img: "TV.png",
+										inner: "",
+										name: "TV",
+										outer: "",
+										url: "https://www.tvspielfilm.de/tv-programm/sendungen/abends.html"
+							},
+							{
+										advanced: false,
+										bar: "",
+										context: [
+													{
+																name: "Nightblue3",
+																url: "https://www.twitch.tv/nightblue3"
+													},
+													{
+																name: "ESL CS:GO",
+																url: "https://www.twitch.tv/esl_csgo"
+													}
+										],
+										cover: "rgb(220, 160, 255)",
+										fill: "",
+										img: "Twitch.png",
+										inner: "",
+										name: "Twitch",
+										outer: "",
+										url: "https://www.twitch.tv/directory"
+							},
+							{
+										advanced: false,
+										bar: "",
+										context: [
+													{
+																name: "New",
+																url: "https://www.reddit.com/submit"
+													}
+										],
+										cover: "rgb(255, 180, 140)",
+										fill: "",
+										img: "Reddit.png",
+										inner: "",
+										name: "Reddit",
+										outer: "",
+										url: "https://www.reddit.com/"
+							}
 				],
-				darksky_key: "",
-				darksky_loc: {lat: -1, lon: -1},
-				weather: true,
+				search_engines: [
+							{
+										color: "#acc0e6",
+										name: "Google",
+										url: "https://www.google.de/search?q="
+							},
+							{
+										color: "#ecb2b0",
+										name: "Youtube",
+										url: "https://www.youtube.com/results?search_query="
+							},
+							{
+										color: "#e9b793",
+										name: "Soundcloud",
+										url: "https://soundcloud.com/search?q="
+							}
+				],
+				sidebar: true,
+				sidebar_websites: [
+							{
+										img: "github.png",
+										name: "Github",
+										url: "https://github.com/Usernameeeeeeeee/startpage"
+							}
+				],
+				weather: true
 			}});
 		}
 	
@@ -48,6 +173,12 @@ chrome.runtime.onInstalled.addListener(function(details){
 			}});
 		}
 	});
+
+	chrome.storage.local.get("startpage_saved_colors", function(c){
+		if(c.startpage_saved_colors == undefined){
+			chrome.storage.local.set({startpage_saved_colors: []})
+		}
+	})
 });
 
 // MAIN
@@ -80,37 +211,24 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			chrome.tabs.create({
 				url:"/startpage/startpage.html"
 			});
-
 		} else if(request.newTab == "false") {
 			chrome.tabs.getSelected(function (tab) {
 				chrome.tabs.update(tab.id, {url:"/startpage/startpage.html"});
 			});
 		}
 	} else if(request.navigate != undefined){
-		if(request.newTab == "true"){
-			if((typeof request.navigate) != undefined){
+		if(request.newTab == "true" || request.newTab === true){
 				chrome.tabs.create({
 					url:request.navigate
 				});
-			} else {
-				chrome.tabs.create({
-					url:"settings.html"
-				});
-			}
-		} else if(request.newTab == "false") {
+		} else if(request.newTab == "false" || request.newTab === false) {
 			chrome.tabs.getSelected(function (tab) {
-				if((typeof request.navigate) != undefined){
-					chrome.tabs.update(tab.id, {url: request.navigate});
-				} else {
-					chrome.tabs.create({
-						url:"settings.html"
-					});
-				}
+				chrome.tabs.update(tab.id, {url: request.navigate});
 			});
 		}
 	}
 
-	if(request.action = "udpate_dark"){
+	if(request.action == "update_dark"){
 		chrome.storage.local.get("startpage_settings", function(a){
 			chrome.storage.local.get("startpage_profiles", function(pr){
 	
@@ -156,6 +274,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				sendResponse({updated: true})
 			})
 		})
+	} else if(request.action == "closeCurrent") {
+		chrome.tabs.getSelected(function(tab) {
+			chrome.tabs.remove(tab.id, function() {});
+		});
 	}
 
 	return true;

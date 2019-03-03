@@ -19,9 +19,9 @@
 				<h4>Profiles</h4>
 				<h4>Basic Settings</h4>
 				<h4>Sidebar</h4>
+				<h4>Content</h4>
 				<h4>Blob</h4>
 				<h4>Weather</h4>
-				<h4>Content</h4>
 			</div>
 		</div>
 		<div class="block resources">
@@ -85,7 +85,7 @@
 
 					<p class="note">(Note: press [SHIFT] + [ENTER] to dodge the saving of your current search query.)</p>
 
-					<p>Manage Suggestions</p>
+					<p>Search History</p>
 
 					<table class="manage" id="autocomplete-suggestions">
 						<tbody>
@@ -132,6 +132,76 @@
 				
 			</div>
 		</div>
+		<div class="block custom">
+			<h2>Content</h2>
+			<div class="content">
+
+				<h3>Featured Websites</h3>
+				
+				<div class="subcontent">
+					<div class="navigation">
+						<ul>
+							<li id="main-0" >One</li>
+							<li id="main-1" >Two</li>
+							<li id="main-2" >Three</li>
+							<li id="main-3" >Four</li>
+							<li id="main-4" >Five</li>
+						</ul>
+					</div>
+					<div class="layered-content">
+						<div class="main">
+							<input autocomplete="off" spellcheck="false" type="text" placeholder="Name" class="main-name">
+							<hr style="width: 200px;margin: 0 0 34px 0;">
+							<p id="main-color-mode">Color</p>
+							<div class="advanced"></div>
+							<div class="main-color-input">
+								<span id="main-color">Cover:</span>
+								<input autocomplete="off" spellcheck="false" type="text" placeholder="#ffffff" class="main-small main-cover">
+							</div>
+							<div class="advanced-container">
+								<div class="main-color-input">
+									<span>Outer Border:</span>
+									<input autocomplete="off" spellcheck="false" type="text" placeholder="#ffffff" class="main-small main-outer save-color">
+								</div>
+								<div class="main-color-input">
+									<span>Inner Border:</span>
+									<input autocomplete="off" spellcheck="false" type="text" placeholder="#ffffff" class="main-small main-inner save-color">
+								</div>
+								<div class="main-color-input">
+									<span>Fill:</span>
+									<input autocomplete="off" spellcheck="false" type="text" placeholder="#ffffff" class="main-small main-fill save-color">
+								</div>
+								<div class="main-color-input">
+									<span>Bar:</span>
+									<input autocomplete="off" spellcheck="false" type="text" placeholder="#ffffff" class="main-small main-bar save-color">
+								</div>
+							</div>
+							<p style="margin-top: 90px;" class="main-p-resources">Resources</p>
+							<input autocomplete="off" spellcheck="false" type="text" placeholder="preview.png" class="main-small main-img">
+							<input autocomplete="off" spellcheck="false" type="text" placeholder="https://www.example.com" class="main-small main-url">
+							<p id="main-preview-header">Preview</p>
+							<div class="main-preview">
+								<div class="preview-small main-1">
+									<img class="img-1" alt="Could not find Image">
+									<div class="outer border-1 background-1 outer-active"></div>
+									<div class="inner border-1 inner-active"></div>
+									<div class="cover-container">
+										<div class="cover"></div>
+									</div>
+								</div>
+							</div>
+							<p style="margin-top: 50px;">Context Menu</p>
+							<table class="manage" id="context-menu">
+								<tbody>
+									<td style="color:rgb(161, 0, 0)">An Error occured. Please reload the page before changing any settings.</td>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
 		<div class="block blob">
 			<h2>Blob</h2>
 			<div class="content">
@@ -140,7 +210,7 @@
 					<span>Enable Blob</span>
 				</div>
 
-				<p class="note">Press and hold [SHIFT] on any website to open a menu at your cursor's position.<br> Point your mouse in the direction of the desired website and either <br><br> 1) left-click to open the site in the current tab or <br> 2) right-click to open it in a new tab. <br><br> Clicking the center will take you to the startpage. <br><br> Opening the menu will be delayed when focusing any input to avoid interference with typing capital letters.</p>
+				<p class="note">Press and hold [SHIFT] on any website to open a menu at your cursor's position.<br> Point your mouse in the direction of the desired website and either <br><br> 1) left-click to open the site in the current tab or <br> 2) right-click to open it in a new tab. <br><br> Clicking the center will take you to the startpage accordingly. <br><br> Opening the menu will be delayed when focusing any input to avoid interference with typing capital letters.</p>
 
 				<h3>Listed Websites</h3>
 
@@ -182,21 +252,6 @@
 					<input type="text" id="darksky" spellcheck="false">
 					<p class="note">Don't have a key? Get one here: <a target="_blank" href="https://darksky.net/dev">https://darksky.net/dev</a> (Account required)</p>
 				</div>
-			</div>
-		</div>
-		<div class="block custom">
-			<h2>Content</h2>
-			<div class="content">
-				<h3>Quick Access</h3>
-
-				<h3>Featured Websites</h3>
-				
-				<div class="subcontent">
-					<p>Manage Featured Websites</p>
-					<p>URL, color, image</p>
-					<p>*coming soon*</p>
-				</div>
-
 			</div>
 		</div>
 

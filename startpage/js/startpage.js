@@ -10,17 +10,16 @@ engine_index = 0,
 s_index = -1,
 progress = 0,
 
-hovered = "",
+hovered = -1,
 engines = [],
 
 showWeather,
 darkmode,
 sidebar,
-queries,
 last,
 autocomplete,
-display_queries,
-old_display_queries;
+display,
+suggestionsHovered = false;
 
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -184,134 +183,135 @@ function monthToStr(mt){
     }
 }
 
-function searchExit(url){
+function nth_occurrence (string, char, nth) {
+    var first_index = string.indexOf(char);
+    var length_up_to_first_index = first_index + 1;
+
+    if (nth == 1) {
+        return first_index;
+    } else {
+        var string_after_first_occurrence = string.slice(length_up_to_first_index);
+        var next_occurrence = nth_occurrence(string_after_first_occurrence, char, nth - 1);
+
+        if (next_occurrence === -1) {
+            return -1;
+        } else {
+            return length_up_to_first_index + next_occurrence;  
+        }
+    }
+}
+
+function searchExit(query, save){
+    url = enginePrefix(query);
+    if(save){
+        chrome.storage.local.get("startpage_autocomplete", function(a){
+            let auto = a.startpage_autocomplete;
+            let sugs = auto.suggestions;
+
+            try{
+                sugs.filter(sug => {
+                    return (sug.query.toUpperCase() == query.toUpperCase() && sug.engine == engines[engine_index].name);
+                })[0].p++;
+                sugs.filter(sug => {
+                    return (sug.query.toUpperCase() == query.toUpperCase() && sug.engine == engines[engine_index].name);
+                })[0].time = new Date().getTime();
+            } catch(e){
+                sugs.push(
+                    {
+                        engine: engines[engine_index].name,
+                        query: query,
+                        p: 1,
+                        time: new Date().getTime()
+                    }
+                )
+            }
+            
+            sugs.sort(function (a, b) {
+                return b.p - a.p;
+            });
+
+            auto.suggestions = sugs;
+
+            chrome.storage.local.set({startpage_autocomplete:auto})
+        })
+    }
     $("#white").addClass("search-exit-fade");
     setTimeout(function(){
         window.location = url;
     }, 70)
 }
 
-function clicked(str, sub){
+function leave(h, url){
     exitPage = true;
-    $(str + "-b").addClass("preview-active-exit");
-    $(str + "-b .small-bar").addClass("small-bar-active-exit");
+    $("#big-" + h).addClass("preview-active-exit");
+    $("#big-" + h + " .small-bar").addClass("small-bar-active-exit");
+    
     $(".content").addClass("fade-out");
     $(".header").addClass("fade-out");
     $(".slider").addClass("display");
+
     setTimeout(function(){
-        $(".triangle-colored").addClass(str.slice(1, str.length) + "-triangle-colored-exit");
+        $(".triangle-colored").css("border-bottom-color", mains[h].cover)
+        $(".triangle-colored").addClass("triangle-colored-exit");
         $(".triangle-white").addClass("triangle-white-exit");
         setTimeout(function(){
-            switch(str){
-                case "#yt":
-                    switch(sub){
-                        case "subscriptions": url = "https://www.youtube.com/feed/subscriptions"; break;
-                        case "ttt": url = "https://www.youtube.com/results?search_query=ttt+pietsmiet&sp=CAISBBABGAI%253D"; break;
-                        case "hdsoundi": url = "https://www.youtube.com/user/MarK1Ira/videos"; break;
-                        default: url = "https://www.youtube.com/"; break;
-                    } 
-                break;
-
-                case "#sc":
-                    switch(sub){
-                        case "likes": url = "https://soundcloud.com/you/likes"; break;
-                        case "history": url = "https://soundcloud.com/you/history"; break;
-                        default: url = "https://soundcloud.com/discover/"; break;
-                    } 
-                break;
-
-                case "#tv":
-                    switch(sub){
-                        case "2200": url = "https://www.tvspielfilm.de/tv-programm/sendungen/fernsehprogramm-nachts.html"; break;
-                        case "tomorrow": 
-                            now = new Date();
-                            url = "https://www.tvspielfilm.de/tv-programm/sendungen/?page=1&order=time&date=" + now.getFullYear() + "-" + checkTime(now.getMonth() + 1) + "-" + checkTime(now.getDate() + 1) + "&cat%5B%5D=SP&cat%5B%5D=SE&cat%5B%5D=RE&cat%5B%5D=U&cat%5B%5D=KIN&cat%5B%5D=SPO&time=prime&channel=";
-                        break;
-                        case "friday":
-                            now = new Date();
-                            now.setDate(now.getDate() + (5+(7-now.getDay())) % 7);
-                            url = "https://www.tvspielfilm.de/tv-programm/sendungen/?page=1&order=time&date=" + now.getFullYear() + "-" + checkTime(now.getMonth() + 1) + "-" + checkTime(now.getDate()) + "&cat%5B%5D=SP&cat%5B%5D=SE&cat%5B%5D=RE&cat%5B%5D=U&cat%5B%5D=KIN&cat%5B%5D=SPO&time=prime&channel=";
-                        break;
-                        default: url = "https://www.tvspielfilm.de/tv-programm/sendungen/abends.html"; break;
-                    } 
-                break;
-
-                case "#tw":
-                    switch(sub){
-                        case "nightblue3": url = "https://www.twitch.tv/nightblue3"; break;
-                        case "nasa": url = "https://www.twitch.tv/nasa"; break;
-                        case "shroud": url = "https://www.twitch.tv/shroud"; break;
-                        default: url = "https://www.twitch.tv/directory"; break;
-                    } 
-                break;
-
-                case "#g":
-                    switch(sub){
-                        case "subscriptions": url = "https://www.reddit.com/user/Valkyrie_Cain_"; break;
-                        case "ttt": url = "https://www.reddit.com/r/all"; break;
-                        default: url = "https://www.reddit.com/"; break;
-                    } 
-                break;
+            
+            if(url != undefined){
+                chrome.runtime.sendMessage({navigate: url, newTab:false})       
+            } else {
+                chrome.runtime.sendMessage({navigate: mains[h].url, newTab:false})
             }
-            window.location = url;
-        }, 600)
+        }, 400)
     }, 350)
+
 }
 
-function hoverIn(str){
-    hovered = str
-    $(str + "-b").addClass("preview-active");
-    $(str + "-b .small-bar").addClass("small-bar-active");
-    $(str + " .container-color-cover .cover").addClass("cover-active");
-    $(str + " .container-color-cover").addClass("container-color-cover-active");
-    if(darkmode){
-        $(str + " .image-container img").css("opacity", "0.9");
-    } else {
-        $(str + " .image-container img").addClass("preview-small-img-active");
-    }
-    $(str + " .container-color .outer-rect").addClass("outer-rect-active");
-    $(str + " .container-white .inner-rect").addClass("inner-rect-active");
-    $(str + "-text .text-site").addClass("text-site-active");
-    $(str + "-text .text-underline").addClass("text-underline-active");
-    $(str + "-text .text-site").addClass("text-site-active");
-    $(str + "-text .text-underline").addClass("text-underline-active");
-    $(str + "-text .text-site").addClass("text-opacity-active");
-    $(str + "-text .text-underline").addClass("text-opacity-active");
+function hoverIn(i){
+    hovered = i;
+
+    $(".main-" + i + " .cover-container .cover").addClass("cover-active")
+    $(".main-" + i + " .outer").addClass("outer-active")
+    $(".main-" + i + " .inner").addClass("inner-active")
+
+    $("#big-" + i).addClass("preview-active")
+    $("#big-" + i + " .small-bar").addClass("small-bar-active");
+    
+    $("#text-" + i + " .text-site").addClass("text-site-active");
+    $("#text-" + i + " .text-underline").addClass("text-underline-active");
+    $("#text-" + i + " .text-site").addClass("text-opacity-active");
+    $("#text-" + i + " .text-underline").addClass("text-opacity-active");
 }
 
-function hoverOut(str){
+function hoverOut(i){
     if(!dropdown_hovered){
-        hovered = ""
+        hovered = -1
     }
-    $(str + "-b").removeClass("preview-active");
-    $(str + "-b .small-bar").removeClass("small-bar-active");
-    $(str + " .container-color-cover .cover").removeClass("cover-active");
-    $(str + " .container-color-cover").removeClass("container-color-cover-active");
-    if(darkmode){
-        $(str + " .image-container img").css("opacity", "0");
-    } else {
-        $(str + " .image-container img").removeClass("preview-small-img-active");
-    }
-    $(str + " .container-color .outer-rect").removeClass("outer-rect-active");
-    $(str + " .container-white .inner-rect").removeClass("inner-rect-active");
-    $(str + "-text .text-site").removeClass("text-site-active");
-    $(str + "-text .text-underline").removeClass("text-underline-active");
-    $(str + "-text .text-site").removeClass("text-opacity-active");
-    $(str + "-text .text-underline").removeClass("text-opacity-active");
+    
+    $(".main-" + i + " .cover-container .cover").removeClass("cover-active")
+    $(".main-" + i + " .outer").removeClass("outer-active")
+    $(".main-" + i + " .inner").removeClass("inner-active")
+
+    $("#big-" + i).removeClass("preview-active")
+    $("#big-" + i + " .small-bar").removeClass("small-bar-active");
+    
+    $("#text-" + i + " .text-site").removeClass("text-site-active");
+    $("#text-" + i + " .text-underline").removeClass("text-underline-active");
+    $("#text-" + i + " .text-site").removeClass("text-opacity-active");
+    $("#text-" + i + " .text-underline").removeClass("text-opacity-active");
 
 }
 
-function startFocusOut(preview){
+function startFocusOut(){
     $(document).on("click",function(){
-        $("#" + preview + " .dropdown").hide();        
+        $(".dropdown").hide(); 
         $(document).off("click");
     });
 } 
 
 function manageHovered(){
     h = hovered;
-    hovered = "";
-    $(h + " .dropdown").hide();
+    hovered = -1;
+    $(".dropdown").hide();
     setTimeout(function(){
         if(hovered != h){
             hoverOut(h);
@@ -328,20 +328,11 @@ function enginePrefix(query){
     }
 }
 
-function searchSelect(selected_index){
-    if(selected_index >= 0){
-        $.each($(".suggestions ul li"), function(index, element) {
-            if(index == selected_index){
-                $(".suggestions ul li").eq(index).addClass("highlighted")
-            } else {
-                $(".suggestions ul li").eq(index).removeClass("highlighted")
-            }
-        });
-    } else {
-        $.each($(".suggestions ul li"), function(index, element) {
-            $(".suggestions ul li").eq(index).removeClass("highlighted")
-        });
+function searchSelect(j){
+    for(let i = 0; i < $(".suggestions ul li").length; i++){
+        i == j ? $(".suggestions ul li").eq(i).addClass("highlighted") : $(".suggestions ul li").eq(i).removeClass("highlighted")
     }
+    $("#input").val($(".highlighted").text());
 }
 
 function updateDarkMode(){
@@ -367,7 +358,45 @@ function updateDarkMode(){
     });
 }
 
+function loadMainImage(i){
+    chrome.storage.local.get("startpage_settings", function(e){
+        mains = e.startpage_settings.mains
+        if(i < 5){
+            main = mains[i];
+            let src = ""
+            if(main.img.indexOf("file:///") == 0 || main.img.indexOf("http://") == 0 || main.img.indexOf("https://") == 0){
+                src = main.img;
+            } else {
+                src = "/startpage/img/main/" + main.img
+            }
+
+            if(src.replace(/\s/g, '') != "" && src.split(".").length > 1){
+                $.get(src)
+                .done(function() { 
+            
+                    $(".img-" + i).attr("src", src);
+                    $("#big-" + i).find("img").attr("src", src);
+                    loadMainImage(i+1)
+
+                }).fail(function() { 
+            
+                    $(".img-" + i).remove();
+                    $("#big-" + i).find("img").remove();
+        
+                    loadMainImage(i+1)
+                })
+            } else {
+                $(".img-" + i).remove();
+                $("#big-" + i).find("img").remove();
+
+                loadMainImage(i+1)
+            }
+        }
+    })
+}
+
 function loadSidebar(i){
+    let src = ""
     chrome.storage.local.get("startpage_settings", function(e){
         if(i < e.startpage_settings.sidebar_websites.length){
             let website = e.startpage_settings.sidebar_websites[i];
@@ -444,9 +473,181 @@ function loadSidebar(i){
     })
 }
 
+function similarity(s1, s2) {
+    var longer = s1;
+    var shorter = s2;
+    if (s1.length < s2.length) {
+        longer = s2;
+        shorter = s1;
+    }
+    var longerLength = longer.length;
+    if (longerLength == 0) {
+        return 1.0;
+    }
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+}
+
+function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+
+    var costs = new Array();
+    for (var i = 0; i <= s1.length; i++) {
+        var lastValue = i;
+        for (var j = 0; j <= s2.length; j++) {
+            if (i == 0)
+                costs[j] = j;
+            else {
+                if (j > 0) {
+                    var newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                        newValue = Math.min(Math.min(newValue, lastValue),
+                        costs[j]) + 1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+        }
+        }
+        if (i > 0)
+        costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
+}
+
+function getScoredDisplay(array, local, val){
+
+    let display = [];
+
+    // table = []
+    // table.push(["response", "query", "match", "query", "pop", "last", "score"])
+
+    array.forEach(response => {
+
+        let score = 0;
+
+        local.forEach(query => {
+
+            querysim = Math.pow(similarity(response, query.query), 2) * 10 > 1 ? Math.pow(similarity(response, query.query), 2) * 10 : 0;
+
+            popbias = query.p * 0.1;
+
+            lastbias = (query.query == last ? 0.1 : 0);
+
+            score += querysim + popbias + lastbias;
+
+            // text = "";
+            // for(let i = 0; i < (querysim + popbias + lastbias) * 10; i++){
+            //     text += "|"
+            // }
+
+            // table.push([response, query.query, text, querysim, popbias, lastbias, score])
+
+        });
+
+        inputsim = Math.pow(similarity(val, response), 2) * 10;
+
+        score += inputsim;
+        
+        // table.push([response, "-", "-", "-", "-", "-", inputsim, score])
+
+        display.push({query: response, score: score})
+
+    })
+
+    display.sort(function (a, b) {
+        if(a.score > b.score){
+            return -1
+        } else if (a.score < b.score){
+            return 1;
+        }
+        return 0;
+    });
+
+    // console.table(table);
+
+    // console.table(display);
+
+    return display;
+}
+
+function boldString(str, find){
+
+    var re = new RegExp(find, 'gi');
+    str = str.replace(re, '<b>' + find + '</b>') // MeH
+
+    return str;
+}
+
+function tabThroughSuggestions(i){
+    
+    let s_length = $(".suggestions ul li").length;
+
+    if(s_length > 0){
+
+        if($(".highlighted").length == 0){
+            lastHumanInput = $("#input").val();
+        }
+    
+        if(i > 0){
+    
+            s_index++;
+            if(s_index > s_length) s_index = 0;
+    
+            if(s_index == s_length){
+                searchSelect(-1);
+                $("#input").val(lastHumanInput);
+            } else {
+                searchSelect(s_index);
+            }
+    
+        } else if(i < 0){
+    
+            s_index--;
+            if(s_index < 0) s_index = s_length;
+    
+            if(s_index == s_length){
+                searchSelect(-1);
+                $("#input").val(lastHumanInput);
+            } else {
+                searchSelect(s_index);
+            }
+    
+        }
+    }
+}
+
+function tabThroughEngines(i){
+    chrome.storage.local.get("startpage_settings", function(s){
+        engines = s.startpage_settings.search_engines;
+        last_index = engine_index;
+        s_index = -1;
+
+        if(i > 0){
+
+            engine_index++;
+            if(engine_index >= engines.length) engine_index = 0;
+
+        } else if(i < 0){
+
+            engine_index--
+            if(engine_index < 0) engine_index = engines.length - 1;
+
+        }
+        
+        $("#input").attr("placeholder", "Search " + engines[engine_index].name)
+        $("#input").css("border-color", engines[engine_index].color)
+        $(".suggestions").css("border-color", engines[engine_index].color)
+    })
+}
+
 chrome.storage.local.get('startpage_settings', function(e){
     engines = e.startpage_settings.search_engines;
-});
+    mains = e.startpage_settings.mains
+
+startDarkCheck();
+
+loadMainImage(0)
+
 $(function() {
 
     chrome.storage.local.get('startpage_settings', function(e){
@@ -468,8 +669,6 @@ $(function() {
 
     startTime();
 
-    startDarkCheck();
-
     setTimeout(function(){
 		$("body").addClass("smooth-bg")
 	}, 1000)
@@ -481,131 +680,63 @@ $(function() {
     $("input").attr("placeholder", "Search " + engines[0].name)
     $("#input").css("border-color", engines[0].color)
 
+    // typing
+
     $("#input").keydown(function(e) {
+
         let val = $(this).val();
+
         switch(e.keyCode){
             case 9: // TAB
-                keyDodge = true;
 
                 if(e.shiftKey){
-                    if($("#input").val() != ""){
-                        let s_length = $(".suggestions ul li").length;
-                        s_index++;
-                        if(s_index >= s_length) s_index = 0;
-                        if(s_length > 0){
-                            if($(".suggestions ul li").eq(s_index).position().top != 0) s_index = 0;
-                            setTimeout(function(){
-                                searchSelect(s_index);
-                            }, 10)
-                        }
-                    }
+                    // if($("#input").val() != "") tabThroughSuggestions(1);
+                    
+                    tabThroughEngines(-1);
                 } else {
-                    chrome.storage.local.get("startpage_settings", function(s){
-                        engines = s.startpage_settings.search_engines;
-                        last_index = engine_index;
-                        s_index = -1;
-        
-                        engine_index++;
-                        if(engine_index >= engines.length) engine_index = 0;
-        
-                        $("#input").attr("placeholder", "Search " + engines[engine_index].name)
-                        $("#input").css("border-color", engines[engine_index].color)
-                    })
+                    tabThroughEngines(1);
                 }
+                break;
+
+            case 38: // UP
+                e.preventDefault();
+                tabThroughSuggestions(-1);
+                break;
+
+            case 40: // DOWN
+                e.preventDefault();
+                tabThroughSuggestions(1);
+                break;
+
+            case 39: // RIGHT
+                // if($(".highlighted").length == 1){
+                //     lastHumanInput = display[Number.parseInt($(".highlighted").attr("id").slice(8, 11))].query
+                // }
                 break;
                 
             case 13: // ENTER
-                keyDodge = true;
-                chrome.storage.local.get("startpage_autocomplete", function(e){
-                    queries = e.startpage_autocomplete.suggestions;
-                    last = e.startpage_autocomplete.last;
-                    autocomplete = e.startpage_autocomplete.enabled;
-                    
-                    chrome.storage.local.get("startpage_settings", function(s){
-                        engines = s.startpage_settings.search_engines;
 
-                        if(!e.shiftKey && autocomplete){
-                            if($(".highlighted").length == 0){
-                                try{
-                                    queries.filter(query => {
-                                        return (query.query.toUpperCase() == val.toUpperCase() && query.engine ==  engines[engine_index].name);
-                                    })[0].p++;
-                                    queries.filter(query => {
-                                        return (query.query.toUpperCase() == val.toUpperCase() && query.engine == engines[engine_index].name);
-                                    })[0].time = new Date().getTime();
-                                } catch(e){
-                                    
-                                    queries.push(
-                                        {
-                                            engine: engines[engine_index].name,
-                                            query: val,
-                                            p: 1,
-                                            time: new Date().getTime()
-                                        }
-                                    )
-                                }
-                                queries.sort(function (a, b) {
-                                    return b.p - a.p;
-                                });
-    
-                                    chrome.storage.local.set({startpage_autocomplete:{
-                                        enabled: autocomplete,
-                                        suggestions: queries,
-                                        last: val
-                                    }})
-                                    
-                                    searchExit(enginePrefix(val));
-    
-    
-                            } else {
-                                
-                                try{
-                                    queries.filter(query => {
-                                        return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == engines[engine_index].name);
-                                    })[0].p++;
-                                    queries.filter(query => {
-                                        return (query.query.toUpperCase() == $(".highlighted").eq(0).html().toUpperCase() && query.engine == engines[engine_index].name);
-                                    })[0].time = new Date().getTime();
-                                } catch(e){
-                                    queries.push(
-                                        {
-                                            engine: engines[engine_index].name,
-                                            query: $(".highlighted").eq(0).html(),
-                                            p: 1,
-                                            time: new Date().getTime()
-                                        }
-                                    )
-                                }
-                                
-                                queries.sort(function (a, b) {
-                                    return b.p - a.p;
-                                });
-    
-                                    chrome.storage.local.set({startpage_autocomplete:{
-                                        enabled: autocomplete,
-                                        suggestions: queries,
-                                        last: $(".highlighted").eq(0).html()
-                                    }})
-                                    
-                                    searchExit(enginePrefix($(".highlighted").eq(0).html()));
-                                
-                            }
-                        } else {
-                            if($(".highlighted").length == 0){
-                                searchExit(enginePrefix(val));
-                            } else {
-                                searchExit(enginePrefix($(".highlighted").eq(0).html()));
-                            }
-                        }
-                    });
+                chrome.storage.local.get("startpage_autocomplete", function(e){
+
+                    console.log(display, $(".highlighted"))
+
+                    searchExit(
+                        ($(".highlighted").length == 0) ? val : display[Number.parseInt($(".highlighted").attr("id").slice(8, 11))].query,
+                        !e.shiftKey && e.startpage_autocomplete.enabled
+                    );
+                      
                 });
+
                 break;
 
             case 27: // ESC
-                searchSelect(-1);
-            break;
+
+                $("#input").blur();
+
+                break;
 
             default:
+
                 if($(".highlighted").length != 0){
                     old = $(".highlighted").eq(0).html();
                     setTimeout(function(){
@@ -619,135 +750,176 @@ $(function() {
                     }, 10);
                 }
                 
-            break;
+                break;
         }
 
-        chrome.storage.local.get("startpage_autocomplete", function(e){
-            queries = e.startpage_autocomplete.suggestions;
-            last = e.startpage_autocomplete.last;
-            autocomplete = e.startpage_autocomplete.enabled;
-            
-            chrome.storage.local.get("startpage_settings", function(s){
-                engines = s.startpage_settings.search_engines;
-                setTimeout(function(){
-                    if($("#input").val() != "" && autocomplete){
-    
-                        if(display_queries){
-                            old_display_queries = display_queries;
-                        }
-    
-                        display_queries = queries.filter(query => {
-                            return (query.engine == engines[engine_index].name && query.query.toUpperCase().includes($("#input").val().toUpperCase()));
-                        })
-    
-                        //fist letter sort
-                        if($("#input").val().length == 1){
-                            display_queries.sort(function (a, b) {
-                                if(a.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && b.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
-                                    return -1
-                                } else if (b.query.toUpperCase()[0] == $("#input").val().toUpperCase()[0] && a.query.toUpperCase()[0] != $("#input").val().toUpperCase()[0]){
-                                    return 1;
-                                }
-                                return 0;
-                            });
-                        }
-    
-                        //last search bias
-                        if(last != undefined && last != ""){
-                            if(display_queries.filter(display_query => {
-                                return display_query.query.toUpperCase() == last.toUpperCase();
-                            }).length != 0 && ($("#input").val().length != 1 || $("#input").val().toUpperCase()[0] == last.toUpperCase()[0])){
-                                display_queries.sort(function (a, b) {
-                                    if(a.query.toUpperCase() == last.toUpperCase()){
-                                        return -1
-                                    } else if (a.query.toUpperCase() != last.toUpperCase()){
-                                        return 1;
-                                    }
-                                    return 0;
-                                });
-                            }
-                        }
-    
-                        // dont update when...
-                        if(![16, 13].includes(e.keyCode)){
-                        $(".suggestions ul").html("");
-                            display_queries.forEach(display_query => {
-                                $(".suggestions ul").append($('<li>' + display_query.query + '</li>'))
-                            });
-                            $(".suggestions").css("display", "block")
-                        }
-                    } else {
-                        $(".suggestions").css("display", "none")
-                    }
-    
-                    $('.suggestions ul li').click(function(e){
-                        clickedQuery = $(this).text()
-                        chrome.storage.local.get("startpage_autocomplete", function(e){
-                            queries = e.startpage_autocomplete.suggestions;
-                            last = e.startpage_autocomplete.last;
-                            autocomplete = e.startpage_autocomplete.enabled;
-    
-    
-                            try{
-                                queries.filter(query => {
-                                    return (query.query.toUpperCase() == clickedQuery.toUpperCase() && query.engine == engines[engine_index].name);
-                                })[0].p++;
-                                queries.filter(query => {
-                                    return (query.query.toUpperCase() == clickedQuery.toUpperCase() && query.engine == engines[engine_index].name);
-                                })[0].time = new Date().getTime();
-                            } catch(e){
-                                queries.push(
-                                    {
-                                        engine: engines[engine_index].name,
-                                        query: $(".highlighted").eq(0).html(),
-                                        p: 1,
-                                        time: new Date().getTime()
-                                    }
-                                )
-                            }
-                            
-                            queries.sort(function (a, b) {
-                                return b.p - a.p;
-                            });
-    
-    
-                            chrome.storage.local.set({startpage_autocomplete:{
-                                enabled: autocomplete,
-                                suggestions: queries,
-                                last: clickedQuery
-                            }})
-    
-    
-                            searchExit(enginePrefix(clickedQuery))
-                            $("#input").val(clickedQuery);
-    
-    
-                        });
-                    })
-                }, 5);
-            });
-        });
+        // autocomplete
 
-        if(keyDodge){
+        if(![27, 13, 16, 17, 18, 20, 38, 40, 37, 39].includes(e.keyCode) && !(e.shiftKey && e.keyCode == 9)){
+            chrome.storage.local.get("startpage_autocomplete", function(e){
+                local_queries = e.startpage_autocomplete.suggestions;
+                last = e.startpage_autocomplete.last;
+                autocomplete = e.startpage_autocomplete.enabled;
+                
+                if(autocomplete){
+                    val = $("#input").val()[$("#input").val().length - 1] == " " ? $("#input").val().slice(0, $("#input").val().length - 1) : $("#input").val()
+                    chrome.storage.local.get("startpage_settings", function(s){
+                        engines = s.startpage_settings.search_engines;
+                        
+                        if(val.replace(/\s/g, '') != ""){
+
+                            if(engines[engine_index].name.toUpperCase() == "GOOGLE"){
+
+                                    $(".input").addClass("input-typing")
+
+                                    $.get("http://suggestqueries.google.com/complete/search?client=firefox&q=" + val, function(google) {
+
+                                        google = JSON.parse(google)[1]
+                                        local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
+
+                                        display = getScoredDisplay(google, local, val)
+                                        html = ""
+
+                                        if(display.length != 0){
+                                            
+                                            display.forEach(d => {
+                                                html += "<li id='display-" + display.indexOf(d) + "'>" + d.query.replace("<", "").replace(">", "") + "</li>"
+                                            });
+
+                                            $(".suggestions ul").html(boldString(html, val.replace("<", "").replace(">", "")))
+
+                                        }
+
+                                        $(".suggestions").css("display", "block")
+
+                                    });
+
+                                
+            
+                            } else if (engines[engine_index].name.toUpperCase() == "YOUTUBE"){
+
+                                    $(".input").addClass("input-typing")
+            
+                                    $.get("http://suggestqueries.google.com/complete/search?client=youtube&ds=yt&client=firefox&q=" + val, function(youtube) {
+
+                                        youtube = JSON.parse(youtube)[1]
+                                        local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
+                                    
+                                        display = getScoredDisplay(youtube, local, val)
+                                        html = ""
+
+                                        if(display.length != 0){
+                                            
+                                            display.forEach(d => {
+                                                html += "<li id='display-" + display.indexOf(d) + "'>" + d.query.replace("<", "").replace(">", "") + "</li>"
+                                            });
+
+                                            $(".suggestions ul").html(boldString(html, val.replace("<", "").replace(">", "")))
+
+                                        }
+
+                                        $(".suggestions").css("display", "block")
+
+                                    });
+
+                            } else {
+
+                                $(".input").addClass("input-typing")
+
+                                $.get("http://suggestqueries.google.com/complete/search?client=firefox&q=" + engines[engine_index].name + " " + val, function(general) {
+
+                                    general = JSON.parse(general)[1]
+                                    local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
+
+                                    for(let i = 0; i < general.length; i++){
+                                        if(general[i].toUpperCase().search((engines[engine_index].name + " ").toUpperCase()) == 0){
+                                            general[i] = general[i].slice((engines[engine_index].name + " ").length, general[i].length)
+                                        }
+                                    }
+
+                                    display = getScoredDisplay(general, local, val)
+                                    html = ""
+
+                                    if(display.length != 0){
+                                            
+                                        display.forEach(d => {
+                                            html += "<li id='display-" + display.indexOf(d) + "'>" + d.query.replace("<", "").replace(">", "") + "</li>"
+                                        });
+
+                                        $(".suggestions ul").html(boldString(html, val.replace("<", "").replace(">", "")))
+
+                                    }
+
+                                    $(".suggestions").css("display", "block")
+
+                                });
+
+                            }
+
+                        } else {
+
+                            $(".suggestions ul").html("")
+                            $(".suggestions").css("display", "none")
+                            $(".input").removeClass("input-typing")
+
+                        }
+                    });
+                }
+            });
+        }
+
+        if(keyDodge || [9, 13].includes(e.KeyCode)){
+            keyDodge = true;
             e.preventDefault();
         }
         return;
     });
 
     $(document).keydown(function(e) {
-        $("#input").focus();
-        if(e.keyCode == 9){
-            e.preventDefault();
+        if(![27, 16].includes(e.keyCode)){
+            $("#input").focus();
+            if(e.keyCode == 9) e.preventDefault();
         }
     });
+
+    $(document).on("focusout", "#input", function(ev){
+        if(!suggestionsHovered) $(".suggestions").css("display", "none")
+        $(".input").removeClass("input-typing")
+    })
+
+    $(".suggestions").hover(function(){
+        suggestionsHovered = true;
+    }, function(){
+        suggestionsHovered = false;
+    })
+
+    $(document).on("click", "#input", function(ev){
+        if($("#input").val().length > 0){
+            $(".suggestions").css("display", "block")
+            $(".input").addClass("input-typing")
+        }
+    })
 
     $("#input").keyup(function(e) {
         if(keyDodge){
             e.preventDefault();
         }
         keyDodge = false;
-        return;
+
     });
+
+    $(document).on("click", ".suggestions ul li", function(ev){
+        
+        console.log(display, $(".highlighted"))
+
+        let val = display[Number.parseInt($(this).attr("id").slice(8, 11))].query
+
+        chrome.storage.local.get("startpage_autocomplete", function(e){
+
+            searchExit(val, !e.shiftKey && e.startpage_autocomplete.enabled);
+              
+        });
+    })
 
     // ---------------------------------------------------- ANIMATIONS -------------------------------------------------------------------
 
@@ -778,88 +950,103 @@ $(function() {
 
     setTimeout(startWeather, 600000)
 
+    // load
 
-    // ---------------------------------------------------- CLICK HANDLERS -------------------------------------------------------------------
 
-    // main
+    for(let i = 0; i < 5; i++){
+        if(mains[i].advanced){
 
-    $("#yt img").click(function(){clicked("#yt")});
-    $("#sc img").click(function(){clicked("#sc")});
-    $("#tv img").click(function(){clicked("#tv")});
-    $("#tw img").click(function(){clicked("#tw")});
-    $("#g img").click(function(){clicked("#g")});
+            $(".main-" + i + " .outer").css("border-color", mains[i].cover)
+            $(".main-" + i + " .outer").css("background-color", mains[i].cover)
+            $(".main-" + i + " .inner").css("border-color", mains[i].cover)
+            $(".main-" + i + " .cover").css("background-color", mains[i].cover)
+            $("#big-" + i + " .small-bar").css("background-color", mains[i].cover)
 
-    $("#yts").click(function(){clicked("#yt", "subscriptions")});
-    $("#ttt").click(function(){clicked("#yt", "ttt")});
-    $("#hds").click(function(){clicked("#yt", "hdsoundi")});
+            $(".main-" + i + " .outer").css("border-color", mains[i].outer)
+            $(".main-" + i + " .outer").css("background-color", mains[i].fill)
+            $(".main-" + i + " .inner").css("border-color", mains[i].inner)
+            $(".main-" + i + " .cover").css("background-color", mains[i].cover)
+            $("#big-" + i + " .small-bar").css("background-color", mains[i].bar)
+        } else {
+            cover = mains[i].cover
+            $(".main-" + i + " .outer").css("border-color", cover)
+            $(".main-" + i + " .inner").css("border-color", cover)
+            $(".main-" + i + " .cover").css("background-color", cover)
+            $("#big-" + i + " .small-bar").css("background-color", cover)
+            
+            if(cover.replace(/\s/g, '') != ""){
+                if(cover.indexOf(",") != -1){
+                    if(cover.match(new RegExp(",", "g")).length == 3){
+                        $(".main-" + i + " .outer").css("background-color", cover.slice(0, nth_occurrence(cover, ",", 3)) + ", 0.15)")
+                    } else if(cover.match(new RegExp(",", "g")).length == 2){
+                        $(".main-" + i + " .outer").css("background-color", cover.slice(0, cover.length-1) + ", 0.15)")
+                    }
+                } else {
+                    if(cover.indexOf("#") == 0){
+                        if(cover.length == 7){
+                            $(".main-" + i + " .outer").css("background-color", cover + "26")
+                        }
+                    }
+                }
+            }
 
-    $("#scl").click(function(){clicked("#sc", "likes")});
-    $("#sch").click(function(){clicked("#sc", "history")});
+            
+        }
 
-    $("#tv22").click(function(){clicked("#tv", "2200")});
-    $("#tvt").click(function(){clicked("#tv", "tomorrow")});
-    $("#tvf").click(function(){clicked("#tv", "friday")});
+        $(".main-" + i).bind("contextmenu", function(e){
+            e.preventDefault();
 
-    $("#nb3").click(function(){clicked("#tw", "nightblue3")});
-    $("#nasa").click(function(){clicked("#tw", "nasa")});
-    $("#shr").click(function(){clicked("#tw", "shroud")});
+            if(hovered != -1){
+                $(".dropdown .dropdown-list").html("");
+    
+                mains[i].context.forEach(e => {
+                    li = document.createElement("li");
+                    li.innerText = e.name
+                    $(".dropdown .dropdown-list").append(li)
+                });
+    
+                $(".dropdown").css("left", e.pageX - 3);
+                $(".dropdown").css("top" , e.pageY - 3);
+                $(".dropdown").show(50);
+                startFocusOut();
+            }
+        })
 
-    $("#prf").click(function(){clicked("#g", "profile")});
-    $("#rall").click(function(){clicked("#g", "all")});
+        
+
+        $(".img-" + i).hover(function(){
+            if(!exitPage) hoverIn(i)
+        }, function(){
+            setTimeout(function(){
+                if(!exitPage && !dropdown_hovered) hoverOut(i)
+            }, 10)
+        });
+
+        $(".main-" + i + " img").on("click", function(){
+            leave(i);
+        })
+
+        $("#text-" + i + " .text-site").text(mains[i].name)
+
+    }
+
 
     $(".top_right_icon").click(function(){searchExit("https://calendar.google.com/calendar/r")});
-    $("#side-github").click(function(){searchExit("https://github.com/")});
-    $("#side-desmos").click(function(){searchExit("https://www.desmos.com/calculator/")});
-    $("#side-translate").click(function(){searchExit("https://translate.google.com/")});
 
-    $("#yt img").hover(function(){if(!exitPage)hoverIn("#yt")}, function(){setTimeout(function(){if(!exitPage && !dropdown_hovered)hoverOut("#yt")}, 10)});
-    $("#sc img").hover(function(){if(!exitPage)hoverIn("#sc")}, function(){setTimeout(function(){if(!exitPage && !dropdown_hovered)hoverOut("#sc")}, 10)});
-    $("#tv img").hover(function(){if(!exitPage)hoverIn("#tv")}, function(){setTimeout(function(){if(!exitPage && !dropdown_hovered)hoverOut("#tv")}, 10)});
-    $("#tw img").hover(function(){if(!exitPage)hoverIn("#tw")}, function(){setTimeout(function(){if(!exitPage && !dropdown_hovered)hoverOut("#tw")}, 10)});
-    $("#g img").hover(function(){if(!exitPage)hoverIn("#g")}, function(){setTimeout(function(){if(!exitPage && !dropdown_hovered)hoverOut("#g")}, 10)});
     $(".sidebar").hover(function(){$(".top_right_icon").addClass("opacity-0")}, function(){$(".top_right_icon").removeClass("opacity-0")});
+    
     $(".settings p").click(function(){searchExit("https://github.com/Usernameeeeeeeee/startpage")})
 
     // dropdown
 
+    $(document).on("click", ".dropdown .dropdown-list li", function(ev){
+        ev.preventDefault();
+        name = $(this).text();
+        leave(hovered, mains[hovered].context.filter(item => item.name == name)[0].url)
+    })
+
     $(document).bind("contextmenu",function(e){
-        e.preventDefault();
-        switch(hovered){
-            case "#yt":
-                $("#yt .dropdown").css("left", e.pageX-1);
-                $("#yt .dropdown").css("top" ,e.pageY-1);     
-                $("#yt .dropdown").fadeIn(120,startFocusOut("yt")); 
-                break;
-            case "#sc":
-                $("#sc .dropdown").css("left", e.pageX - 1);
-                $("#sc .dropdown").css("top" ,e.pageY - 1);     
-                $("#sc .dropdown").fadeIn(120,startFocusOut("sc")); 
-                break;
-            case "#tv":
-                $("#tv .dropdown").css("left", e.pageX - 1);
-                $("#tv .dropdown").css("top" ,e.pageY - 1);     
-                $("#tv .dropdown").fadeIn(120,startFocusOut("tv")); 
-                break;
-            case "#tw":
-                $("#tw .dropdown").css("left", e.pageX - 1);
-                $("#tw .dropdown").css("top" ,e.pageY - 1);     
-                $("#tw .dropdown").fadeIn(120,startFocusOut("tw")); 
-                break;
-            case "#g":
-                if(e.pageX > $(".header").width() - $("#g .dropdown").width()){
-                    $("#g .dropdown").css("left", e.pageX - $("#g .dropdown").width() + 1);
-                } else {
-                    $("#g .dropdown").css("left", e.pageX - 1);
-                }
-                $("#g .dropdown").css("top" ,e.pageY - 1);     
-                $("#g .dropdown").fadeIn(120,startFocusOut("g")); 
-                break;
-            default:
-                // $(".dropdown").css("left", e.pageX - 1);
-                // $(".dropdown").css("top" ,e.pageY - 1);     
-                // $(".dropdown").fadeIn(120,startFocusOut()); 
-                break;
-        }     
+        e.preventDefault();   
     });
     
     $(".dropdown").hover(function(){
@@ -892,4 +1079,7 @@ $(function() {
     $("#settings").click(function(){
         chrome.runtime.sendMessage({navigate:"/settings/settings.html", newTab: "true"});
     })
+});
+
+
 });

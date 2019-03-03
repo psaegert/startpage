@@ -11,12 +11,16 @@
       {
          "matches": ["<all_urls>"],
          "js": [ "jquery.js", "/content/blob/blob.js"],
-         "css": ["/content/blob/blob.css"],
-         "run_at": "document_end"
+         "css": ["/content/blob/blob.css"]
+      },
+      {
+         "matches": ["<all_urls>"],
+         "js": [ "jquery.js", "/content/autoIcon/autoIcon.js"]
       }
    ],
    "web_accessible_resources": [
-      "/content/blob/fonts/GothamRoundedLight.otf"
+      "/content/blob/fonts/GothamRoundedLight.otf",
+      "/startpage/img/*"
    ],
    "icons": {
       "540": "/startpage/img/icon.png"

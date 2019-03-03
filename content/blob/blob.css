@@ -79,8 +79,6 @@
 #startpage-blob--menu{
     height: 95%;
     width: 95%;
-    /* max-width: 225 * 0.95 + px;
-    max-height: 225 * 0.95 + px; */
     top: 0;
     bottom: 0;
     left: 0;
@@ -97,6 +95,9 @@
     width: 20px;
     overflow:visible;
     border-radius: 50%;
+    transition-property: top, left;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease, ease;
 }
 
 .startpage-blob--menu-item:hover .startpage-blob--menu-item-inner{
@@ -138,7 +139,7 @@
     width: 100%;
     top: 0;
     height: 100%;
-    background-color: rgb(0, 0, 0, 0.6);
+    background-color: rgb(0, 0, 0, 0.7);
     z-index: 2147483637;
 }
 
@@ -156,14 +157,12 @@
     top: 0;
     bottom:0;
     left: 200px;
-    /* background-color: rgb(255, 255, 255, 0.2) */
 }
 
 #startpage-blob--description-title-container{
     position: absolute;
     width:100%;
     height:30%;
-    /* background-color: rgb(255, 255, 255, 0.3); */
 }
 
 .startpage-blob--description-title{
@@ -185,6 +184,53 @@
 
 .startpage-blob--description-title-active{
     opacity:1;
+}
+
+.startpage-blob--description-img{
+    all:none;
+    position: absolute;
+    display: block;
+    user-select:none;
+    opacity: 0;
+    width:220%;
+    transform: translateY(30px);
+    filter: brightness(0.8);
+    transition-property: opacity, transform;
+    transition-duration: 0.07s, 0.2s;
+    transition-timing-function: linear, ease;
+}
+
+.startpage-blob--description-img-active{
+    opacity:0.5;
+    transform: translateY(0px);
+}
+
+#startpage-blob--description-img-container{
+    position: absolute;
+    top:35%;
+    width: 95%;
+    height: 65%;
+    left: 5%;
+    -webkit-mask: linear-gradient(271deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 40%);
+    overflow:hidden;
+}
+
+#startpage-blob--description-img-container-2{
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-mask: linear-gradient(-1deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 40%);
+    overflow:hidden;
+}
+
+#startpage-blob--description-fade{
+    width:100%;
+    height:100%;
+    position: absolute;
+    top:0;
+    left:0;
 }
 
 #startpage-blob--description-underline{
