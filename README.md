@@ -47,7 +47,7 @@ Note: Very strict Ad-Blockers will mess things up a bit, so make sure to whiteli
 
 # 4) Known bugs:
 - portrait mode animation not adapted (low priority)
-- weather display: circles overlap when close to 100%
+- weather display: circles overlap when close to 100% [FIXED]
 - not working on safari
 
 # 5) Preview:
