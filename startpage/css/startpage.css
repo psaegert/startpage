@@ -213,7 +213,7 @@ body:after{
 
 .dark-light #input::selection{
   color:rgb(230, 230, 230);
-  background-color:rgba(0, 149, 255, 0.678);
+  background-color:rgba(92, 92, 92, 0.678);
 }
 
 .input-typing #input::placeholder{

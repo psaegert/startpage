@@ -9,7 +9,7 @@ chrome.storage.local.get("startpage_settings", function(s){
         an, capital = 1,
         segment = 2 * Math.PI / mains.length,
         focus = -1,
-        focus_old, position, pressed = false;
+        focus_old, position, pressed = false, scroll = false;;
 
     chrome.storage.local.get("startpage_blob_position", function(e){
         if(e.startpage_blob_position != undefined){
@@ -155,7 +155,7 @@ chrome.storage.local.get("startpage_settings", function(s){
             pressed = true;
             if(position != undefined){
                 if(!open){
-                    if(position.inWindow){
+                    if(position.inWindow && !scroll){
                         if($(":focus:not(div)").length == 0){
                             openBlob();
                         } else {
@@ -175,12 +175,25 @@ chrome.storage.local.get("startpage_settings", function(s){
     $(document).keyup(function (ev) {
         if(ev.keyCode == 16){
             pressed = false;
+            scroll = false;
             ev.preventDefault;
             if(open) {
                 closeBlob();
             }
         }
     });
+
+    $(document).on("mousewheel", function(ev){
+        if(ev.shiftKey){
+            closeBlob();
+            scroll = true;
+            setTimeout(function(){
+                if(!pressed){
+                    scroll = false;
+                }
+            }, 100);
+        }
+    })
 
     //
 

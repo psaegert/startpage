@@ -392,12 +392,20 @@ function editDistance(s1, s2) {
     return costs[s2.length];
 }
 
+function sq(x){
+    return x * x;
+}
+
+function rnd(x){
+    return Math.round(x*100)/100;
+}
+// var dsphistory = []
 function getScoredDisplay(array, local, val){
 
     let display = [];
 
     // table = []
-    // table.push(["response", "query", "match", "query", "pop", "last", "score"])
+    // table.push(["response", "query", "best local contributor", "similarity with saved + popularity bonus = weighted", "shared words", "recent", "incr score"])
 
     let timeNow = new Date().getTime();
     times = []
@@ -408,30 +416,46 @@ function getScoredDisplay(array, local, val){
 
         local.forEach(query => {
 
-            querysim = Math.pow(similarity(response, query.query), 2) * 10 > 1 ? Math.pow(similarity(response, query.query), 2) * 10 : 0;
+            sharedwords = [];
 
-            popbias = query.p * 0.1;
+            responsesplit = response.split(" "), querysplit = query.query.split(" ");
+
+            responsesplit.forEach(rs => {
+                querysplit.forEach(qs => {
+                    if(rs.toUpperCase() == qs.toUpperCase()) sharedwords.push(rs);
+                });
+            });
+
+            shared = sq(sharedwords.length)
+
+            querysim = sq(similarity(response, query.query)) * 10 > 1 ? sq(similarity(response, query.query)) * 10 : 0;
+
+            querysim *= shared
+
+            popbias = query.p;
 
             lastbias = (query.query == last ? 0.1 : 0);
 
-            recent = 1 / (timeNow - query.time)
+            recent = 1000000000 / sq(timeNow - query.time)
 
             // times.push([timeNow - query.time, (timeNow - query.time)/1000, (timeNow - query.time)/60000, (timeNow - query.time)/3600000])
 
-            score += querysim + popbias + lastbias + recent;
+            score += querysim * popbias + lastbias + recent;
 
-            // text = "";
-            // for(let i = 0; i < (querysim + popbias + lastbias) * 10; i++){
-            //     text += "|"
-            // }
+            text = "";
+            for(let i = 0; i < (querysim * popbias + lastbias + recent) * 10; i++){
+                text += "|"
+            }
 
-            // table.push([response, query.query, text, querysim, popbias, lastbias, score])
+            // table.push([response, query.query, text, Math.round(querysim*100)/100 + " * " + popbias + " = " +  querysim * popbias, sharedwords.length == 0 ? "0" : shared, Math.round(recent*100)/100,  Math.round(score*100)/100])
 
         });
 
+        googlebias = 10 - array.indexOf(response);
+
         inputsim = Math.pow(similarity(val, response), 2) * 10;
 
-        score += inputsim;
+        score += inputsim * googlebias;
 
         // times.sort(function(a, b){
         //     if(a[0] < b[0]) return 1;
@@ -444,9 +468,9 @@ function getScoredDisplay(array, local, val){
         // });
         // console.table(times)
         
-        // table.push([response, "-", "-", "-", "-", "-", inputsim, score])
+        table.push([response, inputsim, "-", "-", "-", "-", score])
 
-        display.push({query: response, score: score})
+        display.push({query: response, score: score})//, input: val})
 
     })
 
@@ -462,6 +486,8 @@ function getScoredDisplay(array, local, val){
     // console.table(table);
 
     // console.table(display);
+
+    // dsphistory.push(display);
 
     return display;
 }
@@ -621,8 +647,9 @@ function getAutocomplete(){
 
                             google = JSON.parse(google)[1]
                             local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
+                            display = getScoredDisplay(google, local, val)
 
-                            displayAutocomplete(getScoredDisplay(google, local, val));
+                            displayAutocomplete(display);
 
                         });
     
@@ -633,7 +660,9 @@ function getAutocomplete(){
                             youtube = JSON.parse(youtube)[1]
                             local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
                         
-                            displayAutocomplete(getScoredDisplay(youtube, local, val));
+                            display = getScoredDisplay(google, local, val)
+
+                            displayAutocomplete(display);
 
                         });
 
@@ -650,7 +679,9 @@ function getAutocomplete(){
                                 }
                             }
                             
-                            displayAutocomplete(getScoredDisplay(general, local, val));
+                            display = getScoredDisplay(google, local, val)
+
+                            displayAutocomplete(display);
 
                         });
                     }
