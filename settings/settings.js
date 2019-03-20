@@ -520,10 +520,11 @@ function updateDisplay(){
 					colddiv.className = "table-icon table-icon-color";
 					colddiv.style = "background-color: " + engine.color
 
+					colddiv.innerText = engine.autocomplete ? "A" : ""
+
 					cold.appendChild(colddiv);
 
 				tr.appendChild(cold);
-
 
 				let a = document.createElement("td");
 				a.className = "action";
@@ -613,6 +614,7 @@ function updateDisplay(){
 					if(!Engines.checkEmpty()){
 						if(!Engines.exists(engines)){
 							engines.push({
+								autocomplete: true,
 								name: $("#search-engines .add-engine input").val(),
 								url: $("#search-engines .add-url input").val(),
 								color: $("#search-engines .add-col input").val()
@@ -1739,6 +1741,21 @@ $(function(){
 						engines.splice(engines.indexOf(engine), 1)
 					}
 				});
+		
+				settings.search_engines = engines;
+				chrome.storage.local.set({startpage_settings:settings});
+				loadToProfile(true);
+			}
+		})
+	})
+
+	$(document).on("click", "#search-engines .property", function(){
+		let name = $(this).parent().find(".variable-engine").children(0).val()
+		chrome.storage.local.get("startpage_settings", function(e){
+			let settings = e.startpage_settings;
+			let engines = settings.search_engines;
+			if(engines.length > 1){
+				engines.filter(engine => engine.name == name)[0].autocomplete = !engines.filter(engine => engine.name == name)[0].autocomplete
 		
 				settings.search_engines = engines;
 				chrome.storage.local.set({startpage_settings:settings});

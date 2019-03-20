@@ -13,6 +13,7 @@ hovered = -1,
 engines = [],
 
 showWeather,
+lastHumanInput,
 darkmode,
 sidebar,
 last,
@@ -468,7 +469,7 @@ function getScoredDisplay(array, local, val){
         // });
         // console.table(times)
         
-        table.push([response, inputsim, "-", "-", "-", "-", score])
+        // table.push([response, inputsim, "-", "-", "-", "-", score])
 
         display.push({query: response, score: score})//, input: val})
 
@@ -544,7 +545,7 @@ function tabThroughSuggestions(i){
 
 function tabThroughEngines(i){
     chrome.storage.local.get("startpage_settings", function(s){
-        $("#input").val(lastHumanInput)
+        if(lastHumanInput != undefined) $("#input").val(lastHumanInput)
         engines = s.startpage_settings.search_engines;
         last_index = engine_index;
         s_index = -1;
@@ -598,10 +599,8 @@ function handleControls(e){
 
             chrome.storage.local.get("startpage_autocomplete", function(e){
 
-                searchExit(
-                    ($(".highlighted").length == 0) ? val : display[Number.parseInt($(".highlighted").attr("id").slice(8, 11))].query,
-                    !e.shiftKey && e.startpage_autocomplete.enabled
-                );
+                let searchQuery = $(".highlighted").length == 0 ? val : display[Number.parseInt($(".highlighted").attr("id").slice(8, 11))].query
+                searchExit(searchQuery, !e.shiftKey && e.startpage_autocomplete.enabled && engines[engine_index].autocomplete && searchQuery.replace(/\s/g, '') != "");
                   
             });
 
@@ -639,7 +638,7 @@ function getAutocomplete(){
             chrome.storage.local.get("startpage_settings", function(s){
                 engines = s.startpage_settings.search_engines;
                 
-                if(val.replace(/\s/g, '') != ""){
+                if(val.replace(/\s/g, '') != "" && engines[engine_index].autocomplete){
 
                     if(engines[engine_index].name.toUpperCase() == "GOOGLE"){
 
@@ -660,7 +659,7 @@ function getAutocomplete(){
                             youtube = JSON.parse(youtube)[1]
                             local = local_queries.filter(query => query.engine.toUpperCase() == engines[engine_index].name.toUpperCase())
                         
-                            display = getScoredDisplay(google, local, val)
+                            display = getScoredDisplay(youtube, local, val)
 
                             displayAutocomplete(display);
 
@@ -679,7 +678,7 @@ function getAutocomplete(){
                                 }
                             }
                             
-                            display = getScoredDisplay(google, local, val)
+                            display = getScoredDisplay(general, local, val)
 
                             displayAutocomplete(display);
 
@@ -879,6 +878,7 @@ $(function() {
     })
 
     $(document).bind("input propertychange", "#input", function(e){
+        lastHumanInput = $("#input").val();
         if($("#input").val().length > 0){
             $(".input").addClass("input-typing")
             getAutocomplete()

@@ -321,6 +321,14 @@ p{
 
 #search-engines .table-icon-color{
     background-color: rgb(170, 170, 170);
+    padding-left: 5px;
+    line-height: 16pt;
+    font-size: 10pt;
+    color: white;
+}
+
+.dark-dark #search-engines .table-icon-color{
+    color: rgb(10, 10, 10);
 }
 
 td{

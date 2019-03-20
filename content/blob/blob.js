@@ -432,8 +432,8 @@ chrome.storage.local.get("startpage_settings", function(s){
 
     function blobExit(newTab){
         chrome.storage.local.set({startpage_blob_position: position.mouse});
+        closeBlob();
         if(focus_old >= 0){
-
             switch (newTab) {
                 case 0:
                     chrome.runtime.sendMessage({navigate: mains[focus].url, newTab: "false"});
