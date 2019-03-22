@@ -1,219 +1,8 @@
 function updateDisplay(){
 
-	chrome.storage.local.get("startpage_autocomplete", function(e){
+	updateAutocompleteDisplay();
 
-		$('#autocomplete input').prop("checked", e.startpage_autocomplete.enabled);
-
-		let queries = e.startpage_autocomplete.suggestions;
-		if(queries.length == 0){
-			$("#autocomplete-suggestions  tbody").html("<td>No suggestions found</td>")
-		} else {
-			$("#autocomplete-suggestions  tbody").html("")
-			queries.forEach(query => {
-				let tr = document.createElement("tr");
-
-					let q = document.createElement("td");
-					q.className = "variable-item";
-
-						let qinp = document.createElement("input");
-						qinp.autocomplete= "off";
-						qinp.value = query.query;
-						qinp.name = query.query;
-						qinp.alt = query.engine;
-						qinp.spellcheck = false;
-
-						q.appendChild(qinp);
-
-					tr.appendChild(q);
-
-
-					let e = document.createElement("td");
-					e.className = "property";
-					e.innerText = query.engine;
-					tr.appendChild(e);
-
-
-					let p = document.createElement("td");
-					p.className = "property";
-					p.innerText = query.p;
-					tr.appendChild(p);
-
-					let a = document.createElement("td");
-					a.className = "action";
-
-						let d = document.createElement("div");
-						d.className = "table-icon";
-
-							let i = document.createElement("img");
-							chrome.storage.local.get('startpage_settings', function(e){
-								i.src = e.startpage_settings.darkmode ? "./img/bin_dark.jpg" : "./img/bin.jpg";
-							});
-							i.className = "bin";
-
-							d.appendChild(i)
-
-						a.appendChild(d);
-
-					tr.appendChild(a);
-
-				
-				$("#autocomplete-suggestions  tbody").append(tr)
-
-			});
-
-			$("#autocomplete-suggestions .variable-item input").bind('input propertychange', function() {
-				let val = $(this).val()
-				let name = $(this).attr("name")
-				let engine = $(this).parent().siblings().eq(0).text()
-				chrome.storage.local.get("startpage_autocomplete", function(e){
-					startpage_autocomplete = e.startpage_autocomplete;
-					suggestions = startpage_autocomplete.suggestions;
-					if(val.replace(/\s/g, '') != "" && suggestions.filter(sug => sug.query.toUpperCase() == val.toUpperCase() && sug.engine == engine).length == 0){
-						suggestions.filter(sug => sug.query == name)[0].query = val;
-						$("#autocomplete-suggestions .variable-item input[name = '" + name + "'][alt ='" + engine + "']").attr("name", val);
-						startpage_autocomplete.suggestions = suggestions;
-						chrome.storage.local.set({startpage_autocomplete: {
-							enabled: startpage_autocomplete.enabled,
-							suggestions: suggestions,
-							last: startpage_autocomplete.last
-						}})
-						
-						loadToProfile()
-					}
-				});
-			});
-		}
-	});
-
-	chrome.storage.local.get("startpage_profiles", function(e){
-
-		if(e.startpage_profiles.length == 0){
-			$("#profile-list  tbody").html("<td>No profiles found</td>")
-		} else {
-			$("#profile-list  tbody").html("")		
-			e.startpage_profiles.forEach(profile => {
-				let tr = document.createElement("tr");
-
-					let n = document.createElement("td");
-					n.className = "item";
-
-						let ntxt = document.createElement("div");
-						ntxt.className = "item-text";
-						ntxt.innerText = profile.name ;
-
-
-						n.appendChild(ntxt);
-
-						let nedit = document.createElement("div");
-						nedit.className = "item-edit";
-
-							let ni = document.createElement("img");
-								chrome.storage.local.get('startpage_settings', function(e){
-									ni.src = e.startpage_settings.darkmode ? "./img/edit.png" : "./img/edit_dark.png";
-								});
-								ni.className = "edit";
-
-								nedit.appendChild(ni)
-
-						n.appendChild(nedit);
-
-					tr.appendChild(n);
-
-					let dr = document.createElement("td");
-					dr.className = "property";
-
-						let drdiv = document.createElement("div");
-						if(profile.settings.darkmode){
-							drdiv.className = "table-icon table-icon-color darkmode-on";
-						} else {
-							drdiv.className = "table-icon table-icon-color darkmode-off";
-						}
-						if(profile.settings.darkmode_auto){
-							drdiv.innerText = "A"
-						}
-
-						dr.appendChild(drdiv);
-
-					tr.appendChild(dr);
-
-
-					let s = document.createElement("td");
-					s.className = "property";
-
-						let sdiv = document.createElement("div");
-						sdiv.innerText = "S"
-						if(profile.settings.sidebar){
-							sdiv.className = "table-icon";
-						} else {
-							sdiv.className = "table-icon crossed";
-						}
-
-						s.appendChild(sdiv);
-
-
-					tr.appendChild(s);
-
-					let b = document.createElement("td");
-					b.className = "property";
-
-						let bdiv = document.createElement("div");
-						bdiv.innerText = "B"
-						if(profile.settings.blob){
-							bdiv.className = "table-icon";
-						} else {
-							bdiv.className = "table-icon crossed";
-						}
-
-						b.appendChild(bdiv);
-
-					tr.appendChild(b);
-
-
-					let w = document.createElement("td");
-					w.className = "property";
-
-						let wdiv = document.createElement("div");
-						wdiv.innerText = "W"
-						if(profile.settings.weather){
-							wdiv.className = "table-icon";
-						} else {
-							wdiv.className = "table-icon crossed";
-						}
-
-						w.appendChild(wdiv);
-
-					tr.appendChild(w);
-
-
-					let a = document.createElement("td");
-					a.className = "action";
-
-						let d = document.createElement("div");
-						d.className = "table-icon";
-
-							let i = document.createElement("img");
-							chrome.storage.local.get('startpage_settings', function(e){
-								i.src = e.startpage_settings.darkmode ? "./img/bin_dark.jpg" : "./img/bin.jpg";
-							});
-							i.className = "bin";
-
-							d.appendChild(i)
-
-						a.appendChild(d);
-
-					tr.appendChild(a);
-
-					chrome.storage.local.get('startpage_selected_profile', function(e){
-						if(e.startpage_selected_profile == profile.name)
-							tr.className = "selected"
-					});
-				
-				$("#profile-list  tbody").append(tr)
-
-			});
-		}	
-		$("#profile-text-export").text(JSON.stringify(e.startpage_profiles, null, 6));
-	})
+	updateProfilesDisplay();
 	
 	chrome.storage.local.get("startpage_settings", function(e){
 
@@ -713,7 +502,242 @@ function updateDisplay(){
 	})
 }
 
+function updateAutocompleteDisplay(){
+	chrome.storage.local.get("startpage_autocomplete", function(e){
+
+		$('#autocomplete input').prop("checked", e.startpage_autocomplete.enabled);
+
+		let queries = e.startpage_autocomplete.suggestions;
+		if(queries.length == 0){
+			$("#autocomplete-suggestions  tbody").html("<td>No suggestions found</td>")
+		} else {
+			$("#autocomplete-suggestions  tbody").html("")
+			queries.forEach(query => {
+				let tr = document.createElement("tr");
+
+					let q = document.createElement("td");
+					q.className = "variable-item";
+
+						let qinp = document.createElement("input");
+						qinp.autocomplete= "off";
+						qinp.value = query.query;
+						qinp.name = query.query;
+						qinp.alt = query.engine;
+						qinp.spellcheck = false;
+
+						q.appendChild(qinp);
+
+					tr.appendChild(q);
+
+
+					let e = document.createElement("td");
+					e.className = "property";
+					e.innerText = query.engine;
+					tr.appendChild(e);
+
+
+					let p = document.createElement("td");
+					p.className = "property";
+					p.innerText = query.p;
+					tr.appendChild(p);
+
+					let a = document.createElement("td");
+					a.className = "action";
+
+						let d = document.createElement("div");
+						d.className = "table-icon";
+
+							let i = document.createElement("img");
+							chrome.storage.local.get('startpage_settings', function(e){
+								i.src = e.startpage_settings.darkmode ? "./img/bin_dark.jpg" : "./img/bin.jpg";
+							});
+							i.className = "bin";
+
+							d.appendChild(i)
+
+						a.appendChild(d);
+
+					tr.appendChild(a);
+
+				
+				$("#autocomplete-suggestions  tbody").append(tr)
+
+			});
+
+			$("#autocomplete-suggestions .variable-item input").bind('input propertychange', function() {
+				let val = $(this).val()
+				let name = $(this).attr("name")
+				let engine = $(this).parent().siblings().eq(0).text()
+				chrome.storage.local.get("startpage_autocomplete", function(e){
+					startpage_autocomplete = e.startpage_autocomplete;
+					suggestions = startpage_autocomplete.suggestions;
+					if(val.replace(/\s/g, '') != "" && suggestions.filter(sug => sug.query.toUpperCase() == val.toUpperCase() && sug.engine == engine).length == 0){
+						suggestions.filter(sug => sug.query == name)[0].query = val;
+						$("#autocomplete-suggestions .variable-item input[name = '" + name + "'][alt ='" + engine + "']").attr("name", val);
+						startpage_autocomplete.suggestions = suggestions;
+						chrome.storage.local.set({startpage_autocomplete: {
+							enabled: startpage_autocomplete.enabled,
+							suggestions: suggestions,
+							last: startpage_autocomplete.last
+						}})
+						
+						loadToProfile()
+					}
+				});
+			});
+		}
+	});
+}
+
+function updateProfilesDisplay(){
+	chrome.storage.local.get("startpage_profiles", function(e){
+
+		if(e.startpage_profiles.length == 0){
+			$("#profile-list  tbody").html("<td>No profiles found</td>")
+		} else {
+			$("#profile-list  tbody").html("")		
+			e.startpage_profiles.forEach(profile => {
+				let tr = document.createElement("tr");
+
+					let n = document.createElement("td");
+					n.className = "item";
+
+						let ntxt = document.createElement("div");
+						ntxt.className = "item-text";
+						ntxt.innerText = profile.name ;
+
+						n.appendChild(ntxt);
+
+						let nedit = document.createElement("div");
+						nedit.className = "item-edit";
+
+							let ni = document.createElement("img");
+								chrome.storage.local.get('startpage_settings', function(e){
+									ni.src = e.startpage_settings.darkmode ? "./img/edit.png" : "./img/edit_dark.png";
+								});
+								ni.className = "edit";
+
+								nedit.appendChild(ni)
+
+						n.appendChild(nedit);
+
+					tr.appendChild(n);
+
+					let dr = document.createElement("td");
+					dr.className = "property";
+
+						let drdiv = document.createElement("div");
+						if(profile.settings.darkmode){
+							drdiv.className = "table-icon table-icon-color darkmode-on";
+						} else {
+							drdiv.className = "table-icon table-icon-color darkmode-off";
+						}
+						if(profile.settings.darkmode_auto){
+							drdiv.innerText = "A"
+						}
+
+						dr.appendChild(drdiv);
+
+					tr.appendChild(dr);
+
+
+					let s = document.createElement("td");
+					s.className = "property";
+
+						let sdiv = document.createElement("div");
+						sdiv.innerText = "S"
+						if(profile.settings.sidebar){
+							sdiv.className = "table-icon";
+						} else {
+							sdiv.className = "table-icon crossed";
+						}
+
+						s.appendChild(sdiv);
+
+
+					tr.appendChild(s);
+
+					let b = document.createElement("td");
+					b.className = "property";
+
+						let bdiv = document.createElement("div");
+						bdiv.innerText = "B"
+						if(profile.settings.blob){
+							bdiv.className = "table-icon";
+						} else {
+							bdiv.className = "table-icon crossed";
+						}
+
+						b.appendChild(bdiv);
+
+					tr.appendChild(b);
+
+
+					let w = document.createElement("td");
+					w.className = "property";
+
+						let wdiv = document.createElement("div");
+						wdiv.innerText = "W"
+						if(profile.settings.weather){
+							wdiv.className = "table-icon";
+						} else {
+							wdiv.className = "table-icon crossed";
+						}
+
+						w.appendChild(wdiv);
+
+					tr.appendChild(w);
+
+					let m = document.createElement("td");
+					m.className = "property";
+
+						let mdivs = []
+						for(let j = 0; j < 5; j++){
+							mdivs[j] = document.createElement("div");
+							mdivs[j].className = "table-icon table-icon-color table-icon-main"
+							
+							mdivs[j].style.backgroundColor = profile.settings.mains[j].cover;
+	
+							m.appendChild(mdivs[j]);
+						}
+
+					tr.appendChild(m);
+
+
+					let a = document.createElement("td");
+					a.className = "action";
+
+						let d = document.createElement("div");
+						d.className = "table-icon";
+
+							let i = document.createElement("img");
+							chrome.storage.local.get('startpage_settings', function(e){
+								i.src = e.startpage_settings.darkmode ? "./img/bin_dark.jpg" : "./img/bin.jpg";
+							});
+							i.className = "bin";
+
+							d.appendChild(i)
+
+						a.appendChild(d);
+
+					tr.appendChild(a);
+
+					chrome.storage.local.get('startpage_selected_profile', function(e){
+						if(e.startpage_selected_profile == profile.name)
+							tr.className = "selected"
+					});
+				
+				$("#profile-list  tbody").append(tr)
+
+			});
+		}	
+		$("#profile-text-export").text(JSON.stringify(e.startpage_profiles, null, 6));
+	})
+}
+
 function loadMain(i){
+
+	updateProfilesDisplay();
 
 	mainIndex = i;
 
@@ -979,14 +1003,14 @@ function checkAdvanced(){
 	chrome.storage.local.get("startpage_settings", function(s){
 		if(!s.startpage_settings.mains[mainIndex].advanced){
 			$(".custom .advanced-container").css("display", "none")
-			$(".advanced").css("transform", "rotate(0deg)")
+			$(".advanced").removeClass("advanced-true")
 			$(".main-preview").removeClass("main-preview-active")
 			$(".main-p-resources").css("margin-top", "90px");
 			$(".main #main-color").text("")
 			$(".main #main-color-mode").removeClass("main-color-mode-advanced")
 		} else {
 			$(".custom .advanced-container").css("display", "block")
-			$(".advanced").css("transform", "rotate(90deg)")
+			$(".advanced").addClass("advanced-true")
 			$(".main-preview").addClass("main-preview-active")
 			$(".main-p-resources").css("margin-top", "30px");
 			$(".main #main-color").text("Cover:")
@@ -1125,7 +1149,7 @@ function startDarkCheck(){
 			loadMain(mainIndex);
 		});
 	}
-    var t = setTimeout(startDarkCheck, 30000)
+    // var t = setTimeout(startDarkCheck, 30000)
 }
 
 function updateMoveCenters(){
@@ -1946,6 +1970,7 @@ $(function(){
 	})
 	
 	$(document).on("click", "#profile-list .property", function(ev){
+		var name = $(this).siblings().eq(0).eq(0).text();
 		var setting
 		switch($(this).children().text()){
 			case "S":
@@ -1960,6 +1985,12 @@ $(function(){
 			case "":
 				if($(this).children().eq(0).prop("class").includes("darkmode-o")){
 					setting = "darkmode";
+				} else {
+					chrome.storage.local.get("startpage_selected_profile", function(sp){
+						if(sp.startpage_selected_profile == name) $([document.documentElement, document.body]).animate({
+											scrollTop: anchor[4] + 185
+										}, 500);
+					})
 				}
 			break;
 			

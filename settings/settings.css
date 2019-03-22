@@ -569,6 +569,11 @@ tr.selected{
 
 .property .table-icon.table-icon-color{
     border-radius: 50%;
+    display: inline-block;
+}
+
+.property .table-icon.table-icon-color.table-icon-main{
+    margin: 3px;
 }
 
 .move{
@@ -880,21 +885,27 @@ textarea{
 
 .advanced{
     position: absolute;
+    top: 180px;
+    padding-left: 6px;
+    left: -10px;
+    width: 15px;
+    height: 15px;
+}
+
+.advanced div{
     height: 0;
     width: 0;
-    top: 179px;
     border-left: 5px solid rgb(44, 44, 44);
-    left: -6px;
     border-top: 6px solid transparent;
     border-bottom: 6px solid transparent;
     transition: transform 0.1s ease;
 }
 
-.dark-dark .advanced{
+.dark-dark .advanced div{
     border-left-color: rgb(230, 230, 230);
 }
 
-.advanced-true{
+.advanced-true div{
     transform: rotate(90deg);
 }
 
@@ -979,7 +990,7 @@ textarea{
 
 #sidebar-websites .property .table-icon{
     border-radius: 18.3%;
-    background-color: #424951;
+    background-color: #e6e6e6;
     cursor: pointer;
 }
 
