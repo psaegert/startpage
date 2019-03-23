@@ -318,11 +318,16 @@ p{
     border-spacing: 15px 10px;
 }
 
+#search-engines .property{
+    width: 20px;
+}
 
 #search-engines .table-icon-color{
+    position:absolute;
     background-color: rgb(170, 170, 170);
-    padding-left: 5px;
-    line-height: 16pt;
+    top:3px;
+    padding-left: 5.5px;
+    line-height: 16.5pt;
     font-size: 10pt;
     color: white;
 }

@@ -9,10 +9,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 							from: "18:10",
 							to: "07:30"
 				},
-				darksky_key: "9c4e8944261ed3b6f5f3438431a5cfa0",
+				darksky_key: "",
 				darksky_loc: {
-							lat: 49.4489522,
-							lon: 8.6715483
+							lat: 0,
+							lon: 0
 				},
 				mains: [
 							{

@@ -1022,7 +1022,12 @@ $(function() {
     }
 
 
-    $(".top_right_icon").click(function(){searchExit("https://calendar.google.com/calendar/r")});
+    $(".top_right_icon").click(function(){
+        $("#white").addClass("search-exit-fade");
+        setTimeout(function(){
+            window.location = "https://calendar.google.com/calendar/r";
+        }, 70)
+    });
 
     $(".sidebar").hover(function(){$(".top_right_icon").addClass("opacity-0")}, function(){$(".top_right_icon").removeClass("opacity-0")});
     
