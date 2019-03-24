@@ -271,7 +271,7 @@ p{
     max-height: 350px;
 }
 
-.manage input{
+/*.manage*/ input{
     text-overflow: ellipsis;
 }
 
@@ -326,7 +326,6 @@ p{
     position:absolute;
     background-color: rgb(170, 170, 170);
     top:3px;
-    padding-left: 5.5px;
     line-height: 16.5pt;
     font-size: 10pt;
     color: white;
@@ -352,19 +351,18 @@ th{
 .table-icon{
     height: 22px;
     width: 22px;
+    text-align: center;
 }
 
 .table-icon.table-icon-color.darkmode-off{
     font-size: 10pt;
     line-height: 19px;
-    padding: 0px 0px 0px 4.5px;
     color:black !important;
 }
 
 .table-icon.table-icon-color.darkmode-on{
     font-size: 10pt;
     line-height: 19px;
-    padding: 0px 0px 0px 4.5px;
     color:white !important;
 }
 
@@ -616,7 +614,7 @@ tr.selected{
 .crossed:before {
     position: absolute;
     content: "";
-    left: -6px;
+    left: -2px;
     top: 50%;
     right: 0;
     width: 26px;

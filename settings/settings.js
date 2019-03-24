@@ -6,6 +6,10 @@ function updateDisplay(){
 	
 	chrome.storage.local.get("startpage_settings", function(e){
 
+		for(let i = 4; i >= 0; i--){
+			loadMain(i)
+		}
+
 		$('#darkmode input').prop("checked", e.startpage_settings.darkmode);
 		
 		$('#darkmode_auto input').prop("checked", e.startpage_settings.darkmode_auto);
@@ -737,7 +741,7 @@ function updateProfilesDisplay(){
 
 function loadMain(i){
 
-	updateProfilesDisplay();
+	updateProfilesDisplay(); // colors in profile table
 
 	mainIndex = i;
 
@@ -907,17 +911,17 @@ function loadMain(i){
 								chrome.storage.local.set({startpage_settings: settings})
 
 								loadToProfile(false);
-								loadMain(mainIndex);
+								// loadMain(mainIndex);
 							}
 						break;
 						case "variable-url":
 							if(val.replace(/\s/g, '') != "" && context_menu.filter(context => context.name == editName).length == 1){
 								context_menu.filter(context => context.name == editName)[0].url = val;
-								settings.mains[mainIndex] = context_menu;
+								settings.mains[mainIndex].context = context_menu;
 								chrome.storage.local.set({startpage_settings: settings})
 
 								loadToProfile(false);
-								loadMain(mainIndex);
+								// loadMain(mainIndex);
 							}
 						break;
 					}
@@ -933,6 +937,8 @@ function loadMain(i){
 }
 
 function loadMainPreview(main){
+
+	$("#main-" + mainIndex).text(main.name)
 
 	$(".main-1 .outer").css("border-color", "rgb(170, 170, 170)")
 	$(".main-1 .outer").css("background-color", "rgb(170, 170, 170, 0.15)")
@@ -1005,14 +1011,14 @@ function checkAdvanced(){
 			$(".custom .advanced-container").css("display", "none")
 			$(".advanced").removeClass("advanced-true")
 			$(".main-preview").removeClass("main-preview-active")
-			$(".main-p-resources").css("margin-top", "90px");
+			$(".main-p-color").css("margin-top", "200px");
 			$(".main #main-color").text("")
 			$(".main #main-color-mode").removeClass("main-color-mode-advanced")
 		} else {
 			$(".custom .advanced-container").css("display", "block")
 			$(".advanced").addClass("advanced-true")
 			$(".main-preview").addClass("main-preview-active")
-			$(".main-p-resources").css("margin-top", "30px");
+			$(".main-p-color").css("margin-top", "48px");
 			$(".main #main-color").text("Cover:")
 			$(".main #main-color-mode").addClass("main-color-mode-advanced")
 		}
@@ -1333,6 +1339,7 @@ var Profile_io = {
 
 					if(!Array.isArray(profile.settings.search_engines)) {valid = false;} else {
 						profile.settings.search_engines.forEach(engine => {
+							if(typeof(engine.autocomplete) !== "boolean") valid = false;
 							if(typeof(engine.color) !== "string") valid = false;
 							if(typeof(engine.name) !== "string" || engine.name.replace(/\s/g, '') == "") valid = false;
 							if(typeof(engine.url) !== "string" || engine.url.replace(/\s/g, '') == "") valid = false;
@@ -2070,7 +2077,7 @@ $(function(){
 		}
 	});
 	
-	$("#profile-text-export").on("click", function(){$(this).select()});
+	// $("#profile-text-export").on("click", function(){$(this).select()});
 
 	$("#profile-text-export").on("keyup", function(ev){
 		if(ev.keyCode == 67 && ev.ctrlKey) Profile_io.click();
@@ -2356,6 +2363,8 @@ $(function(){
 			chrome.storage.local.set({startpage_settings: settings})
 
 			loadToProfile(false);
+
+			loadMainPreview(settings.mains[mainIndex])
 		});
 	});
 
@@ -2485,7 +2494,7 @@ $(function(){
 
 			chrome.storage.local.set({startpage_settings: settings})
 
-			loadToProfile(true);
+			loadToProfile(false);
 
 			checkAdvanced();
 		})
@@ -2537,7 +2546,7 @@ $(function(){
 				}
 	
 				loadToProfile(false);
-				loadMain(mainIndex);
+				// loadMain(mainIndex);
 			});	
 		}
 	})

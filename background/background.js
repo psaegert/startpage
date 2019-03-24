@@ -115,19 +115,28 @@ chrome.runtime.onInstalled.addListener(function(details){
 				],
 				search_engines: [
 							{
+										autocomplete: true,
 										color: "#acc0e6",
 										name: "Google",
 										url: "https://www.google.de/search?q="
 							},
 							{
+										autocomplete: true,
 										color: "#ecb2b0",
 										name: "Youtube",
 										url: "https://www.youtube.com/results?search_query="
 							},
 							{
+										autocomplete: true,
 										color: "#e9b793",
 										name: "Soundcloud",
 										url: "https://soundcloud.com/search?q="
+							},
+							{
+										autocomplete: false,
+										color: "#ee9873",
+										name: "DuckDuckGo",
+										url: "https://duckduckgo.com/?q="
 							}
 				],
 				sidebar: true,
@@ -206,24 +215,35 @@ chrome.tabs.onCreated.addListener(function(tab){
 // BLOB
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if(typeof(request.delay) != "number" || request.delay == undefined){
+		request.delay = 0;
+	}
 	if (request.navigate == "home"){
-		if(request.newTab == "true"){
-			chrome.tabs.create({
-				url:"/startpage/startpage.html"
-			});
-		} else if(request.newTab == "false") {
+		if(request.newTab == "true" || request.newTab === true){
+			setTimeout(function(){
+				chrome.tabs.create({
+					url:"/startpage/startpage.html"
+				});
+			}, request.delay)
+		} else if(request.newTab == "false" || request.newTab === false) {
 			chrome.tabs.getSelected(function (tab) {
-				chrome.tabs.update(tab.id, {url:"/startpage/startpage.html"});
+				setTimeout(function(){
+					chrome.tabs.update(tab.id, {url:"/startpage/startpage.html"});
+				}, request.delay)
 			});
 		}
 	} else if(request.navigate != undefined){
 		if(request.newTab == "true" || request.newTab === true){
+			setTimeout(function(){
 				chrome.tabs.create({
 					url:request.navigate
 				});
+			}, request.delay)
 		} else if(request.newTab == "false" || request.newTab === false) {
 			chrome.tabs.getSelected(function (tab) {
-				chrome.tabs.update(tab.id, {url: request.navigate});
+				setTimeout(function(){
+					chrome.tabs.update(tab.id, {url: request.navigate});
+				}, request.delay)
 			});
 		}
 	}

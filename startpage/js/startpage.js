@@ -223,6 +223,7 @@ function loadMainImage(i){
                 src = "/startpage/img/main/" + main.img
             }
 
+
             if(src.replace(/\s/g, '') != "" && src.split(".").length > 1){
                 $.get(src)
                 .done(function() { 
@@ -731,9 +732,10 @@ function searchExit(query, save){
         })
     }
     $("#white").addClass("search-exit-fade");
-    setTimeout(function(){
-        window.location = url;
-    }, 70)
+    chrome.runtime.sendMessage({navigate: url, newTab: false, delay: 70})
+    // setTimeout(function(){
+    //     window.location = url;
+    // }, 70)
 }
 
 function leave(h, url){
@@ -745,18 +747,20 @@ function leave(h, url){
     $(".header").addClass("fade-out");
     $(".slider").addClass("display");
 
+    if(url != undefined && url.replace(/\s/g, '') != ""){
+        chrome.runtime.sendMessage({navigate: url, newTab:false, delay: 750})       
+    } else {
+        chrome.runtime.sendMessage({navigate: mains[h].url, newTab:false, delay: 750})
+    }
+
     setTimeout(function(){
         $(".triangle-colored").css("border-bottom-color", mains[h].cover)
         $(".triangle-colored").addClass("triangle-colored-exit");
         $(".triangle-white").addClass("triangle-white-exit");
-        setTimeout(function(){
+        // setTimeout(function(){
             
-            if(url != undefined){
-                chrome.runtime.sendMessage({navigate: url, newTab:false})       
-            } else {
-                chrome.runtime.sendMessage({navigate: mains[h].url, newTab:false})
-            }
-        }, 400)
+            
+        // }, 400)
     }, 350)
 
 }
@@ -987,7 +991,7 @@ $(function() {
         $(".main-" + i).bind("contextmenu", function(e){
             e.preventDefault();
 
-            if(hovered != -1){
+            if(hovered != -1 && mains[hovered].context.length != 0){
                 $(".dropdown .dropdown-list").html("");
     
                 mains[i].context.forEach(e => {
@@ -1024,9 +1028,7 @@ $(function() {
 
     $(".top_right_icon").click(function(){
         $("#white").addClass("search-exit-fade");
-        setTimeout(function(){
-            window.location = "https://calendar.google.com/calendar/r";
-        }, 70)
+        chrome.runtime.sendMessage({navigate: "https://calendar.google.com/calendar/r", newTab: false, delay: 70})
     });
 
     $(".sidebar").hover(function(){$(".top_right_icon").addClass("opacity-0")}, function(){$(".top_right_icon").removeClass("opacity-0")});
