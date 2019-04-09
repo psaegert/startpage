@@ -41,7 +41,7 @@ Note: Very strict Ad-Blockers will mess things up a bit, so make sure to whiteli
 - custom background
 - autocomplete improvements
 - more intuitive UI
-- automatically get icons or screenshots, so you dont have to download or take them and 
+- automatically get icons or screenshots, so you dont have to download or tthem manually
 - bugfixes and performance improvements
 - ...
 
