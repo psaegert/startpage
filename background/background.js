@@ -144,7 +144,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 							{
 										img: "github.png",
 										name: "Github",
-										url: "https://github.com/Usernameeeeeeeee/startpage"
+										url: "https://github.com/paulsae/startpage"
 							}
 				],
 				weather: true

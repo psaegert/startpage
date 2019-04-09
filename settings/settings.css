@@ -997,6 +997,10 @@ textarea{
     cursor: pointer;
 }
 
+.dark-dark #sidebar-websites .property .table-icon{
+    background-color: rgb(10, 10, 10);
+}
+
 
 .border{
     border: 1px solid black;
