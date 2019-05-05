@@ -192,11 +192,13 @@ chrome.runtime.onInstalled.addListener(function(details){
 
 // MAIN
 
-var redir = ['opera://startpage/', 'browser://startpage/', 'chrome://startpage/'];
+var redir = ['opera://startpage/', 'browser://startpage/', 'chrome://startpage/', 'chrome://startpage/#plus-button'];
 
 var startpage_path = "/startpage/startpage.html"
 
 chrome.tabs.onCreated.addListener(function(tab){
+
+	console.log(tab)
 
 	for (var i = 0; i < redir.length; i++) {
 		if(tab.url === redir[i])

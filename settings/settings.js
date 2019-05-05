@@ -6,9 +6,7 @@ function updateDisplay(){
 	
 	chrome.storage.local.get("startpage_settings", function(e){
 
-		for(let i = 4; i >= 0; i--){
-			loadMain(i)
-		}
+		loadMain(mainIndex)
 
 		$('#darkmode input').prop("checked", e.startpage_settings.darkmode);
 		
@@ -237,7 +235,7 @@ function updateDisplay(){
 			});
 		});
 
-		loadIcons(0)
+		loadIcons(0) // recursive
 
 		// sidebar websites -
 
@@ -1003,6 +1001,7 @@ function loadMainPreview(main){
 		
 		$(".img-1").attr("src", src)
 	}
+
 }
 
 function checkAdvanced(){
@@ -1155,7 +1154,7 @@ function startDarkCheck(){
 			loadMain(mainIndex);
 		});
 	}
-    // var t = setTimeout(startDarkCheck, 30000)
+    var t = setTimeout(startDarkCheck, 30000)
 }
 
 function updateMoveCenters(){
