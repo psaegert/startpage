@@ -234,12 +234,12 @@ chrome.storage.local.get("startpage_settings", function(s){
 
     $("#startpage-blob--container").contextmenu(function(ev){
         ev.preventDefault();
-        blobExit(1);
+        setTimeout(function(){blobExit(1)}, 50);
     });
 
     $("#startpage-blob--dark").contextmenu(function(ev){
         ev.preventDefault();
-        blobExit(1);
+        setTimeout(function(){blobExit(1)}, 50);
     })
 
     //
