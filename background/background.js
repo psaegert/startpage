@@ -192,71 +192,91 @@ chrome.runtime.onInstalled.addListener(function(details){
 
 // MAIN
 
-var redir = ['opera://startpage/', 'browser://startpage/', 'chrome://startpage/', 'chrome://startpage/#plus-button'];
+var redir = ['about:newtab', 'opera://startpage/', 'browser://startpage/', 'chrome://startpage/', 'chrome://startpage/#plus-button'];
 
 var startpage_path = "/startpage/startpage.html"
 
-chrome.tabs.onCreated.addListener(function(tab){
+if(typeof InstallTrigger == "undefined"){ // Not Firefox
 
-	console.log(tab)
-
-	for (var i = 0; i < redir.length; i++) {
-		if(tab.url === redir[i])
-			break;
-		if(i == redir.length - 1)
-			return;
-	};
-
-	chrome.tabs.create({
-		url:"/startpage/startpage.html"
+	chrome.tabs.onCreated.addListener(function(tab){
+	
+		for (var i = 0; i < redir.length; i++) {
+			if(tab.url === redir[i])
+				break;
+			if(i == redir.length - 1)
+				return;
+		};
+	
+		chrome.tabs.create({
+			url:"/startpage/startpage.html"
+		});
+		chrome.tabs.remove(tab.id);
+		
 	});
-	chrome.tabs.remove(tab.id);
 	
-});
-
-// BLOB
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if(typeof(request.delay) != "number" || request.delay == undefined){
-		request.delay = 0;
-	}
-	if (request.navigate == "home"){
-		if(request.newTab == "true" || request.newTab === true){
-			setTimeout(function(){
-				chrome.tabs.create({
-					url:"/startpage/startpage.html"
-				});
-			}, request.delay)
-		} else if(request.newTab == "false" || request.newTab === false) {
-			chrome.tabs.getSelected(function (tab) {
-				setTimeout(function(){
-					chrome.tabs.update(tab.id, {url:"/startpage/startpage.html"});
-				}, request.delay)
-			});
-		}
-	} else if(request.navigate != undefined){
-		if(request.newTab == "true" || request.newTab === true){
-			setTimeout(function(){
-				chrome.tabs.create({
-					url:request.navigate
-				});
-			}, request.delay)
-		} else if(request.newTab == "false" || request.newTab === false) {
-			chrome.tabs.getSelected(function (tab) {
-				setTimeout(function(){
-					chrome.tabs.update(tab.id, {url: request.navigate});
-				}, request.delay)
-			});
-		}
-	}
-
-	if(request.action == "update_dark"){
-		chrome.storage.local.get("startpage_settings", function(a){
-			chrome.storage.local.get("startpage_profiles", function(pr){
+	// BLOB
 	
-				let profiles = pr.startpage_profiles;
-				profiles.forEach(profile => {
-					settings = profile.settings;
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+		if(typeof(request.delay) != "number" || request.delay == undefined){
+			request.delay = 0;
+		}
+		if (request.navigate == "home"){
+			if(request.newTab == "true" || request.newTab === true){
+				setTimeout(function(){
+					chrome.tabs.create({
+						url:"/startpage/startpage.html"
+					});
+				}, request.delay)
+			} else if(request.newTab == "false" || request.newTab === false) {
+				chrome.tabs.query({active:true}, function (tab) {
+					setTimeout(function(){
+						chrome.tabs.update(tab.id, {url:"/startpage/startpage.html"});
+					}, request.delay)
+				});
+			}
+		} else if(request.navigate != undefined){
+			if(request.newTab == "true" || request.newTab === true){
+				setTimeout(function(){
+					chrome.tabs.create({
+						url:request.navigate
+					});
+				}, request.delay)
+			} else if(request.newTab == "false" || request.newTab === false) {
+				chrome.tabs.query({active:true}, function (tab) {
+					setTimeout(function(){
+						chrome.tabs.update(tab.id, {url: request.navigate});
+					}, request.delay)
+				});
+			}
+		}
+	
+		if(request.action == "update_dark"){
+			chrome.storage.local.get("startpage_settings", function(a){
+				chrome.storage.local.get("startpage_profiles", function(pr){
+		
+					let profiles = pr.startpage_profiles;
+					profiles.forEach(profile => {
+						settings = profile.settings;
+						dm = settings.darkmode;
+						auto = settings.darkmode_auto;
+			
+						from = settings.darkmode_auto_time.from;
+						to = settings.darkmode_auto_time.to;
+			
+						if(auto){
+							var time = {
+								m: new Date().getMinutes(),
+								h: new Date().getHours()
+							}
+		
+							settings.darkmode = Date.parse('01/01/2011 ' + from) < Date.parse('01/01/2011 ' + to) ? (Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from) && Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to)) : (Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to) || Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from));
+							
+						}
+						profile.settings = settings;
+					});
+					chrome.storage.local.set({startpage_profiles: profiles})
+		
+					settings = a.startpage_settings;
 					dm = settings.darkmode;
 					auto = settings.darkmode_auto;
 		
@@ -268,39 +288,129 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 							m: new Date().getMinutes(),
 							h: new Date().getHours()
 						}
-	
+		
 						settings.darkmode = Date.parse('01/01/2011 ' + from) < Date.parse('01/01/2011 ' + to) ? (Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from) && Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to)) : (Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to) || Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from));
-						
+						chrome.storage.local.set({startpage_settings: settings})
 					}
-					profile.settings = settings;
-				});
-				chrome.storage.local.set({startpage_profiles: profiles})
-	
-				settings = a.startpage_settings;
-				dm = settings.darkmode;
-				auto = settings.darkmode_auto;
-	
-				from = settings.darkmode_auto_time.from;
-				to = settings.darkmode_auto_time.to;
-	
-				if(auto){
-					var time = {
-						m: new Date().getMinutes(),
-						h: new Date().getHours()
-					}
-	
-					settings.darkmode = Date.parse('01/01/2011 ' + from) < Date.parse('01/01/2011 ' + to) ? (Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from) && Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to)) : (Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to) || Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from));
-					chrome.storage.local.set({startpage_settings: settings})
-				}
-				
-				sendResponse({updated: true})
+					
+					sendResponse({updated: true})
+				})
 			})
-		})
-	} else if(request.action == "closeCurrent") {
-		chrome.tabs.getSelected(function(tab) {
-			chrome.tabs.remove(tab.id, function() {});
-		});
-	}
+		} else if(request.action == "closeCurrent") {
+			chrome.tabs.query({active:true}, function(tab) {
+				chrome.tabs.remove(tab.id, function() {});
+			});
+		}
+	
+		return true;
+	});
 
-	return true;
-});
+} else { // Firefox
+
+	browser.tabs.onCreated.addListener(function(tab){
+
+		for (var i = 0; i < redir.length; i++) {
+			if(tab.url === redir[i])
+				break;
+			if(i == redir.length - 1)
+				return;
+		};
+	
+		browser.tabs.create({
+			url:"/startpage/startpage.html"
+		});
+		browser.tabs.remove(tab.id);
+		
+	});
+	
+	// BLOB
+	
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+		if(typeof(request.delay) != "number" || request.delay == undefined){
+			request.delay = 0;
+		}
+		if (request.navigate == "home"){
+			if(request.newTab == "true" || request.newTab === true){
+				setTimeout(function(){
+					browser.tabs.create({
+						url:"/startpage/startpage.html"
+					});
+				}, request.delay)
+			} else if(request.newTab == "false" || request.newTab === false) {
+				browser.tabs.query({active:true}, function (tab) {
+					setTimeout(function(){
+						browser.tabs.update(tab.id, {url:"/startpage/startpage.html"});
+					}, request.delay)
+				});
+			}
+		} else if(request.navigate != undefined){
+			if(request.newTab == "true" || request.newTab === true){
+				setTimeout(function(){
+					browser.tabs.create({
+						url:request.navigate
+					});
+				}, request.delay)
+			} else if(request.newTab == "false" || request.newTab === false) {
+				browser.tabs.query({active:true}, function (tab) {
+					setTimeout(function(){
+						browser.tabs.update(tab.id, {url: request.navigate});
+					}, request.delay)
+				});
+			}
+		}
+	
+		if(request.action == "update_dark"){
+			chrome.storage.local.get("startpage_settings", function(a){
+				chrome.storage.local.get("startpage_profiles", function(pr){
+		
+					let profiles = pr.startpage_profiles;
+					profiles.forEach(profile => {
+						settings = profile.settings;
+						dm = settings.darkmode;
+						auto = settings.darkmode_auto;
+			
+						from = settings.darkmode_auto_time.from;
+						to = settings.darkmode_auto_time.to;
+			
+						if(auto){
+							var time = {
+								m: new Date().getMinutes(),
+								h: new Date().getHours()
+							}
+		
+							settings.darkmode = Date.parse('01/01/2011 ' + from) < Date.parse('01/01/2011 ' + to) ? (Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from) && Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to)) : (Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to) || Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from));
+							
+						}
+						profile.settings = settings;
+					});
+					chrome.storage.local.set({startpage_profiles: profiles})
+		
+					settings = a.startpage_settings;
+					dm = settings.darkmode;
+					auto = settings.darkmode_auto;
+		
+					from = settings.darkmode_auto_time.from;
+					to = settings.darkmode_auto_time.to;
+		
+					if(auto){
+						var time = {
+							m: new Date().getMinutes(),
+							h: new Date().getHours()
+						}
+		
+						settings.darkmode = Date.parse('01/01/2011 ' + from) < Date.parse('01/01/2011 ' + to) ? (Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from) && Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to)) : (Date.parse('01/01/2011 ' + time.h + ":" + time.m) <= Date.parse('01/01/2011 ' + to) || Date.parse('01/01/2011 ' + time.h + ":" + time.m) >= Date.parse('01/01/2011 ' + from));
+						chrome.storage.local.set({startpage_settings: settings})
+					}
+					
+					sendResponse({updated: true})
+				})
+			})
+		} else if(request.action == "closeCurrent") {
+			browser.tabs.query({active:true}, function(tab) {
+				browser.tabs.remove(tab.id, function() {});
+			});
+		}
+	
+		return true;
+	});
+}

@@ -757,10 +757,6 @@ function leave(h, url){
         $(".triangle-colored").css("border-bottom-color", mains[h].cover)
         $(".triangle-colored").addClass("triangle-colored-exit");
         $(".triangle-white").addClass("triangle-white-exit");
-        // setTimeout(function(){
-            
-            
-        // }, 400)
     }, 350)
 
 }

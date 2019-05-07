@@ -2,8 +2,12 @@
     padding: 0px;
     margin: 0px;
     font-family: GothamRoundedLight;
-    box-sizing: border-box;
-    user-select:none;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    -webkit-user-select:none;
+       -moz-user-select:none;
+        -ms-user-select:none;
+            user-select:none;
 }
 
 @font-face {
@@ -16,6 +20,8 @@ body{
 }
 
 .smooth-bg{
+    -webkit-transition: 0.5s background-color ease;
+    -o-transition: 0.5s background-color ease;
     transition: 0.5s background-color ease;
 }
 
@@ -23,7 +29,8 @@ body{
     position: relative;
     width: 80%;
     margin: 20px auto;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
     padding: 3% 3% 2.5% 3%;
     border-radius: 3px;
     background-color: white;
@@ -56,6 +63,8 @@ h3{
 h4{
     margin: 10px 0;
     opacity: 0.3;
+    -webkit-transition: 0.1s opacity ease;
+    -o-transition: 0.1s opacity ease;
     transition: 0.1s opacity ease;
     will-change: opacity;
 }
@@ -68,17 +77,22 @@ h4:hover{
     position: fixed;
     top: 50%;
     left: 0;
+    -webkit-transition: opacity 0.1s ease;
+    -o-transition: opacity 0.1s ease;
     transition: opacity 0.1s ease;
 }
 
 .side-content{
     position: relative;
-    transform:translateY(-50%);
+    -webkit-transform:translateY(-50%);
+        -ms-transform:translateY(-50%);
+            transform:translateY(-50%);
     background-color: white;
     font-size: 16pt;
     padding: 20px 30px;
     border-radius: 3px;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 @media only screen and (max-width: 1470px){
@@ -155,6 +169,10 @@ input[type="checkbox"]{
     outline: none;
 }
 
+::-moz-selection{
+    background-color:rgb(0, 150, 255, 0.25)
+}
+
 ::selection{
     background-color:rgb(0, 150, 255, 0.25)
 }
@@ -184,6 +202,8 @@ p{
 }
 
 .button-action-active::after{
+    -webkit-transition: 0.2s ease;
+    -o-transition: 0.2s ease;
     transition: 0.2s ease;
     content: "";
     background-color: #737373;
@@ -254,7 +274,8 @@ p{
 }
 
 .blur{
-    filter:blur(3px)
+    -webkit-filter:blur(3px);
+            filter:blur(3px)
 }
 
 .manage{
@@ -272,7 +293,8 @@ p{
 }
 
 /*.manage*/ input{
-    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+       text-overflow: ellipsis;
 }
 
 .dark-dark .manage input{
@@ -375,8 +397,11 @@ th{
     height:22px;
     width:22px;
     opacity: 0.4;
+    -webkit-transition: 0.1s ease;
+    -o-transition: 0.1s ease;
     transition: 0.1s ease;
-    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
 }
 
 .bin:hover{
@@ -387,8 +412,11 @@ th{
     height:22px;
     width:22px;
     opacity: 0.25;
+    -webkit-transition: 0.1s ease;
+    -o-transition: 0.1s ease;
     transition: 0.1s ease;
-    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
 }
 
 .edit:hover{
@@ -396,11 +424,16 @@ th{
 }
 
 #path{
-    user-select: all;
+    -webkit-user-select: all;
+       -moz-user-select: all;
+        -ms-user-select: all;
+            user-select: all;
 }
 
 #popup-input{
     display:none;
+    -webkit-transition: 0.2s ease;
+    -o-transition: 0.2s ease;
     transition: 0.2s ease;
     margin:auto;
 }
@@ -427,7 +460,8 @@ tr.selected{
     background-color: white;
     border: 1px solid #cdcdcd;
     border-bottom: none;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     display:none;
@@ -488,6 +522,8 @@ tr.selected{
 .add td input{
     border:none;
     padding: 0;
+    -webkit-transition: 0.1s border ease;
+    -o-transition: 0.1s border ease;
     transition: 0.1s border ease;
     border-bottom: 1px solid rgb(220, 220, 220) !important;
 }
@@ -505,8 +541,35 @@ tr.selected{
 }
 
 
+#sidebar-websites input::-webkit-input-placeholder, #context-menu input::-webkit-input-placeholder, #search-engines input::-webkit-input-placeholder{
+    color:rgb(220, 220, 220);
+}
+
+
+#sidebar-websites input:-ms-input-placeholder, #context-menu input:-ms-input-placeholder, #search-engines input:-ms-input-placeholder{
+    color:rgb(220, 220, 220);
+}
+
+
+#sidebar-websites input::-ms-input-placeholder, #context-menu input::-ms-input-placeholder, #search-engines input::-ms-input-placeholder{
+    color:rgb(220, 220, 220);
+}
+
+
 #sidebar-websites input::placeholder, #context-menu input::placeholder, #search-engines input::placeholder{
     color:rgb(220, 220, 220);
+}
+
+.dark-dark #sidebar-websites input::-webkit-input-placeholder, .dark-dark #search-engines input::-webkit-input-placeholder, .dark-dark #context-menu input::-webkit-input-placeholder{
+    color:rgb(100, 100, 100);
+}
+
+.dark-dark #sidebar-websites input:-ms-input-placeholder, .dark-dark #search-engines input:-ms-input-placeholder, .dark-dark #context-menu input:-ms-input-placeholder{
+    color:rgb(100, 100, 100);
+}
+
+.dark-dark #sidebar-websites input::-ms-input-placeholder, .dark-dark #search-engines input::-ms-input-placeholder, .dark-dark #context-menu input::-ms-input-placeholder{
+    color:rgb(100, 100, 100);
 }
 
 .dark-dark #sidebar-websites input::placeholder, .dark-dark #search-engines input::placeholder, .dark-dark #context-menu input::placeholder{
@@ -592,6 +655,8 @@ tr.selected{
     position:absolute;
     height:22px;
     opacity: 0.3;
+    -webkit-transition: 0.1s ease;
+    -o-transition: 0.1s ease;
     transition: 0.1s ease;
 }
 
@@ -620,7 +685,9 @@ tr.selected{
     width: 26px;
     border-top: 1px solid;
     border-color: inherit;
-    transform: rotate(-30deg);
+    -webkit-transform: rotate(-30deg);
+        -ms-transform: rotate(-30deg);
+            transform: rotate(-30deg);
 }
 
 #profile-text-export{
@@ -649,7 +716,8 @@ tr.selected{
 textarea{
     resize: none;
     text-decoration: none;
-    box-shadow: rgba(0, 0, 0, 0.1) 2px 3px 9px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.1) 2px 3px 9px;
+            box-shadow: rgba(0, 0, 0, 0.1) 2px 3px 9px;
 }
 
 .location{
@@ -666,8 +734,32 @@ textarea{
     border: none;
 }
 
+.location input::-webkit-input-placeholder{
+    color:rgb(220, 220, 220);
+}
+
+.location input:-ms-input-placeholder{
+    color:rgb(220, 220, 220);
+}
+
+.location input::-ms-input-placeholder{
+    color:rgb(220, 220, 220);
+}
+
 .location input::placeholder{
     color:rgb(220, 220, 220);
+}
+
+.dark-dark .location input::-webkit-input-placeholder{
+    color:rgb(100, 100, 100);
+}
+
+.dark-dark .location input:-ms-input-placeholder{
+    color:rgb(100, 100, 100);
+}
+
+.dark-dark .location input::-ms-input-placeholder{
+    color:rgb(100, 100, 100);
 }
 
 .dark-dark .location input::placeholder{
@@ -727,6 +819,8 @@ textarea{
     left: 0;
     width: 100%;
     height: 100%;
+    -webkit-transition: 0.2s background-color ease;
+    -o-transition: 0.2s background-color ease;
     transition: 0.2s background-color ease;
     display: inline-block;
 }
@@ -815,11 +909,13 @@ textarea{
     width:100%;
     height:100%;
     border:1px solid black;
-    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 .preview-small *{
-    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 .preview-small > *{
@@ -834,20 +930,32 @@ textarea{
     opacity: 0.9;
     width: 100%;
     height: 100%;
-    transform-origin: center center;
+    -webkit-transform-origin: center center;
+        -ms-transform-origin: center center;
+            transform-origin: center center;
     margin: auto auto;
-    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -o-pixelated;
+        image-rendering: pixelated;
 }
 
 .outer{
     position: absolute;
     width:100%;
     height:100%;
-    transform-origin: center center;
+    -webkit-transform-origin: center center;
+        -ms-transform-origin: center center;
+            transform-origin: center center;
     border: 1px solid;
     background-color: rgb(170, 170, 170, 0.15);
     border-color: rgb(170, 170, 170);
+    -webkit-transition: 0.2s -webkit-transform ease;
+    transition: 0.2s -webkit-transform ease;
+    -o-transition: 0.2s transform ease;
     transition: 0.2s transform ease;
+    transition: 0.2s transform ease, 0.2s -webkit-transform ease;
     will-change: transform;
 }
 
@@ -855,11 +963,17 @@ textarea{
     position: absolute;
     width:100%;
     height:100%;
-    transform-origin: center center;
+    -webkit-transform-origin: center center;
+        -ms-transform-origin: center center;
+            transform-origin: center center;
     border: 1px solid;
     border-color: rgb(170, 170, 170);
     background-color: white;
+    -webkit-transition: 0.2s -webkit-transform ease;
+    transition: 0.2s -webkit-transform ease;
+    -o-transition: 0.2s transform ease;
     transition: 0.2s transform ease;
+    transition: 0.2s transform ease, 0.2s -webkit-transform ease;
     will-change: transform;
 }
 
@@ -882,8 +996,14 @@ textarea{
     height: 202%;
     background-color: rgb(170, 170, 170);
     top: -51%;
-    transform: translateY(0%) skewY(-30deg);
+    -webkit-transform: translateY(0%) skewY(-30deg);
+        -ms-transform: translateY(0%) skewY(-30deg);
+            transform: translateY(0%) skewY(-30deg);
+    -webkit-transition: -webkit-transform 0.15s linear;
+    transition: -webkit-transform 0.15s linear;
+    -o-transition: transform 0.15s linear;
     transition: transform 0.15s linear;
+    transition: transform 0.15s linear, -webkit-transform 0.15s linear;
 }
 
 .advanced{
@@ -901,7 +1021,11 @@ textarea{
     border-left: 5px solid rgb(44, 44, 44);
     border-top: 6px solid transparent;
     border-bottom: 6px solid transparent;
+    -webkit-transition: -webkit-transform 0.1s ease;
+    transition: -webkit-transform 0.1s ease;
+    -o-transition: transform 0.1s ease;
     transition: transform 0.1s ease;
+    transition: transform 0.1s ease, -webkit-transform 0.1s ease;
 }
 
 .dark-dark .advanced div{
@@ -909,7 +1033,9 @@ textarea{
 }
 
 .advanced-true div{
-    transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+            transform: rotate(90deg);
 }
 
 .main-color-mode-advanced::after{
@@ -923,28 +1049,40 @@ textarea{
 }
 
 .preview-small img:hover ~ .cover-container .cover{
-    transform: translateY(100%) skewY(-30deg);
+    -webkit-transform: translateY(100%) skewY(-30deg);
+        -ms-transform: translateY(100%) skewY(-30deg);
+            transform: translateY(100%) skewY(-30deg);
 }
 
 .preview-small img:hover ~ .outer{
-    transform: scale(1.07954, 1.13636);
+    -webkit-transform: scale(1.07954, 1.13636);
+        -ms-transform: scale(1.07954, 1.13636);
+            transform: scale(1.07954, 1.13636);
 }
 
 .preview-small img:hover ~ .inner{
-    transform: scale(1.0375, 1.060227);
+    -webkit-transform: scale(1.0375, 1.060227);
+        -ms-transform: scale(1.0375, 1.060227);
+            transform: scale(1.0375, 1.060227);
 }
 
 
 .main-preview-active .cover-container .cover{
-    transform: translateY(70%) skewY(-30deg) !important;
+    -webkit-transform: translateY(70%) skewY(-30deg) !important;
+        -ms-transform: translateY(70%) skewY(-30deg) !important;
+            transform: translateY(70%) skewY(-30deg) !important;
 }
 
 .main-preview-active .outer{
-    transform: scale(1.07954, 1.13636) !important;
+    -webkit-transform: scale(1.07954, 1.13636) !important;
+        -ms-transform: scale(1.07954, 1.13636) !important;
+            transform: scale(1.07954, 1.13636) !important;
 }
 
 .main-preview-active .inner{
-    transform: scale(1.0375, 1.060227) !important;
+    -webkit-transform: scale(1.0375, 1.060227) !important;
+        -ms-transform: scale(1.0375, 1.060227) !important;
+            transform: scale(1.0375, 1.060227) !important;
 }
 
 .main-small{

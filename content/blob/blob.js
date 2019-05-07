@@ -214,9 +214,27 @@ chrome.storage.local.get("startpage_settings", function(s){
 
     // handle clicks
 
-    $("#startpage-blob--container :not(#startbage-blob--container):not(#startpage-blob--dark)").contextmenu(function(ev){
+    // $(document).on("contextmenu", ".startpage-blob--container :not(#startbage-blob--container):not(#startpage-blob--dark)", function(ev){
+    //     ev.preventDefault();
+    // });
+
+    $(document).on("contextmenu", ".startpage-blob--blur :not(#startbage-blob--container):not(#startpage-blob--dark)", function(ev){
         ev.preventDefault();
     });
+    
+    $("#startpage-blob--container").on("contextmenu", function(ev){
+        ev.shiftKey = false;
+        ev.preventDefault();
+        ev.stopPropagation();
+        setTimeout(function(){blobExit(1)}, 100);
+    });
+
+    $("#startpage-blob--dark").on("contextmenu", function(ev){
+        ev.shiftKey = false;
+        ev.preventDefault();
+        ev.stopPropagation();
+        setTimeout(function(){blobExit(1)}, 100);
+    })
 
     $("#startpage-blob--container").mousedown(function(ev){
         ev.preventDefault();
@@ -232,15 +250,7 @@ chrome.storage.local.get("startpage_settings", function(s){
         }
     })
 
-    $("#startpage-blob--container").contextmenu(function(ev){
-        ev.preventDefault();
-        setTimeout(function(){blobExit(1)}, 50);
-    });
 
-    $("#startpage-blob--dark").contextmenu(function(ev){
-        ev.preventDefault();
-        setTimeout(function(){blobExit(1)}, 50);
-    })
 
     //
 

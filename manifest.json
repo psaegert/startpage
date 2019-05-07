@@ -1,9 +1,11 @@
 {
    "manifest_version": 2,
    "name": "Startpage",
-   "version": "2.3.1",
-   "options_page": "/settings/settings.html",
-   "permissions": [ "tabs", "storage", "file://*/*"],
+   "version": "3.4.2",
+   "options_ui": {
+      "page": "/settings/settings.html"
+   },
+   "permissions": ["tabs", "storage", "file://*/*", "unlimitedStorage"],
    "background": {
       "scripts": ["/background/background.js" ]
    },
